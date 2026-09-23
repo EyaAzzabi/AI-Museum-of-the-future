@@ -1,3 +1,4 @@
 python-dotenv
 supabase
 requests
+psycopg2-binary

@@ -58,4 +58,5 @@ Week 1 (use case, scope, roles, tool choice, first architecture draft) is comple
 2. `cp .env.example .env` and fill in your own values — **never commit `.env`**.
 3. Data source keys: start with the keyless sources first (GDELT, Wikimedia Commons, arXiv, World Bank, Wikipedia/Wikidata) — no signup needed. Only add `NEWSAPI_KEY` / `UNSPLASH_ACCESS_KEY` / `NASA_API_KEY` if you need those specific sources.
 4. Vector store: create a free [Supabase](https://supabase.com) project, put its URL/keys in `.env`, then run [`rag/schema.sql`](rag/schema.sql) against it (Dashboard > SQL Editor > New query, or `psql "$SUPABASE_DB_URL" -f rag/schema.sql`) — it enables `pgvector` and creates the `documents`/`chunks` tables plus a `match_chunks` retrieval function. Supabase has a native n8n node, so it also plugs directly into the orchestration layer.
+   - For `SUPABASE_DB_URL`, use the **Transaction pooler** connection string (Settings > Database > Connection string, port 6543) — the direct `db.<ref>.supabase.co` host is IPv6-only and won't resolve on most networks/CI runners.
 5. Scripts load config via `scripts/config.py` (reads `.env` through `python-dotenv`).
