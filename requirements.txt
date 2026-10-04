@@ -1,4 +1,16 @@
-python-dotenv
-supabase
-requests
-psycopg2-binary
+# ── Core ──────────────────────────────────────────────────────────────────────
+python-dotenv==1.0.1
+requests==2.32.3
+
+# ── Database ──────────────────────────────────────────────────────────────────
+supabase==2.10.0
+psycopg2-binary==2.9.10
+
+# ── Data collection ───────────────────────────────────────────────────────────
+pytrends==4.9.2          # Google Trends (unofficial wrapper)
+
+# ── LLM / Embeddings (for RAG — week 2+) ─────────────────────────────────────
+openai==1.51.0
+
+# ── Data processing (for preprocessing — week 2+) ────────────────────────────
+pandas==2.2.3
