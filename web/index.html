@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Museum of the Future — Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <nav class="sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-icon">🏛</span>
+        <span class="logo-text">AI Museum</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#overview"   class="nav-item active" data-section="overview">   <span class="nav-icon">📊</span> Vue d'ensemble</a></li>
+        <li><a href="#pipeline"   class="nav-item"        data-section="pipeline">   <span class="nav-icon">🔄</span> Pipeline S5</a></li>
+        <li><a href="#corpus"     class="nav-item"        data-section="corpus">     <span class="nav-icon">📚</span> Corpus</a></li>
+        <li><a href="#data"      class="nav-item"        data-section="data">      <span class="nav-icon">🗂️</span> Données</a></li>
+        <li><a href="#agents"     class="nav-item"        data-section="agents">     <span class="nav-icon">🤖</span> Agents</a></li>
+        <li><a href="#prompts"    class="nav-item"        data-section="prompts">    <span class="nav-icon">💬</span> Prompts</a></li>
+        <li><a href="#tests"      class="nav-item"        data-section="tests">      <span class="nav-icon">✅</span> Tests</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <span class="badge-week">Week 2 · Session 5</span>
+      </div>
+    </nav>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="main">
+
+      <!-- Top bar -->
+      <header class="topbar">
+        <h1 id="page-title">Vue d'ensemble</h1>
+        <div class="topbar-actions">
+          <button id="btnValidate" class="btn btn-primary">
+            <span class="btn-icon">▶</span> Lancer la validation S5
+          </button>
+        </div>
+      </header>
+
+      <!-- ── SECTION: Overview ──────────────────────────────────── -->
+      <section id="section-overview" class="section active">
+
+        <!-- Status banner -->
+        <div id="statusBanner" class="status-banner status-idle">
+          <span class="status-icon">⏳</span>
+          <span id="statusText">Cliquez sur "Lancer la validation S5" pour démarrer</span>
+        </div>
+
+        <!-- KPI cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card" id="kpi-corpus">
+            <div class="kpi-icon">📂</div>
+            <div class="kpi-value" id="kpi-corpus-val">—</div>
+            <div class="kpi-label">Fichiers corpus</div>
+          </div>
+          <div class="kpi-card" id="kpi-chunks">
+            <div class="kpi-icon">✂️</div>
+            <div class="kpi-value" id="kpi-chunks-val">—</div>
+            <div class="kpi-label">Chunks générés</div>
+          </div>
+          <div class="kpi-card" id="kpi-agents">
+            <div class="kpi-icon">🤖</div>
+            <div class="kpi-value" id="kpi-agents-val">—</div>
+            <div class="kpi-label">Cross-références</div>
+          </div>
+          <div class="kpi-card" id="kpi-prompts">
+            <div class="kpi-icon">💬</div>
+            <div class="kpi-value" id="kpi-prompts-val">—</div>
+            <div class="kpi-label">Prompts V1</div>
+          </div>
+        </div>
+
+        <!-- Pipeline progress -->
+        <div class="card">
+          <h2 class="card-title">Progression du pipeline</h2>
+          <div id="pipelineSteps" class="pipeline-steps">
+            <div class="pipeline-step idle" data-step="0">
+              <div class="step-dot"></div>
+              <div class="step-info">
+                <div class="step-name">Corpus collecté</div>
+                <div class="step-detail">—</div>
+              </div>
+            </div>
+            <div class="pipeline-step idle" data-step="1">
+              <div class="step-dot"></div>
+              <div class="step-info">
+                <div class="step-name">Chunking strategy</div>
+                <div class="step-detail">—</div>
+              </div>
+            </div>
+            <div class="pipeline-step idle" data-step="2">
+              <div class="step-dot"></div>
+              <div class="step-info">
+                <div class="step-name">Retrieval tests</div>
+                <div class="step-detail">—</div>
+              </div>
+            </div>
+            <div class="pipeline-step idle" data-step="3">
+              <div class="step-dot"></div>
+              <div class="step-info">
+                <div class="step-name">Agents & Communication</div>
+                <div class="step-detail">—</div>
+              </div>
+            </div>
+            <div class="pipeline-step idle" data-step="4">
+              <div class="step-dot"></div>
+              <div class="step-info">
+                <div class="step-name">Prompts V1</div>
+                <div class="step-detail">—</div>
+              </div>
+            </div>
+            <div class="pipeline-step idle" data-step="5">
+              <div class="step-dot"></div>
+              <div class="step-info">
+                <div class="step-name">Composant multimodal</div>
+                <div class="step-detail">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ── SECTION: Pipeline S5 ───────────────────────────────── -->
+      <section id="section-pipeline" class="section">
+        <div class="card">
+          <h2 class="card-title">Validation S5 — Résultats détaillés</h2>
+          <p class="card-subtitle">6 livrables Week 2 évalués automatiquement</p>
+          <div id="pipelineResults" class="results-list">
+            <p class="empty-state">Lancez la validation pour voir les résultats.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Architecture du pipeline</h2>
+          <div class="arch-diagram">
+            <div class="arch-row">
+              <div class="arch-box source">GDELT</div>
+              <div class="arch-box source">Wikimedia</div>
+              <div class="arch-box source">arXiv</div>
+              <div class="arch-box source">Wikipedia</div>
+            </div>
+            <div class="arch-arrow">↓ data/process_raw.py</div>
+            <div class="arch-row">
+              <div class="arch-box store">data/processed/*.json<br><small>Processed Records</small></div>
+            </div>
+            <div class="arch-arrow">↓ rag/chunking/ + embeddings</div>
+            <div class="arch-row">
+              <div class="arch-box store">Supabase / pgvector<br><small>documents + chunks tables</small></div>
+            </div>
+            <div class="arch-arrow">↓ Retriever.retrieve(query)</div>
+            <div class="arch-row">
+              <div class="arch-box agent">Historian</div>
+              <div class="arch-box agent">Sociologist</div>
+              <div class="arch-box agent">Technology</div>
+              <div class="arch-box agent">Culture &amp; Art</div>
+              <div class="arch-box agent">Visual</div>
+            </div>
+            <div class="arch-arrow">↓ SharedContext + cross_references</div>
+            <div class="arch-row">
+              <div class="arch-box curator">CuratorAgent → ExhibitionSynthesis</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: Corpus ────────────────────────────────────── -->
+      <section id="section-corpus" class="section">
+        <div class="card">
+          <h2 class="card-title">Corpus collecté</h2>
+          <p class="card-subtitle">Fichiers normalisés dans <code>data/processed/</code></p>
+          <div id="corpusFiles" class="corpus-grid">
+            <p class="empty-state">Lancez la validation pour inspecter le corpus.</p>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Schéma Processed_Record</h2>
+          <pre class="code-block">{
+  "id":           str,   // identifiant unique
+  "source":       str,   // gdelt | wikimedia | arxiv | wikipedia | wikidata
+  "category":     str,   // news | image | science | culture | history
+  "title":        str,
+  "text":         str,
+  "url":          str,
+  "image_url":    str | null,
+  "date":         str | null,
+  "lang":         str | null,
+  "tags":         list[str],
+  "raw_source":   str,
+  "processed_on": str
+}</pre>
+        </div>
+      </section>
+
+      <!-- ── SECTION: Données ──────────────────────────────────── -->
+      <section id="section-data" class="section">
+        <div class="card">
+          <h2 class="card-title">Données du corpus</h2>
+          <p class="card-subtitle">Enregistrements normalisés depuis <code>data/processed/</code></p>
+
+          <!-- Toolbar -->
+          <div class="data-toolbar">
+            <input type="text" id="dataSearch" class="data-search" placeholder="🔍  Rechercher titre, texte, source…" />
+            <select id="dataFilterSource" class="data-filter">
+              <option value="">Toutes les sources</option>
+              <option value="arxiv">arXiv</option>
+              <option value="wikimedia">Wikimedia</option>
+              <option value="gdelt">GDELT</option>
+              <option value="wikipedia">Wikipedia</option>
+              <option value="wikidata">Wikidata</option>
+            </select>
+            <select id="dataFilterCategory" class="data-filter">
+              <option value="">Toutes les catégories</option>
+              <option value="science">Science</option>
+              <option value="news">News</option>
+              <option value="image">Image</option>
+              <option value="culture">Culture</option>
+              <option value="history">Histoire</option>
+            </select>
+            <span id="dataCount" class="data-count">— enregistrements</span>
+          </div>
+
+          <!-- Table -->
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th>Catégorie</th>
+                  <th>Titre</th>
+                  <th>Date</th>
+                  <th>Tags</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="dataTableBody">
+                <tr><td colspan="6" class="empty-state">Lancez la validation pour charger les données.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="data-pagination">
+            <button id="dataPrev" class="btn-page" disabled>← Précédent</button>
+            <span id="dataPage">Page 1 / 1</span>
+            <button id="dataNext" class="btn-page" disabled>Suivant →</button>
+          </div>
+        </div>
+
+        <!-- Detail modal -->
+        <div id="dataModal" class="modal hidden">
+          <div class="modal-backdrop" id="modalBackdrop"></div>
+          <div class="modal-box">
+            <div class="modal-header">
+              <h3 id="modalTitle">Détail</h3>
+              <button id="modalClose" class="modal-close">✕</button>
+            </div>
+            <div id="modalBody" class="modal-body"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: Agents ────────────────────────────────────── -->
+      <section id="section-agents" class="section">
+        <div class="agents-grid">
+          <div class="agent-card">
+            <div class="agent-icon">📜</div>
+            <h3>Historian</h3>
+            <p>Interprète le contexte à travers les événements clés, la signification historique et l'impact à long terme.</p>
+            <code class="agent-file">agents/historian.py</code>
+          </div>
+          <div class="agent-card">
+            <div class="agent-icon">👥</div>
+            <h3>Sociologist</h3>
+            <p>Analyse les tendances sociales, les changements de mode de vie et le comportement humain.</p>
+            <code class="agent-file">agents/sociologist.py</code>
+          </div>
+          <div class="agent-card">
+            <div class="agent-icon">⚙️</div>
+            <h3>Technology</h3>
+            <p>Identifie les innovations, percées technologiques et leur potentiel futur.</p>
+            <code class="agent-file">agents/technology.py</code>
+          </div>
+          <div class="agent-card">
+            <div class="agent-icon">🎨</div>
+            <h3>Culture &amp; Art</h3>
+            <p>Explore les mouvements culturels, les arts, les médias et les éléments symboliques.</p>
+            <code class="agent-file">agents/culture_art.py</code>
+          </div>
+          <div class="agent-card">
+            <div class="agent-icon">🖼️</div>
+            <h3>Visual</h3>
+            <p>Analyse d'image, curation visuelle, ambiance et esthétique de l'ère.</p>
+            <code class="agent-file">agents/visual.py</code>
+          </div>
+          <div class="agent-card curator-card">
+            <div class="agent-icon">🏛️</div>
+            <h3>Curator</h3>
+            <p>Synthèse finale — reçoit tous les insights, sélectionne les éléments pertinents et structure l'exposition.</p>
+            <code class="agent-file">agents/curator.py</code>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Flux de communication</h2>
+          <div id="agentComm" class="comm-flow">
+            <div class="comm-step">
+              <span class="comm-label">Chunks (RAG)</span>
+              <span class="comm-arrow">→</span>
+              <span class="comm-label">5 specialist agents (parallel)</span>
+              <span class="comm-arrow">→</span>
+              <span class="comm-label">SharedContext</span>
+              <span class="comm-arrow">→</span>
+              <span class="comm-label">CuratorAgent</span>
+              <span class="comm-arrow">→</span>
+              <span class="comm-label">ExhibitionSynthesis</span>
+            </div>
+            <div id="crossRefs" class="cross-refs-box">
+              <strong>Cross-références :</strong>
+              <span id="crossRefsVal">—</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: Prompts ───────────────────────────────────── -->
+      <section id="section-prompts" class="section">
+        <div class="card">
+          <h2 class="card-title">Bibliothèque de prompts V1</h2>
+          <p class="card-subtitle">Un fichier versionné par agent + system prompt partagé</p>
+          <div id="promptsList" class="prompts-grid">
+            <!-- filled by JS -->
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="card-title">Structure d'un prompt</h2>
+          <pre class="code-block">## v1 — YYYY-MM-DD
+Changelog en une phrase.
+
+---
+&lt;!-- TEMPLATE ACTIF --&gt;
+
+{system}
+
+Agent: {agent}
+
+Evidence:
+{chunks}
+
+Retournez uniquement du JSON conforme au schéma InsightObject.</pre>
+        </div>
+      </section>
+
+      <!-- ── SECTION: Tests ─────────────────────────────────────── -->
+      <section id="section-tests" class="section">
+        <div class="card">
+          <h2 class="card-title">Suite de tests</h2>
+          <p class="card-subtitle">247 tests · Property-based (Hypothesis) + Unit (pytest)</p>
+
+          <div class="test-categories">
+            <div class="test-cat">
+              <div class="test-cat-title">📊 data/</div>
+              <ul class="test-list">
+                <li>Property 1 — Processed_Record schema completeness</li>
+                <li>Property 2 — Normalizer deduplication</li>
+                <li>Unit — gdelt, wikimedia, arxiv, wikipedia, wikidata normalizers</li>
+                <li>Unit — ingest_processed IngestionReport</li>
+              </ul>
+            </div>
+            <div class="test-cat">
+              <div class="test-cat-title">🔍 rag/</div>
+              <ul class="test-list">
+                <li>Property 3 — Fixed-size overlap invariant</li>
+                <li>Property 4 — Chunker non-empty output</li>
+                <li>Property 5 — Chunk metadata inheritance</li>
+                <li>Property 6 — Retriever score range & ordering</li>
+                <li>Property 7 — Retriever filter correctness</li>
+                <li>Property 8 — Reranker count preservation</li>
+                <li>Unit — chunker, embedder, store, retriever</li>
+              </ul>
+            </div>
+            <div class="test-cat">
+              <div class="test-cat-title">🤖 agents/</div>
+              <ul class="test-list">
+                <li>Property 9 — Specialist agent output structure &amp; grounding</li>
+                <li>Property 10 — SharedContext cross-references correctness</li>
+                <li>Property 11 — Curator synthesis structure</li>
+                <li>Unit — 5 specialist agents, curator, pipeline resilience</li>
+              </ul>
+            </div>
+            <div class="test-cat">
+              <div class="test-cat-title">🖼️ multimodal/</div>
+              <ul class="test-list">
+                <li>Property 12 — VisualDescription structure completeness</li>
+                <li>Property 13 — Vision graceful degradation</li>
+                <li>Unit — 5 Wikimedia URLs, timing, error handling</li>
+              </ul>
+            </div>
+            <div class="test-cat">
+              <div class="test-cat-title">💬 prompts/</div>
+              <ul class="test-list">
+                <li>Unit — evaluate_all, EvalRecord schema, FAIL logging</li>
+                <li>3 chunk fixtures × 6 agents</li>
+              </ul>
+            </div>
+            <div class="test-cat">
+              <div class="test-cat-title">🔗 e2e/</div>
+              <ul class="test-list">
+                <li>Ingest 5-record fixture corpus</li>
+                <li>Retriever.retrieve → similarity ≥ 0.70</li>
+                <li>run_pipeline → ExhibitionSynthesis &lt; 120s</li>
+                <li>analyze_image → VisualDescription</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="test-run-box">
+            <code class="code-inline">pytest tests/ --tb=short -q</code>
+            <span class="test-result-badge">247 passed ✓</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}?v=4"></script>
+  </body>
+</html>

@@ -22,6 +22,12 @@ rag/vector_store/*
 Thumbs.db
 .vscode/
 .idea/
+.kiro/
+
+# Tests & caches
+.pytest_cache/
+.hypothesis/
 
 # Jupyter
 .ipynb_checkpoints/
+
