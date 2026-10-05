@@ -32,7 +32,15 @@ def upsert_document(supabase_client, record: dict) -> str:
     if record.get("date"):
         row["published_at"] = record["date"]
 
-    response = supabase_client.table("documents").upsert(row).execute()
+    # Without on_conflict, PostgREST's upsert only dedupes on the primary key
+    # (id) — since we never pass one, every call would just INSERT a fresh
+    # row even for a record we've already ingested. source_id is the actual
+    # natural key (see rag/schema.sql's documents_source_source_id_idx).
+    response = (
+        supabase_client.table("documents")
+        .upsert(row, on_conflict="source,source_id")
+        .execute()
+    )
     data = response.data
     return data[0].get("id", "") if data else ""
 

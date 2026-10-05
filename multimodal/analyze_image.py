@@ -71,22 +71,39 @@ def analyze_image(source: str, openai_client: Any = None) -> VisualDescription:
             return default_result
 
         label_text = content.strip()
+
+        def _extract_after(text: str, marker: str) -> str:
+            """Return text after the first case-insensitive occurrence of `marker`, or ''."""
+            lower = text.lower()
+            idx = lower.find(marker)
+            if idx == -1:
+                return ""
+            return text[idx + len(marker):]
+
+        # The model doesn't reliably use a flat "label: value" format (it often
+        # replies with Markdown headers like "### Objects" instead) — these
+        # extractions are best-effort and must never raise, since losing a
+        # perfectly good description to a parsing hiccup is worse than a
+        # slightly rougher objects/tags/scene split.
         objects = []
-        if "objects" in label_text.lower():
-            objects = [part.strip() for part in label_text.split("objects:", 1)[1].split(";") if part.strip()][:10]
+        after_objects = _extract_after(label_text, "objects")
+        if after_objects:
+            after_objects = after_objects.lstrip(":#* \n")
+            objects = [p.strip(" -*\n") for p in after_objects.split("\n\n")[0].replace(";", "\n").split("\n") if p.strip(" -*\n")][:10]
+
         tags = []
-        if "tags" in label_text.lower():
-            _, after = label_text.lower().split("tags:", 1) if "tags:" in label_text.lower() else (None, "")
-            tags = [part.strip() for part in after.replace("\n", " ").split(",") if part.strip()][:10]
+        after_tags = _extract_after(label_text, "tags")
+        if after_tags:
+            after_tags = after_tags.lstrip(":#* \n")
+            tags = [p.strip(" -*\n") for p in after_tags.replace("\n", ",").split(",") if p.strip(" -*\n")][:10]
 
-        description = label_text
         scene = ""
-        if "scene" in label_text.lower():
-            scene = label_text.split("scene:", 1)[1].split("\n")[0].strip() if "scene:" in label_text.lower() else ""
+        after_scene = _extract_after(label_text, "scene")
+        if after_scene:
+            after_scene = after_scene.lstrip(":#* \n")
+            scene = after_scene.split("\n\n")[0].split("\n")[0].strip(" -*")
 
-        description = description or "Image unavailable."
-        if description == "":
-            description = "Image unavailable."
+        description = label_text or "Image unavailable."
 
         embedding = None
         try:
