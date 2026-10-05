@@ -100,5 +100,12 @@ def upsert_chunks(
         for chunk, vector in chunk_embeddings
     ]
 
-    response = supabase_client.table("chunks").upsert(rows).execute()
+    # Matches chunks_doc_chunk_idx (see rag/schema.sql) — without this,
+    # re-ingesting a document already in the table hits that unique
+    # constraint as a hard error instead of updating the existing rows.
+    response = (
+        supabase_client.table("chunks")
+        .upsert(rows, on_conflict="document_id,chunk_index")
+        .execute()
+    )
     return len(response.data) if response.data else 0
