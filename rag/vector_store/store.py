@@ -5,7 +5,35 @@ Task 4.3 — Requirements: 2.5, 2.6
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from rag.chunking.chunker import Chunk
+
+
+def _parse_published_at(value) -> str | None:
+    """Return an ISO datetime string if `value` parses as one, else None.
+
+    Source records aren't consistent here — e.g. some Wikidata records carry
+    a bare year like "2013" instead of a full date, which Postgres's
+    `timestamptz` column rejects outright (not silently truncates). Rather
+    than crash the whole ingestion run on one malformed record, skip
+    `published_at` for anything that doesn't parse and keep the raw value in
+    metadata instead.
+    """
+    if not value:
+        return None
+    text = str(value).strip()
+    for fmt in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d", "%Y-%m", "%Y"):
+        try:
+            dt = datetime.strptime(text, fmt)
+        except ValueError:
+            continue
+        if fmt == "%Y":
+            dt = dt.replace(month=1, day=1)
+        elif fmt == "%Y-%m":
+            dt = dt.replace(day=1)
+        return dt.isoformat()
+    return None
 
 
 def upsert_document(supabase_client, record: dict) -> str:
@@ -14,6 +42,7 @@ def upsert_document(supabase_client, record: dict) -> str:
     Returns the row's UUID (`documents.id`), or `""` if the response carried
     no data.
     """
+    raw_date = record.get("date")
     row = {
         "source_id": record.get("id", ""),
         "source": record.get("source", ""),
@@ -27,10 +56,12 @@ def upsert_document(supabase_client, record: dict) -> str:
             "tags": record.get("tags", []),
             "raw_source": record.get("raw_source"),
             "processed_on": record.get("processed_on"),
+            "date_raw": raw_date,
         },
     }
-    if record.get("date"):
-        row["published_at"] = record["date"]
+    published_at = _parse_published_at(raw_date)
+    if published_at:
+        row["published_at"] = published_at
 
     # Without on_conflict, PostgREST's upsert only dedupes on the primary key
     # (id) — since we never pass one, every call would just INSERT a fresh
