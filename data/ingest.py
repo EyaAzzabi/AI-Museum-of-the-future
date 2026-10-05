@@ -21,10 +21,28 @@ They will be replaced by real implementations in rag/vector_store/store.py (Task
 from __future__ import annotations
 
 import json
+import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, TypeVar
+
+T = TypeVar("T")
+
+
+def _retry(fn: Callable[[], T], attempts: int = 3, backoff_s: float = 2.0) -> T:
+    """Retry a network call a few times before giving up — Supabase calls over a
+    few thousand records will hit the occasional transient timeout/connection
+    reset, and that shouldn't kill the whole ingestion run."""
+    last_exc: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            return fn()
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            if attempt < attempts:
+                time.sleep(backoff_s * attempt)
+    raise last_exc  # type: ignore[misc]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -134,8 +152,20 @@ def ingest_processed(
             if not isinstance(record, dict):
                 continue
 
-            # Upsert document (stub returns a fake UUID)
-            doc_uuid = upsert_document(supabase_client, record)
+            # upsert_document/upsert_chunks hit the network (Supabase) —
+            # transient failures (timeouts, connection resets) are expected
+            # over a few thousand calls and must not kill the whole batch.
+            try:
+                doc_uuid = _retry(lambda: upsert_document(supabase_client, record))
+            except Exception as exc:  # noqa: BLE001
+                print(
+                    f"  [ingest][error] upsert_document failed for record "
+                    f"'{record.get('id', '?')}' after retries: {exc} — skipping record"
+                )
+                report.documents_processed += 1
+                report.skipped_chunks += 0  # record itself never got chunked/embedded
+                continue
+
             report.documents_processed += 1
 
             # Chunk the record
@@ -165,7 +195,15 @@ def ingest_processed(
             else:
                 chunk_embeddings = chunks
 
-            stored = upsert_chunks(supabase_client, chunk_embeddings, doc_uuid)
+            try:
+                stored = _retry(lambda: upsert_chunks(supabase_client, chunk_embeddings, doc_uuid))
+            except Exception as exc:  # noqa: BLE001
+                print(
+                    f"  [ingest][error] upsert_chunks failed for record "
+                    f"'{record.get('id', '?')}' after retries: {exc} — chunks not stored"
+                )
+                report.skipped_chunks += len(chunk_embeddings)
+                continue
             report.total_chunks_stored += stored
 
     # ── Human-readable summary ────────────────────────────────────────────────
