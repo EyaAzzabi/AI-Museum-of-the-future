@@ -65,6 +65,13 @@ except ImportError:
         """Stub: returns the count of items provided."""
         return len(chunk_embeddings)
 
+try:
+    from rag.vector_store.embedder import embed_chunks  # type: ignore[import]
+except ImportError:
+    def embed_chunks(chunks: list[Any], openai_client: Any, **kwargs: Any) -> list[Any]:  # type: ignore[misc]
+        """Stub: pretends every chunk embedded with an empty vector."""
+        return [(c, []) for c in chunks]
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Main ingestion function
@@ -74,10 +81,11 @@ def ingest_processed(
     processed_dir: Path,
     chunker: Any,
     supabase_client: Any,
+    openai_client: Any = None,
 ) -> IngestionReport:
     """
-    Read all ``*.json`` files in *processed_dir*, chunk each record, and
-    upsert the results into the vector store (via stub helpers in this task).
+    Read all ``*.json`` files in *processed_dir*, chunk each record, embed
+    the chunks, and upsert the results into the vector store.
 
     Parameters
     ----------
@@ -91,6 +99,12 @@ def ingest_processed(
     supabase_client:
         A Supabase client instance (from the ``supabase`` library) or ``None``
         when running with stub helpers.
+    openai_client:
+        An OpenAI client used to embed each chunk's content before storage.
+        When omitted, chunks are passed straight to ``upsert_chunks`` as-is
+        (only correct when ``upsert_chunks`` is itself stubbed/mocked, as in
+        this module's own unit tests — the real store layer expects
+        ``(Chunk, vector)`` pairs).
 
     Returns
     -------
@@ -143,11 +157,16 @@ def ingest_processed(
                     report.chunks_by_strategy.get(strategy, 0) + 1
                 )
 
-            # Upsert chunks (stub returns len(chunk_embeddings))
-            # At this stage we pass chunks directly (no embeddings yet).
-            stored = upsert_chunks(supabase_client, chunks, doc_uuid)
+            # Embed before storing — the real upsert_chunks expects
+            # (Chunk, vector) pairs, not bare Chunks.
+            if openai_client is not None:
+                chunk_embeddings = embed_chunks(chunks, openai_client)
+                report.skipped_chunks += len(chunks) - len(chunk_embeddings)
+            else:
+                chunk_embeddings = chunks
+
+            stored = upsert_chunks(supabase_client, chunk_embeddings, doc_uuid)
             report.total_chunks_stored += stored
-            # skipped_chunks stays 0 — stubs never fail
 
     # ── Human-readable summary ────────────────────────────────────────────────
     print()

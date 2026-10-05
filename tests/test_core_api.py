@@ -45,7 +45,24 @@ class DummySupabase:
                 {"chunk_id": "y", "document_id": "doc-2", "content": "More text", "metadata": {"category": "science"}, "similarity": 0.62},
             ]
 
-        return Response()
+        class Call:
+            def execute(self):
+                return Response()
+
+        return Call()
+
+    def table(self, name):
+        class CountResponse:
+            count = 200
+
+        class Query:
+            def select(self, *args, **kwargs):
+                return self
+
+            def execute(self):
+                return CountResponse()
+
+        return Query()
 
 
 def test_cross_references_are_detected():

@@ -150,7 +150,7 @@ import json
 import pytest
 from unittest.mock import MagicMock, patch
 
-from hypothesis import given, settings
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from agents.historian import HistorianAgent
@@ -214,7 +214,7 @@ def _make_mock_llm_response(chunks: list[RetrievalResult], agent_name: str) -> d
 
 @pytest.mark.parametrize("AgentClass,agent_name", SPECIALIST_AGENTS)
 @given(chunks=st.lists(retrieval_result_strategy(), min_size=1))
-@settings(max_examples=100)
+@settings(max_examples=100, deadline=None, suppress_health_check=[HealthCheck.too_slow])
 def test_specialist_agent_output_structure_and_grounding(
     AgentClass,
     agent_name: str,

@@ -52,13 +52,14 @@ def _run_ingestion() -> None:
         return
 
     # ── Supabase client guard ─────────────────────────────────────────────────
+    # Service-role key, not anon — this writes server-side and should bypass RLS.
     try:
-        from scripts.config import SUPABASE_URL, SUPABASE_ANON_KEY  # type: ignore[import]
-        if not SUPABASE_URL:
-            print("  [ingest] SUPABASE_URL not configured — skipping ingestion.")
+        from scripts.config import SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY  # type: ignore[import]
+        if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+            print("  [ingest] SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY not configured — skipping ingestion.")
             return
         from supabase import create_client  # type: ignore[import]
-        supabase_client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY or "")
+        supabase_client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
     except ImportError:
         print("  [ingest] supabase library not available — skipping ingestion.")
         return
@@ -66,7 +67,23 @@ def _run_ingestion() -> None:
         print(f"  [ingest] Could not create Supabase client: {exc} — skipping ingestion.")
         return
 
-    ingest_processed(PROCESSED_DIR, chunker, supabase_client)
+    # ── OpenAI client guard ───────────────────────────────────────────────────
+    # Without this, chunks would be stored unembedded — retrieval needs real vectors.
+    try:
+        from scripts.config import OPENAI_API_KEY  # type: ignore[import]
+        if not OPENAI_API_KEY:
+            print("  [ingest] OPENAI_API_KEY not configured — skipping ingestion (chunks need embeddings to be useful).")
+            return
+        from openai import OpenAI  # type: ignore[import]
+        openai_client = OpenAI(api_key=OPENAI_API_KEY)
+    except ImportError:
+        print("  [ingest] openai library not available — skipping ingestion.")
+        return
+    except Exception as exc:  # noqa: BLE001
+        print(f"  [ingest] Could not create OpenAI client: {exc} — skipping ingestion.")
+        return
+
+    ingest_processed(PROCESSED_DIR, chunker, supabase_client, openai_client)
 
 
 def run_module(module_path: str) -> bool:

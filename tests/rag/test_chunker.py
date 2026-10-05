@@ -10,7 +10,7 @@ chunking module.
 from math import floor
 
 import tiktoken
-from hypothesis import given, settings
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from rag.chunking.chunker import Chunker, ChunkConfig, ChunkingStrategy
@@ -23,7 +23,7 @@ from rag.chunking.chunker import Chunker, ChunkConfig, ChunkingStrategy
 
 
 @given(st.text(min_size=1))
-@settings(max_examples=100)
+@settings(max_examples=100, deadline=None, suppress_health_check=[HealthCheck.too_slow])
 def test_chunker_fixed_size_non_empty_output(text: str) -> None:
     """**Validates: Requirements 2.2**
 

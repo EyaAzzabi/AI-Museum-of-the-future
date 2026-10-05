@@ -16,6 +16,7 @@ data/processed/*
 !data/processed/.gitkeep
 rag/vector_store/*
 !rag/vector_store/.gitkeep
+!rag/vector_store/*.py
 
 # OS / editor
 .DS_Store

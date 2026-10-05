@@ -7,8 +7,9 @@ supabase>=2.10.0
 psycopg2-binary>=2.9.10
 
 # ── Data collection & processing ──────────────────────────────────────────────
-pytrends>=4.9.2
+pytrends>=4.9.2          # Google Trends (unofficial wrapper — has a known urllib3 2.x incompatibility, see data/README.md)
 pandas>=2.2.3
+trafilatura              # article full-text extraction from source URLs
 
 # ── Web & API ─────────────────────────────────────────────────────────────────
 Flask==3.1.0
