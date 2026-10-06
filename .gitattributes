@@ -1,0 +1,7 @@
+# Prevent git from ever attempting line-ending conversion on binary files —
+# autocrlf's text/binary detection isn't perfect, and corrupting a PDF/image
+# this way is silent until someone tries to open it.
+*.pdf -text binary
+*.png -text binary
+*.jpg -text binary
+*.jpeg -text binary
