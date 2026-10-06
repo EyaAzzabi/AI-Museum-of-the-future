@@ -1,13 +1,18 @@
 # Data
 
-Public, accessible sources only (no full-internet crawling, no HTML scraping — everything below is an official JSON API). Two parallel collection pipelines currently exist in this repo, covering different scope:
+Public, accessible sources only (no full-internet crawling, no HTML scraping — everything below is an official JSON API). There is **one canonical pipeline**: two complementary sets of collectors (Tunisia-focused, global/topical) feeding a single shared normalize → chunk → embed → store path.
 
-- **`scripts/fetch_*.py`** — broad, global/topical corpus (36 countries, 22+ topics, multiple sources). See "Global pipeline" below.
-- **`data/fetch_*.py` + `data/process_raw.py` + `data/ingest.py`** — Tunisia 2020-2026 focused pipeline, already normalizing output into the schema the RAG chunking step consumes. See "Tunisia pipeline" below.
+- **Collection** — two independent sets of fetch scripts, each targeting different scope, writing to `data/raw/` (different filenames/subdirectories, no overwrite conflicts):
+  - `data/fetch_*.py` — Tunisia 2020-2026 focused. See "Tunisia collectors" below.
+  - `scripts/fetch_*.py` — broad global/topical corpus (36 countries, 22+ topics). See "Global collectors" below.
+- **Normalization** — both feed the same `data/processed/` directory and the same record schema:
+  - `data/process_raw.py` normalizes the Tunisia collectors' output.
+  - `data/process_global.py` normalizes the global collectors' output. GDELT and arXiv records from either side share the same `source` value and merge naturally; Openverse, Met Museum, Internet Archive and DBpedia add four sources the Tunisia pipeline doesn't cover.
+- **Ingestion** — `data/ingest.py` reads every `data/processed/*.json` file regardless of which normalizer produced it, chunks each record, embeds the chunks, and upserts into the shared Supabase project. One call (`data/fetch_all.py`'s `_run_ingestion()`) ingests everything.
 
-Both write to `data/raw/` (different filenames/subdirectories, no overwrite conflicts) and should be reconciled into one corpus before/during chunking rather than kept permanently separate — worth a team conversation on which becomes canonical.
+An earlier, genuinely redundant third pipeline (`scripts/collectors/*.py` + `scripts/run_collection.py`, duplicating the same six Tunisia sources with a different, never-wired-to-ingestion implementation) has been removed rather than left alongside the canonical one.
 
-## Tunisia pipeline (`data/`)
+## Tunisia collectors (`data/`)
 
 | Script | Source | Key needed |
 |---|---|---|
@@ -63,7 +68,7 @@ Every source is normalized to this common structure before being handed off to t
 
 **Note on Wikimedia access:** `fetch_wikipedia.py`/`fetch_wikimedia.py` use `requests`, which works around a stale-OS-certificate-store issue that makes raw `urllib` fail with "certificate has expired" errors against `wikimedia.org`-family domains on at least one team member's machine. If Wikimedia pulls fail for you with that exact error, see the global pipeline's note on this below — the fix is to use `requests`, not to treat the domain as blocked.
 
-## Global pipeline (`scripts/`)
+## Global collectors (`scripts/`)
 
 | Script | Source | Category | Key needed? |
 |---|---|---|---|
@@ -71,6 +76,7 @@ Every source is normalized to this common structure before being handed off to t
 | `fetch_trends.py` | GDELT DOC API (`mode=timelinevol`) | Social & cultural trends | No |
 | `fetch_arxiv.py` | arXiv API | Science & research | No |
 | `fetch_met.py` | Met Museum Open Access API | Images & media (art/artifacts) | No |
+| `process_global.py` (in `data/`) | — | Normalizes all of the above into the shared processed schema | No |
 | `fetch_openverse.py` | Openverse API | Images & media (general) | No |
 | `fetch_archive.py` | Internet Archive `advancedsearch` API | Historical context (primary sources) | No |
 | `fetch_dbpedia.py` | DBpedia (structured categories only, see below) | Historical context (structured facts) | No |
