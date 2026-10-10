@@ -15,7 +15,8 @@ trafilatura              # article full-text extraction from source URLs
 Flask==3.1.0
 
 # ── LLM / Embeddings ──────────────────────────────────────────────────────────
-openai>=1.51.0
+openai>=1.51.0           # SDK only: used as the client for any OpenAI-compatible provider (Groq)
+fastembed>=0.4.0         # local, free multilingual embeddings (ONNX, no torch)
 tiktoken>=0.9.0
 
 # ── Testing ───────────────────────────────────────────────────────────────────

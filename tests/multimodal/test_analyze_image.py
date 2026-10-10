@@ -50,6 +50,19 @@ MOCK_VISION_RESPONSE_2 = (
 # Helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _fake_embedding_client() -> MagicMock:
+    client = MagicMock()
+    client.embeddings.create.return_value.data = [MagicMock(embedding=[0.1] * 384)]
+    return client
+
+
+@pytest.fixture(autouse=True)
+def _no_real_embedding_model():
+    """analyze_image embeds locally; never load the real model in unit tests."""
+    with patch("multimodal.analyze_image.build_embedding_client", side_effect=_fake_embedding_client):
+        yield
+
+
 def _make_openai_client(response_text: str = MOCK_VISION_RESPONSE) -> MagicMock:
     """Return a mock OpenAI client for vision + embeddings calls."""
     client = MagicMock()
@@ -65,7 +78,7 @@ def _make_openai_client(response_text: str = MOCK_VISION_RESPONSE) -> MagicMock:
 
     # embeddings.create → dummy embedding
     emb_data = MagicMock()
-    emb_data.embedding = [0.1] * 1536
+    emb_data.embedding = [0.1] * 384
     emb_response = MagicMock()
     emb_response.data = [emb_data]
     client.embeddings.create.return_value = emb_response
@@ -330,14 +343,14 @@ class TestAnalyzeImageUnit:
     # ── No API key falls back to degradation ─────────────────────────────────
 
     def test_no_api_key_and_no_client_returns_degradation(self):
-        """When openai_client is None and OPENAI_API_KEY is unset, return degradation."""
+        """When openai_client is None and LLM_API_KEY is unset, return degradation."""
         url = VALID_URLS[0]
 
         with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
             with patch.dict("os.environ", {}, clear=True):
-                # Remove OPENAI_API_KEY if present
+                # Remove LLM_API_KEY if present
                 import os
-                os.environ.pop("OPENAI_API_KEY", None)
+                os.environ.pop("LLM_API_KEY", None)
                 result = analyze_image(url, openai_client=None)
 
         assert result.description == "Image unavailable."

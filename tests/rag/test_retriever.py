@@ -17,6 +17,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from agents.llm_config import get_model
 from rag.vector_store.retriever import RetrievalResult, Retriever
 
 
@@ -180,7 +181,7 @@ class TestRetrieverRetrieve:
         assert results == []
 
     def test_embed_query_called_with_model(self):
-        """Embedding must use text-embedding-3-small."""
+        """Embedding must use the local multilingual model."""
         sb = _make_supabase_client([])
         oai = _make_openai_client()
 
@@ -188,12 +189,12 @@ class TestRetrieverRetrieve:
 
         call_kwargs = oai.embeddings.create.call_args
         assert call_kwargs is not None
-        # model arg should be text-embedding-3-small
+        # model arg should be the local embedding model
         model = call_kwargs[1].get("model") or call_kwargs[0][0] if call_kwargs[0] else None
         if model is None:
             # check kwargs dict
             model = call_kwargs.kwargs.get("model")
-        assert model == "text-embedding-3-small"
+        assert model == "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
     def test_rpc_called_with_embedding_and_match_count(self):
         sb = _make_supabase_client([])
@@ -356,8 +357,8 @@ def _make_reranker_client(scores: list[dict]) -> MagicMock:
 class TestReranker:
     """Unit tests for Retriever._rerank and rerank=True path in retrieve()."""
 
-    def test_rerank_true_calls_gpt4o(self):
-        """When rerank=True, chat.completions.create must be called with gpt-4o."""
+    def test_rerank_true_calls_configured_model(self):
+        """When rerank=True, chat.completions.create must be called with the configured rerank model."""
         rows = [
             _make_rpc_row(chunk_id="c1", similarity=0.9),
             _make_rpc_row(chunk_id="c2", similarity=0.8),
@@ -373,7 +374,7 @@ class TestReranker:
         model = call_kwargs[1].get("model") or (call_kwargs[0][0] if call_kwargs[0] else None)
         if model is None:
             model = call_kwargs.kwargs.get("model")
-        assert model == "gpt-4o", f"Expected gpt-4o but got {model}"
+        assert model == get_model("RERANK_MODEL"), f"Unexpected rerank model {model}"
 
     def test_rerank_reorders_by_score_descending(self):
         """Higher LLM score should move a chunk earlier in the results."""

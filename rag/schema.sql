@@ -25,13 +25,15 @@ create unique index if not exists documents_source_source_id_idx on documents (s
 
 -- One row per chunk of a document, with its embedding.
 -- `embedding` dimension must match your embedding model's output
--- (1536 = OpenAI text-embedding-3-small / ada-002 — change if you pick a different model).
+-- (384 = sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2, the local model in
+-- rag/vector_store/local_embeddings.py. If you previously created this table with 1536 dims
+-- (OpenAI), drop `chunks` + its index + match_chunks and re-run this file, then re-ingest.)
 create table if not exists chunks (
     id uuid primary key default gen_random_uuid(),
     document_id uuid not null references documents(id) on delete cascade,
     chunk_index int not null,
     content text not null,
-    embedding vector(1536),
+    embedding vector(384),
     metadata jsonb not null default '{}'::jsonb,
     created_at timestamptz not null default now()
 );
@@ -56,7 +58,7 @@ create index if not exists chunks_embedding_idx
 
 -- Top-k similarity search, callable from Python (supabase-py .rpc()) or n8n (Supabase node / HTTP request).
 create or replace function match_chunks (
-    query_embedding vector(1536),
+    query_embedding vector(384),
     match_count int default 5,
     filter jsonb default '{}'::jsonb
 )

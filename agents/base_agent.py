@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from agents.llm_config import get_model
+
 
 @dataclass
 class InsightObject:
@@ -16,9 +18,15 @@ class InsightObject:
 
 
 class BaseAgent(ABC):
+    model_env_var = "LLM_MODEL"
+
     def __init__(self, openai_client: Any, prompt_path: str | Path):
         self.openai_client = openai_client
         self.prompt_path = Path(prompt_path)
+
+    @property
+    def model(self) -> str:
+        return get_model(self.model_env_var)
 
     @abstractmethod
     def run(self, chunks: Any) -> InsightObject:
@@ -30,7 +38,7 @@ class BaseAgent(ABC):
 
         try:
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=self.model,
                 response_format={"type": "json_object"},
                 messages=[
                     {"role": "system", "content": system},

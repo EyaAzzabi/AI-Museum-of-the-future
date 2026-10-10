@@ -67,23 +67,16 @@ def _run_ingestion() -> None:
         print(f"  [ingest] Could not create Supabase client: {exc} — skipping ingestion.")
         return
 
-    # ── OpenAI client guard ───────────────────────────────────────────────────
-    # Without this, chunks would be stored unembedded — retrieval needs real vectors.
+    # ── Embedding client ──────────────────────────────────────────────────────
+    # Local fastembed model: free, no API key. Chunks need real vectors for retrieval.
     try:
-        from scripts.config import OPENAI_API_KEY  # type: ignore[import]
-        if not OPENAI_API_KEY:
-            print("  [ingest] OPENAI_API_KEY not configured — skipping ingestion (chunks need embeddings to be useful).")
-            return
-        from openai import OpenAI  # type: ignore[import]
-        openai_client = OpenAI(api_key=OPENAI_API_KEY)
-    except ImportError:
-        print("  [ingest] openai library not available — skipping ingestion.")
-        return
+        from rag.vector_store.local_embeddings import build_embedding_client  # type: ignore[import]
+        embed_client = build_embedding_client()
     except Exception as exc:  # noqa: BLE001
-        print(f"  [ingest] Could not create OpenAI client: {exc} — skipping ingestion.")
+        print(f"  [ingest] Could not create embedding client: {exc} — skipping ingestion.")
         return
 
-    ingest_processed(PROCESSED_DIR, chunker, supabase_client, openai_client)
+    ingest_processed(PROCESSED_DIR, chunker, supabase_client, embed_client)
 
 
 def run_module(module_path: str) -> bool:

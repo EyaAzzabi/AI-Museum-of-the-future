@@ -4,7 +4,7 @@ Usage: python test_agents_live.py
 """
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
+from agents.llm_config import build_llm_client
 
 from agents.historian import HistorianAgent
 from agents.sociologist import SociologistAgent
@@ -16,12 +16,12 @@ from rag.vector_store.retriever import RetrievalResult
 
 load_dotenv()
 
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("LLM_API_KEY") or os.getenv("GROQ_API_KEY")
 if not api_key:
-    print("[ERREUR] OPENAI_API_KEY non trouvée dans .env")
+    print("[ERREUR] LLM_API_KEY (Groq gratuit) non trouvée dans .env")
     raise SystemExit(1)
 
-client = OpenAI(api_key=api_key)
+client = build_llm_client()
 
 # ── Chunks de test ────────────────────────────────────────────────────────────
 CHUNKS = [

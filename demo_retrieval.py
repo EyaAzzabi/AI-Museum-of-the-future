@@ -9,17 +9,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import os
-from openai import OpenAI
+from agents.llm_config import build_llm_client
+from rag.vector_store.local_embeddings import build_embedding_client
 from supabase import create_client
 
 from rag.vector_store.retriever import Retriever
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-if not all([SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, OPENAI_API_KEY]):
-    print("[ERROR] Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / OPENAI_API_KEY in .env")
+if not all([SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY]):
+    print("[ERROR] Missing SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY in .env")
     raise SystemExit(1)
 
 QUERIES = [
@@ -33,8 +32,8 @@ QUERIES = [
 
 def main():
     sb = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-    oai = OpenAI(api_key=OPENAI_API_KEY)
-    retriever = Retriever(sb, oai, match_count=3)
+    # Embeddings are local; the chat client is only used when reranking.
+    retriever = Retriever(sb, build_llm_client(), match_count=3, embed_client=build_embedding_client())
 
     total = sb.table("documents").select("id", count="exact").limit(1).execute().count
     print("=" * 65)

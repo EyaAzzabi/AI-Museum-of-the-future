@@ -18,6 +18,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from agents.llm_config import get_model
 from prompts.evaluate_prompts import EvalRecord, evaluate_all
 
 # ---------------------------------------------------------------------------
@@ -106,7 +107,7 @@ class TestHappyPathSpecialistAgents:
         assert isinstance(record.schema_valid, bool)
         assert record.schema_valid is True
         assert record.fail_reason is None
-        assert record.model == "gpt-4o-mini"
+        assert record.model == get_model()
         assert isinstance(record.input_tokens, int)
         assert record.input_tokens >= 0
 

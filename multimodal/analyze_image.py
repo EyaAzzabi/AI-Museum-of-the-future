@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import base64
-import os
 from dataclasses import dataclass, field
 from typing import Any
 
 import requests
-from openai import OpenAI
+
+from agents.llm_config import build_llm_client, get_vision_model
+from rag.vector_store.local_embeddings import EMBEDDING_MODEL, build_embedding_client
 
 
 @dataclass
@@ -18,8 +19,12 @@ class VisualDescription:
     clip_embedding: list[float] | None = None
 
 
-def analyze_image(source: str, openai_client: Any = None) -> VisualDescription:
-    """Analyze an image from a URL or file path and return a structured description."""
+def analyze_image(source: str, openai_client: Any = None, embed_client: Any = None) -> VisualDescription:
+    """Analyze an image from a URL or file path and return a structured description.
+
+    ``openai_client`` is any OpenAI-compatible vision-capable chat client (Groq by default,
+    built from LLM_API_KEY when omitted). ``embed_client`` embeds the description locally.
+    """
     default_result = VisualDescription(
         objects=[],
         scene="",
@@ -40,16 +45,19 @@ def analyze_image(source: str, openai_client: Any = None) -> VisualDescription:
     except (requests.RequestException, FileNotFoundError, OSError, ValueError):
         return default_result
 
+    if not payload:  # e.g. a device file like NUL on Windows reads as empty
+        return default_result
+
     try:
         encoded = base64.b64encode(payload).decode("utf-8")
         if openai_client is None:
-            api_key = os.getenv("OPENAI_API_KEY")
-            if not api_key:
+            try:
+                openai_client = build_llm_client()
+            except ValueError:
                 return default_result
-            openai_client = OpenAI(api_key=api_key)
 
         completion = openai_client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=get_vision_model(),
             messages=[
                 {
                     "role": "user",
@@ -107,8 +115,8 @@ def analyze_image(source: str, openai_client: Any = None) -> VisualDescription:
 
         embedding = None
         try:
-            embedding_response = openai_client.embeddings.create(
-                model="text-embedding-3-small",
+            embedding_response = (embed_client or build_embedding_client()).embeddings.create(
+                model=EMBEDDING_MODEL,
                 input=description,
             )
             embedding = embedding_response.data[0].embedding

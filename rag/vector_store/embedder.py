@@ -1,4 +1,4 @@
-"""Embed Chunks via the OpenAI embeddings API, with per-chunk retry.
+"""Embed Chunks via an embeddings client (local fastembed by default, see local_embeddings.py), with per-chunk retry.
 
 Task 4.3 — Requirements: 2.5, 2.6
 """
@@ -8,12 +8,13 @@ from __future__ import annotations
 import time
 
 from rag.chunking.chunker import Chunk
+from rag.vector_store.local_embeddings import EMBEDDING_MODEL
 
 
 def embed_chunks(
     chunks: list[Chunk],
     openai_client,
-    model: str = "text-embedding-3-small",
+    model: str = EMBEDDING_MODEL,
     max_retries: int = 3,
 ) -> list[tuple[Chunk, list[float]]]:
     """Embed each chunk's content, retrying transient failures.

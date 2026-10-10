@@ -9,10 +9,11 @@ import json
 import logging
 from dataclasses import dataclass, field
 
+from agents.llm_config import get_model
+from rag.vector_store.local_embeddings import EMBEDDING_MODEL
+
 logger = logging.getLogger(__name__)
 
-EMBEDDING_MODEL = "text-embedding-3-small"
-RERANK_MODEL = "gpt-4o"
 LOW_CHUNK_COUNT_THRESHOLD = 100
 
 
@@ -26,9 +27,12 @@ class RetrievalResult:
 
 
 class Retriever:
-    def __init__(self, supabase_client, openai_client, match_count: int = 5) -> None:
+    def __init__(self, supabase_client, openai_client, match_count: int = 5, embed_client=None) -> None:
+        # openai_client: any OpenAI-compatible chat client (used for reranking).
+        # embed_client: embeddings client; defaults to openai_client for backwards compatibility.
         self.supabase_client = supabase_client
         self.openai_client = openai_client
+        self.embed_client = embed_client if embed_client is not None else openai_client
         self.match_count = match_count
 
     # ── public API ──────────────────────────────────────────────────────────
@@ -45,7 +49,7 @@ class Retriever:
             return []
 
         try:
-            embed_response = self.openai_client.embeddings.create(input=query, model=EMBEDDING_MODEL)
+            embed_response = self.embed_client.embeddings.create(input=query, model=EMBEDDING_MODEL)
             query_embedding = embed_response.data[0].embedding
         except Exception as e:  # noqa: BLE001
             logger.warning(f"Failed to embed query: {e}")
@@ -127,7 +131,8 @@ class Retriever:
                 'Respond with JSON only: {"scores": [{"chunk_id": "...", "score": 0-10}, ...]}'
             )
             completion = self.openai_client.chat.completions.create(
-                model=RERANK_MODEL,
+                model=get_model("RERANK_MODEL"),
+                response_format={"type": "json_object"},
                 messages=[{"role": "user", "content": prompt}],
             )
             parsed = json.loads(completion.choices[0].message.content)

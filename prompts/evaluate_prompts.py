@@ -5,6 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from agents.llm_config import get_model
+
 
 @dataclass
 class EvalRecord:
@@ -36,7 +38,7 @@ def evaluate_all(openai_client: Any, test_cases: list[dict]) -> list[EvalRecord]
 
         try:
             response = openai_client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=get_model(),
                 response_format={"type": "json_object"},
                 messages=[
                     {"role": "system", "content": "Evaluate prompt compliance."},
@@ -63,7 +65,7 @@ def evaluate_all(openai_client: Any, test_cases: list[dict]) -> list[EvalRecord]
             EvalRecord(
                 agent=agent,
                 prompt_version=version,
-                model="gpt-4o-mini",
+                model=get_model(),
                 input_tokens=max(0, len(chunks_text.split())),
                 schema_valid=schema_valid,
                 fail_reason=fail_reason,

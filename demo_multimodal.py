@@ -12,15 +12,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
 
-import os
-from openai import OpenAI
+from agents.llm_config import build_llm_client
 
 from multimodal.analyze_image import analyze_image
-
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-if not OPENAI_API_KEY:
-    print("[ERROR] Missing OPENAI_API_KEY in .env")
-    raise SystemExit(1)
 
 DEFAULT_IMAGE = "data/raw/images/gdelt_news/architecture/119199647147.jpg"
 
@@ -41,7 +35,7 @@ def pick_image() -> str:
 
 def main():
     image_path = pick_image()
-    client = OpenAI(api_key=OPENAI_API_KEY)
+    client = build_llm_client()
 
     print("=" * 65)
     print("  AI Museum of the Future — Live Multimodal Analysis")
