@@ -50,13 +50,85 @@ These are responsibility areas, not silos — everyone should understand the ful
 
 ## Status
 
-Week 1 (use case, scope, roles, tool choice, first architecture draft) is complete — see `docs/`. Repo scaffolding is in place; corpus collection and RAG implementation are next (Week 2 milestone).
+Week 1 (use case, scope, roles, tool choice, first architecture draft) is complete, see `docs/`. Weeks 2-3: data collection, RAG, the five specialist agents and the curator are implemented; see [`docs/`](docs/) for the validation report.
 
-## Setup
+## Setup and run (from a fresh clone)
 
-1. `pip install -r requirements.txt`
-2. `cp .env.example .env` and fill in your own values — **never commit `.env`**.
-3. Data source keys: start with the keyless sources first (GDELT, Wikimedia Commons, arXiv, World Bank, Wikipedia/Wikidata) — no signup needed. Only add `NEWSAPI_KEY` / `UNSPLASH_ACCESS_KEY` / `NASA_API_KEY` if you need those specific sources.
-4. Vector store: create a free [Supabase](https://supabase.com) project, put its URL/keys in `.env`, then run [`rag/schema.sql`](rag/schema.sql) against it (Dashboard > SQL Editor > New query, or `psql "$SUPABASE_DB_URL" -f rag/schema.sql`) — it enables `pgvector` and creates the `documents`/`chunks` tables plus a `match_chunks` retrieval function. Supabase has a native n8n node, so it also plugs directly into the orchestration layer.
-   - For `SUPABASE_DB_URL`, use the **Transaction pooler** connection string (Settings > Database > Connection string, port 6543) — the direct `db.<ref>.supabase.co` host is IPv6-only and won't resolve on most networks/CI runners.
-5. Scripts load config via `scripts/config.py` (reads `.env` through `python-dotenv`).
+Requires Python 3.11+.
+
+```bash
+git clone <repo-url> && cd AI-Museum-of-the-future
+python -m venv .venv
+.venv\Scriptsctivate            # Windows   (macOS/Linux: source .venv/bin/activate)
+pip install -r requirements.txt
+cp .env.example .env              # Windows: copy .env.example .env
+```
+
+Then fill in `.env` (**never commit it**). What you need depends on what you want to run:
+
+| You want to... | Keys needed |
+|---|---|
+| Run the agents / curator (`test_agents_live.py`) | `LLM_API_KEY` only (free, see below) |
+| Image analysis, retrieval reranking | `LLM_API_KEY` (same free key) |
+| Run the web app and the tests | nothing |
+| Fetch + ingest data into the vector store | Supabase keys (embeddings are local, no key) |
+
+**No OpenAI account is needed anywhere.** Chat, vision and reranking go through the Groq key; embeddings run locally with [fastembed](https://github.com/qdrant/fastembed) (`paraphrase-multilingual-MiniLM-L12-v2`, 384 dimensions, multilingual). The first embedding call downloads a ~120 MB model once.
+
+### 1. LLM provider for the agents (free)
+
+All agents (historian, sociologist, technology, culture_art, visual and the curator) use any **OpenAI-compatible** endpoint. The default is [Groq](https://console.groq.com/keys), which has a free tier:
+
+1. Create a free account at https://console.groq.com/keys and generate an API key.
+2. Put it in `.env`: `LLM_API_KEY=gsk_...` (each teammate uses their own key).
+3. Defaults are `LLM_BASE_URL=https://api.groq.com/openai/v1` and `LLM_MODEL=openai/gpt-oss-120b`. Override them in `.env` only if needed. Model availability depends on your account: list yours with
+   `python -c "from dotenv import load_dotenv; load_dotenv(); from agents.llm_config import build_llm_client as b; print([m.id for m in b().models.list().data])"`.
+4. Optional: `CURATOR_MODEL=<model>` uses a different model for the curator only.
+
+Other free options (set `LLM_BASE_URL` + `LLM_MODEL`): Google Gemini `https://generativelanguage.googleapis.com/v1beta/openai/` (`gemini-2.0-flash`), OpenRouter `https://openrouter.ai/api/v1` (a `:free` model). Config lives in [`agents/llm_config.py`](agents/llm_config.py).
+
+Test the agents and the full pipeline live:
+
+```bash
+python test_agents_live.py        # Windows: set PYTHONIOENCODING=utf-8 first, or the console crashes on non-ASCII output
+```
+
+### 2. Web app
+
+```bash
+python app.py                     # http://localhost:5000
+```
+
+Serves the data explorer and the pipeline validation page (`/api/validate`). It does not call the LLM, so it runs with no keys. The explorer shows records from `data/processed/`, which is empty on a fresh clone (data is not committed); fill it with step 4.
+
+### 3. Tests
+
+```bash
+python -m pytest tests -q
+```
+
+All tests use mocked clients, so no keys or network are needed. (`hypothesis` is in `requirements.txt`; the cross-reference property test can occasionally trip Hypothesis' "too slow" health check on the very first run. Rerun it.)
+
+### 4. Data and vector store (optional, only for the RAG part)
+
+1. Start with the keyless sources (GDELT, Wikimedia Commons, arXiv, World Bank, Wikipedia/Wikidata). Only add `NEWSAPI_KEY` / `UNSPLASH_ACCESS_KEY` / `NASA_API_KEY` if you need those sources.
+2. Create a free [Supabase](https://supabase.com) project, put its URL/keys in `.env`, then run [`rag/schema.sql`](rag/schema.sql) (Dashboard > SQL Editor > New query, or `psql "$SUPABASE_DB_URL" -f rag/schema.sql`). It enables `pgvector` and creates the `documents`/`chunks` tables plus a `match_chunks` function. Supabase also has a native n8n node.
+   - For `SUPABASE_DB_URL`, use the **Transaction pooler** string (Settings > Database > Connection string, port 6543). The direct `db.<ref>.supabase.co` host is IPv6-only and won't resolve on most networks.
+3. Embeddings are local and the vector columns are `vector(384)`. If your Supabase project was created with the old OpenAI schema (1536 dims), drop the `chunks` table, its index and `match_chunks`, re-run `rag/schema.sql`, then re-ingest. Never mix vectors from different embedding models in one table.
+4. Fetch, normalize and ingest: `python data/fetch_all.py` (`--sources gdelt`, `--skip-process`, `--skip-ingest` available). Scripts load config via `scripts/config.py`.
+
+## Curator agent
+
+[`agents/curator.py`](agents/curator.py) takes the five specialist insights plus their cross-references and writes the exhibition (title, concept, 4-6 sections, selected items). Prompt: [`prompts/curator.md`](prompts/curator.md) (v3).
+
+What changed in the latest iteration:
+
+- **Retry with feedback.** If the output breaks a rule (section count outside 4-6, empty title/narrative, missing title/concept), the curator retries once, telling the model exactly what was wrong. It raises `CuratorValidationError` only if the second attempt also fails.
+- **No invented artifacts.** `selected_items` and each section's new `artifacts` list are checked against the artifacts the specialists actually selected. If nothing valid remains it falls back to the cross-references.
+- **Failed specialists are visible.** Empty insights (an agent that timed out or errored) are passed to the model as `unavailable_perspectives` and returned in the new `ExhibitionSynthesis.missing_perspectives` field.
+- **Better synthesis prompt.** Builds the exhibition around artifacts that several specialists picked, surfaces disagreements between perspectives, imposes a narrative arc and 60-120 word narratives, and forbids invented facts. A dedicated system prompt sets the curator persona.
+- **Changelog stripped.** The version-history header in `curator.md` is no longer sent to the model.
+- **Free LLM provider.** The agents moved from `gpt-4o-mini` to the configurable OpenAI-compatible provider above (Groq by default), with an optional separate `CURATOR_MODEL`.
+- **OpenAI removed repo-wide.** Image analysis uses a Groq vision model (`VISION_MODEL`, default `qwen/qwen3.8-27b`), reranking uses `RERANK_MODEL` (defaults to `LLM_MODEL`), and embeddings are local (`rag/vector_store/local_embeddings.py`).
+
+Tests: [`tests/agents/test_curator_improvements.py`](tests/agents/test_curator_improvements.py) covers retry, artifact validation, missing perspectives and header stripping.
