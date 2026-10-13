@@ -23,3 +23,35 @@ def test_validation_api_returns_steps():
     assert len(payload['steps']) >= 6
     agents_step = next(step for step in payload['steps'] if step['name'] == 'Agents implemented and communicating')
     assert agents_step['ok'] is True
+
+
+def test_historian_presets_api():
+    client = create_app().test_client()
+    response = client.get('/api/historian/presets')
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert 'presets' in payload
+    assert len(payload['presets']) >= 3
+    assert payload['presets'][0]['chunks'][0]['chunk_id']
+
+
+def test_historian_analyze_endpoint():
+    client = create_app().test_client()
+    # Test valid chunks
+    data = {
+        "chunks": [
+            {"chunk_id": "test-c1", "content": "Treaty signed in 2026."}
+        ]
+    }
+    response = client.post('/api/historian/analyze', json=data)
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload['ok'] is True
+    assert payload['insight']['agent'] == 'historian'
+    assert len(payload['insight']['selected_artifacts']) >= 1
+    assert "test-c1" in payload['insight']['selected_artifacts']
+
+    # Test empty chunks error
+    bad_response = client.post('/api/historian/analyze', json={"chunks": []})
+    assert bad_response.status_code == 400
+

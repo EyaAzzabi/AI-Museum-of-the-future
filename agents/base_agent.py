@@ -17,6 +17,8 @@ class InsightObject:
     selected_artifacts: list[str]
 
 
+import time
+
 class BaseAgent(ABC):
     model_env_var = "LLM_MODEL"
 
@@ -36,17 +38,39 @@ class BaseAgent(ABC):
         if self.openai_client is None:
             raise ValueError("openai_client is required for LLM calls.")
 
-        try:
-            response = self.openai_client.chat.completions.create(
-                model=self.model,
-                response_format={"type": "json_object"},
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-            )
-        except Exception as exc:  # pragma: no cover - bridge for tests
-            raise ValueError(f"LLM call failed: {exc}") from exc
+        models_to_try = [self.model]
+        if "gemini" in self.model.lower():
+            for alt in ["gemini-flash-lite-latest", "gemini-3.1-flash-lite", "gemini-flash-latest"]:
+                if alt not in models_to_try:
+                    models_to_try.append(alt)
+
+        response = None
+        last_exc = None
+        for m in models_to_try:
+            for attempt in range(3):
+                try:
+                    response = self.openai_client.chat.completions.create(
+                        model=m,
+                        response_format={"type": "json_object"},
+                        messages=[
+                            {"role": "system", "content": system},
+                            {"role": "user", "content": user},
+                        ],
+                    )
+                    last_exc = None
+                    break
+                except Exception as exc:
+                    last_exc = exc
+                    err_msg = str(exc)
+                    if any(code in err_msg for code in ["503", "429", "high demand", "UNAVAILABLE", "quota"]):
+                        time.sleep(1.0 * (attempt + 1))
+                        continue
+                    break
+            if last_exc is None and response is not None:
+                break
+
+        if last_exc is not None:
+            raise ValueError(f"LLM call failed: {last_exc}") from last_exc
 
         if isinstance(response, dict):
             payload = response
