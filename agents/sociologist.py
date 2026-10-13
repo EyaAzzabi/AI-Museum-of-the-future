@@ -45,6 +45,7 @@ from agents.sociologist_tools import (
     format_chunks_for_prompt,
     score_evidence_relevance,
 )
+from rag.hyde_retriever import HyDERetriever
 
 logger = logging.getLogger(__name__)
 
@@ -127,14 +128,31 @@ class SociologistAgent(BaseAgent):
 
         # Step 4 — Tools & actions
         self.retriever = retriever
+
+        # Build Groq LLM client for internal use (HyDE + analysis)
+        try:
+            from agents.llm_config import build_llm_client
+            self._llm_client = build_llm_client()
+        except Exception:
+            self._llm_client = openai_client
+
+        # HyDE Retriever — Advanced RAG
+        self._hyde_retriever = HyDERetriever(
+            retriever=retriever,
+            llm_client=self._llm_client,
+            top_k=10,
+        ) if retriever is not None else None
+
         self._tools_available = {
             "rag_retrieval":        retriever is not None,
+            "hyde_retrieval":       retriever is not None,
+            "query_expansion":      True,
             "theme_filtering":      True,
             "source_filtering":     True,
             "theme_coverage":       True,
             "date_extraction":      True,
             "evidence_scoring":     True,
-            "llm_analysis":         openai_client is not None,
+            "llm_analysis":         self._llm_client is not None,
             "self_validation":      True,
         }
 
@@ -194,7 +212,30 @@ class SociologistAgent(BaseAgent):
     # ── Step 3 — Evidence retrieval & preparation ────────────────────────────
 
     def _retrieve_evidence(self) -> EvidenceBundle:
-        """Retrieve evidence from RAG for all core social themes."""
+        """
+        Retrieve evidence using HyDE (Advanced RAG) pipeline.
+        Falls back to standard retrieval if HyDE fails.
+        """
+        # Try HyDE first (Advanced RAG)
+        if self._hyde_retriever is not None:
+            try:
+                logger.info("[SociologistAgent] Using HyDE Advanced RAG pipeline...")
+                chunks = self._hyde_retriever.build_enriched_context(
+                    themes=CORE_THEMES,
+                    top_k_per_theme=5,
+                )
+                if chunks:
+                    logger.info("[SociologistAgent] HyDE retrieved %d chunks", len(chunks))
+                    return EvidenceBundle(
+                        query="HyDE multi-theme",
+                        theme=", ".join(CORE_THEMES),
+                        chunks=chunks,
+                        total_retrieved=len(chunks),
+                    )
+            except Exception as e:
+                logger.warning("[SociologistAgent] HyDE failed: %s — falling back to standard RAG", e)
+
+        # Fallback to standard retrieval
         try:
             return build_evidence_bundle(
                 retriever=self.retriever,
@@ -202,7 +243,7 @@ class SociologistAgent(BaseAgent):
                 top_k_per_theme=5,
             )
         except Exception as e:
-            logger.warning("[SociologistAgent] RAG retrieval failed: %s", e)
+            logger.warning("[SociologistAgent] Standard RAG also failed: %s", e)
             return EvidenceBundle(query="", theme="", chunks=[])
 
     def _prepare_evidence(self, chunks: list[Any]) -> list[Any]:
@@ -308,18 +349,44 @@ Produce a structured sociological analysis in the JSON format specified in your 
     # ── Step 5c — LLM call with retry ────────────────────────────────────────
 
     def _call_llm_with_retry(self, system_prompt: str, user_prompt: str) -> dict:
-        """Call LLM with retry on failure."""
+        """Call LLM with retry on failure — uses Groq via llm_config."""
+        import json
+        from agents.llm_config import build_llm_client, get_model
+
         last_error = None
 
         for attempt in range(1, MAX_RETRIES + 1):
             try:
                 logger.info("[SociologistAgent] LLM call attempt %d/%d", attempt, MAX_RETRIES)
-                payload = self._call_llm(system_prompt, user_prompt)
+
+                # Use llm_config client (Groq) instead of self.openai_client (OpenAI)
+                llm_client = build_llm_client()
+                model = get_model()
+
+                response = llm_client.chat.completions.create(
+                    model=model,
+                    response_format={"type": "json_object"},
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user",   "content": user_prompt},
+                    ],
+                )
+
+                content = response.choices[0].message.content
+                if not content:
+                    raise ValueError("LLM returned empty content")
+
+                payload = json.loads(content)
                 logger.info("[SociologistAgent] LLM call succeeded on attempt %d", attempt)
                 return payload
+
             except Exception as e:
                 last_error = e
-                logger.warning("[SociologistAgent] LLM attempt %d failed: %s", attempt, e)
+                import time
+                wait = 2 ** attempt
+                logger.warning("[SociologistAgent] LLM attempt %d failed: %s — waiting %ds", attempt, e, wait)
+                if attempt < MAX_RETRIES:
+                    time.sleep(wait)
 
         logger.error("[SociologistAgent] All %d LLM attempts failed. Last error: %s", MAX_RETRIES, last_error)
         return self._fallback_payload()
