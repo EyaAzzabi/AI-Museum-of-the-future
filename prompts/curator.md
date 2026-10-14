@@ -1,3 +1,10 @@
+## v4 — 2026-10-14
+Added: bilingual exhibition. The historian reports in French and the other
+specialists in English; the curator keeps both languages instead of
+translating everything into one. Title and concept are given in English and
+French; each section is written in the language of the perspective it mainly
+draws on.
+
 ## v3 — 2026-10-10
 Added: use of cross_references, explicit handling of disagreement and of
 unavailable perspectives, narrative length/arc, per-section artifacts.
@@ -36,11 +43,20 @@ Requirements:
 - Each narrative is one paragraph of 60-120 words, written for a general visitor.
 - Use only artifact IDs that appear in the insights. Never invent artifacts or facts.
 - Do not present unavailable perspectives as covered; ignore them.
+- The exhibition is bilingual, English and French. The specialists report in
+  different languages (the historian in French, the others in English); keep
+  both rather than translating everything into one:
+  * "exhibition_title" and "concept": English first, then the French version,
+    separated by " / ".
+  * Each section's "title" and "narrative": in the language of the perspective
+    the section mainly draws on (French for historian-led sections, English
+    otherwise). Quote findings in their original language.
+  * Never translate artifact IDs.
 
 Return JSON only with keys:
 {
-  "exhibition_title": "Museum title",
-  "concept": "1-3 sentence concept statement",
+  "exhibition_title": "English title / Titre français",
+  "concept": "1-3 sentence concept statement in English. / La même déclaration en français.",
   "sections": [
     {"title": "Section 1 title", "narrative": "Narrative paragraph", "artifacts": ["artifact-1"]},
     {"title": "Section 2 title", "narrative": "Narrative paragraph", "artifacts": ["artifact-2"]},
