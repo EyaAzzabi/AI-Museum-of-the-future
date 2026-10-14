@@ -400,16 +400,14 @@ Produce a structured sociological analysis in the JSON format specified in your 
             if "confidence_score" not in payload:
                 payload["confidence_score"] = 0.5
 
-        # Validate findings count
+        # Validate findings count. Short output is kept as is: placeholder
+        # findings would reach the curator as if they were real analysis.
         findings = payload.get("key_findings", [])
         if len(findings) < MIN_FINDINGS:
             logger.warning(
-                "[SociologistAgent] Only %d findings (min %d) — padding with defaults",
+                "[SociologistAgent] Only %d findings (expected at least %d) — evidence may be thin",
                 len(findings), MIN_FINDINGS
             )
-            while len(findings) < MIN_FINDINGS:
-                findings.append(f"Additional social pattern {len(findings)+1} — requires more evidence.")
-            payload["key_findings"] = findings
 
         # Validate confidence score
         try:
@@ -450,25 +448,19 @@ Produce a structured sociological analysis in the JSON format specified in your 
 
         perspective = str(payload.get("perspective", "Social patterns in Tunisian society 2020-2026."))
 
-        # Enrich perspective with metadata
+        # Analysis metadata goes to the log, not into the exhibition text
         themes   = payload.get("themes_detected", [])
         conf     = payload.get("confidence_score", 0.5)
         evidence = payload.get("evidence_count", len(chunks))
 
-        enriched_perspective = (
-            f"{perspective} "
-            f"[Themes: {', '.join(themes[:3]) if themes else 'general'}] "
-            f"[Evidence: {evidence} chunks | Confidence: {conf:.0%}]"
-        )
-
         logger.info(
-            "[SociologistAgent] Insight built | %d findings | %d artifacts",
-            len(findings), len(artifacts)
+            "[SociologistAgent] Insight built | %d findings | %d artifacts | themes=%s | evidence=%d chunks | confidence=%.0f%%",
+            len(findings), len(artifacts), ", ".join(themes[:3]) if themes else "general", evidence, conf * 100
         )
 
         return InsightObject(
             agent="sociologist",
-            perspective=enriched_perspective,
+            perspective=perspective,
             key_findings=findings,
             selected_artifacts=artifacts,
         )

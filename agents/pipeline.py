@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from typing import Any
 
@@ -9,7 +10,7 @@ from agents.curator import CuratorAgent, ExhibitionSynthesis
 from agents.shared_context import SharedContext, compute_cross_references
 
 
-def _build_specialist_agents(openai_client: Any):
+def _build_specialist_agents(openai_client: Any, retriever: Any = None):
     from agents.culture_art import CultureArtAgent
     from agents.historian import HistorianAgent
     from agents.sociologist import SociologistAgent
@@ -18,26 +19,38 @@ def _build_specialist_agents(openai_client: Any):
 
     return {
         "historian": HistorianAgent(openai_client),
-        "sociologist": SociologistAgent(openai_client),
+        "sociologist": SociologistAgent(openai_client, retriever=retriever),
         "technology": TechnologyAgent(openai_client),
         "culture_art": CultureArtAgent(openai_client),
         "visual": VisualAgent(openai_client),
     }
 
 
-def run_pipeline(chunks: list[Any], openai_client: Any, timeout_secs: int = 120) -> ExhibitionSynthesis:
-    """Fan out to the specialist agents and then synthesize an exhibition."""
-    agents = _build_specialist_agents(openai_client)
+def run_pipeline(
+    chunks: list[Any],
+    openai_client: Any,
+    timeout_secs: int = 120,
+    retriever: Any = None,
+) -> ExhibitionSynthesis:
+    """Fan out to the specialist agents and then synthesize an exhibition.
+
+    With a ``retriever`` (rag.vector_store.retriever.Retriever), the sociologist
+    also fetches extra evidence from the vector store through HyDE.
+    """
+    agents = _build_specialist_agents(openai_client, retriever)
     insights: dict[str, InsightObject] = {}
 
+    # Agents run in parallel, so they share one deadline rather than each
+    # getting a 1/N slice of it (which cut off the slower HyDE sociologist).
+    deadline = time.monotonic() + timeout_secs
     with ThreadPoolExecutor(max_workers=len(agents)) as executor:
         futures = {executor.submit(agent.run, chunks): name for name, agent in agents.items()}
         for future, name in futures.items():
             try:
-                result = future.result(timeout=max(0.1, timeout_secs / max(len(futures), 1)))
+                result = future.result(timeout=max(0.1, deadline - time.monotonic()))
                 insights[name] = result
             except Exception as exc:  # pragma: no cover - pipeline resiliency
-                logging.warning("[error] %s: %s", name, exc)
+                logging.warning("[error] %s: %r", name, exc)
                 insights[name] = InsightObject(
                     agent=name,
                     perspective="",

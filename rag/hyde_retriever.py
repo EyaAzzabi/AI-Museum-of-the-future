@@ -186,10 +186,15 @@ class HyDERetriever:
                     {"role": "system", "content": HYDE_SYSTEM_PROMPT},
                     {"role": "user",   "content": HYDE_USER_TEMPLATE.format(topic=topic)},
                 ],
-                max_tokens=200,
+                # Reasoning models (the default gpt-oss) spend part of this budget
+                # thinking; 200 often left an empty or cut-off passage.
+                max_tokens=1000,
                 temperature=0.3,  # Low temperature for factual consistency
             )
-            hypo_doc = response.choices[0].message.content.strip()
+            hypo_doc = (response.choices[0].message.content or "").strip()
+            if not hypo_doc:
+                logger.warning("[HyDE] Empty hypothetical doc — using expanded query")
+                return query
             logger.info("[HyDE] Generated hypothetical doc (%d chars)", len(hypo_doc))
             return hypo_doc
 
@@ -222,6 +227,8 @@ class HyDERetriever:
         try:
             self.retriever.match_count = self.top_k
             results = self.retriever.retrieve(query=hypo_doc, rerank=False)
+            if not results and hypo_doc != expanded_query:
+                results = self.retriever.retrieve(query=expanded_query, rerank=False)
             logger.info("[HyDE] Retrieved %d chunks for theme '%s'", len(results), theme)
             return results
         except Exception as e:

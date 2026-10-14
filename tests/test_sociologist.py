@@ -321,8 +321,8 @@ class TestSociologistAgent:
         for key in ["agent", "key_findings", "selected_artifacts", "confidence_score"]:
             assert key in fixed
 
-    def test_validate_pads_findings(self, agent, sample_chunks):
-        """_validate_and_fix should pad findings if below minimum."""
+    def test_validate_does_not_pad_findings(self, agent, sample_chunks):
+        """_validate_and_fix keeps short output instead of inventing placeholder findings."""
         payload = {
             "agent": "sociologist",
             "perspective": "Test",
@@ -332,7 +332,7 @@ class TestSociologistAgent:
             "confidence_score": 0.5,
         }
         fixed = agent._validate_and_fix(payload, sample_chunks)
-        assert len(fixed["key_findings"]) >= MIN_FINDINGS
+        assert fixed["key_findings"] == ["Only one finding"]
 
     def test_validate_clamps_confidence(self, agent, sample_chunks):
         """_validate_and_fix should clamp confidence_score to [0, 1]."""
@@ -399,17 +399,17 @@ class TestSociologistOutputQuality:
             word_count = len(finding.split())
             assert word_count >= 8, f"Finding too short ({word_count} words): {finding}"
 
-    def test_insight_metadata_present(self, agent, sample_chunks):
-        """Perspective should include metadata injected by the agent."""
+    def test_perspective_has_no_metadata_tags(self, agent, sample_chunks):
+        """Perspective is exhibition text: no [Themes:...] / [Evidence:...] tags."""
         result = agent.run(sample_chunks)
-        # Agent enriches perspective with [Themes:...] and [Evidence:...]
-        assert "Themes:" in result.perspective or len(result.perspective) > 50
+        assert "[Themes:" not in result.perspective
+        assert "[Evidence:" not in result.perspective
 
-    def test_confidence_score_logged(self, agent, sample_chunks):
-        """Agent should log confidence score (perspective contains it)."""
-        result = agent.run(sample_chunks)
-        # Confidence is embedded in perspective by _build_insight
-        assert "Confidence:" in result.perspective or "%" in result.perspective
+    def test_confidence_score_logged(self, agent, sample_chunks, caplog):
+        """Agent logs themes, evidence count and confidence instead."""
+        with caplog.at_level("INFO", logger="agents.sociologist"):
+            agent.run(sample_chunks)
+        assert "confidence=82%" in caplog.text
 
     def test_no_duplicate_findings(self, agent, sample_chunks):
         """Findings should not be exact duplicates."""
@@ -458,3 +458,32 @@ class TestSociologistLive:
             print(f"  {i}. {f[:100]}...")
         print(f"\nArtifacts: {result.selected_artifacts}")
         print("="*60)
+
+
+def test_pipeline_passes_retriever_to_sociologist():
+    """run_pipeline(retriever=...) enables the sociologist's HyDE retrieval."""
+    from agents.pipeline import _build_specialist_agents
+
+    retriever = MagicMock()
+    agents = _build_specialist_agents(openai_client=None, retriever=retriever)
+    assert agents["sociologist"].retriever is retriever
+    assert agents["sociologist"]._hyde_retriever is not None
+
+    assert _build_specialist_agents(openai_client=None)["sociologist"]._hyde_retriever is None
+
+
+def test_hyde_empty_hypothetical_doc_falls_back_to_query():
+    """Reasoning models can return empty content; HyDE must still search."""
+    from rag.hyde_retriever import HyDERetriever
+
+    empty = MagicMock()
+    empty.choices = [MagicMock()]
+    empty.choices[0].message.content = ""
+    llm = MagicMock()
+    llm.chat.completions.create.return_value = empty
+    retriever = MagicMock()
+    retriever.retrieve.side_effect = lambda query, rerank=False: [MagicMock(chunk_id="x")] if query.strip() else []
+
+    hyde = HyDERetriever(retriever=retriever, llm_client=llm, top_k=5)
+    assert hyde.generate_hypothetical_doc("gender_women", "Tunisia women") == "Tunisia women"
+    assert len(hyde.retrieve_with_hyde("gender_women", "Tunisia women")) == 1
