@@ -490,3 +490,26 @@ def test_hyde_empty_hypothetical_doc_falls_back_to_query():
     hyde = HyDERetriever(retriever=retriever, llm_client=llm, top_k=5)
     assert hyde.generate_hypothetical_doc("gender_women", "Tunisia women") == "Tunisia women"
     assert len(hyde.retrieve_with_hyde("gender_women", "Tunisia women")) == 1
+
+
+def test_hyde_documents_are_cached_and_themes_run_in_parallel(tmp_path, monkeypatch):
+    """A hypothetical document is generated once per (model, theme, query), then read from disk."""
+    from rag.hyde_retriever import HyDERetriever
+
+    monkeypatch.setenv("HYDE_CACHE_DIR", str(tmp_path))
+    doc = MagicMock()
+    doc.choices = [MagicMock()]
+    doc.choices[0].message.content = "Hypothetical passage about Tunisian youth."
+    llm = MagicMock()
+    llm.chat.completions.create.return_value = doc
+    retriever = MagicMock()
+    retriever.retrieve.return_value = [MagicMock(chunk_id="x")]
+
+    hyde = HyDERetriever(retriever=retriever, llm_client=llm, top_k=5)
+    themes = ["politics_civic", "gender_women", "youth_education"]
+    first = hyde.retrieve_all_themes(themes)
+    second = hyde.retrieve_all_themes(themes)
+
+    assert [r.theme for r in first] == themes            # order kept despite parallel execution
+    assert llm.chat.completions.create.call_count == 3   # second run answered from the cache
+    assert second[0].hypothetical_document == "Hypothetical passage about Tunisian youth."

@@ -35,11 +35,21 @@ Reference: Gao et al. (2022) "Precise Zero-Shot Dense Retrieval without
 
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
+import os
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
+
+# Hypothetical documents depend only on (model, theme, query), so they are
+# cached on disk and reused across runs. HYDE_CACHE_DIR="" disables the cache.
+DEFAULT_HYDE_CACHE_DIR = Path(__file__).resolve().parents[1] / ".cache" / "hyde"
+HYDE_WORKERS = 4  # parallel LLM calls; kept small for free-tier rate limits
 
 # ── Sociological query expansion map ─────────────────────────────────────────
 # Maps abstract sociological concepts to concrete search terms
@@ -174,6 +184,30 @@ class HyDERetriever:
             logger.warning("[HyDE] No LLM client — skipping hypothetical doc generation")
             return query
 
+        cache_path = self._cache_path(theme, query)
+        if cache_path is not None and cache_path.exists():
+            try:
+                return json.loads(cache_path.read_text(encoding="utf-8"))["document"]
+            except (OSError, ValueError, KeyError):
+                pass
+
+        hypo_doc = self._generate(theme, query)
+        if cache_path is not None and hypo_doc != query:
+            cache_path.parent.mkdir(parents=True, exist_ok=True)
+            cache_path.write_text(json.dumps({"theme": theme, "query": query, "document": hypo_doc},
+                                             ensure_ascii=False), encoding="utf-8")
+        return hypo_doc
+
+    def _cache_path(self, theme: str, query: str) -> Path | None:
+        root = os.getenv("HYDE_CACHE_DIR", str(DEFAULT_HYDE_CACHE_DIR))
+        if not root:
+            return None
+        from agents.llm_config import get_model
+
+        key = hashlib.sha256(f"{get_model()}|{theme}|{query}".encode("utf-8")).hexdigest()[:24]
+        return Path(root) / f"{key}.json"
+
+    def _generate(self, theme: str, query: str) -> str:
         topic = f"{theme.replace('_', ' ')} in Tunisia 2020-2026: {query}"
 
         try:
@@ -272,32 +306,32 @@ class HyDERetriever:
         Run the full HyDE pipeline for all given themes.
         Returns a list of HyDEResult objects, one per theme.
         """
-        results = []
+        # Themes are independent: run them in parallel (LLM call + retrieval each).
+        with ThreadPoolExecutor(max_workers=min(HYDE_WORKERS, max(len(themes), 1))) as pool:
+            return list(pool.map(self._retrieve_theme, themes))
 
-        for theme in themes:
-            # Build base query from theme name
-            base_query = f"Tunisia {theme.replace('_', ' ')} society 2020 2026"
+    def _retrieve_theme(self, theme: str) -> HyDEResult:
+        # Build base query from theme name
+        base_query = f"Tunisia {theme.replace('_', ' ')} society 2020 2026"
 
-            # Expand query (Step 1)
-            expanded = self.expand_query(theme, base_query)
+        # Expand query (Step 1)
+        expanded = self.expand_query(theme, base_query)
 
-            # Generate hypothetical doc (Step 2)
-            hypo_doc = self.generate_hypothetical_doc(theme, expanded)
+        # Generate hypothetical doc (Step 2)
+        hypo_doc = self.generate_hypothetical_doc(theme, expanded)
 
-            # Retrieve (Step 3)
-            chunks = self.retrieve_with_hyde(theme, base_query, hypo_doc=hypo_doc)
+        # Retrieve (Step 3)
+        chunks = self.retrieve_with_hyde(theme, base_query, hypo_doc=hypo_doc)
 
-            results.append(HyDEResult(
-                theme=theme,
-                original_query=base_query,
-                expanded_query=expanded,
-                hypothetical_document=hypo_doc,
-                retrieved_chunks=chunks,
-                total_retrieved=len(chunks),
-                hyde_used=True,
-            ))
-
-        return results
+        return HyDEResult(
+            theme=theme,
+            original_query=base_query,
+            expanded_query=expanded,
+            hypothetical_document=hypo_doc,
+            retrieved_chunks=chunks,
+            total_retrieved=len(chunks),
+            hyde_used=True,
+        )
 
     # ── Full pipeline for Sociologist Agent ───────────────────────────────────
 
