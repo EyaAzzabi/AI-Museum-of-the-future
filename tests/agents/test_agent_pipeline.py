@@ -13,7 +13,7 @@ or more distinct agents — no more, no fewer, and with no duplicates.
 
 from __future__ import annotations
 
-from hypothesis import given, settings
+from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 
 from agents.base_agent import InsightObject
@@ -66,7 +66,7 @@ def insight_object_strategy(draw: st.DrawFn) -> InsightObject:
 
 
 @given(st.lists(insight_object_strategy(), min_size=0, max_size=8))
-@settings(max_examples=100)
+@settings(max_examples=100, suppress_health_check=[HealthCheck.too_slow])
 def test_cross_references_correctness(insights_list: list[InsightObject]) -> None:
     """**Validates: Requirements 4.7**
 

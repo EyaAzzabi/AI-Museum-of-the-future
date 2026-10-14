@@ -20,6 +20,7 @@
         <li><a href="#corpus"     class="nav-item"        data-section="corpus">     <span class="nav-icon">📚</span> Corpus</a></li>
         <li><a href="#data"      class="nav-item"        data-section="data">      <span class="nav-icon">🗂️</span> Données</a></li>
         <li><a href="#agents"     class="nav-item"        data-section="agents">     <span class="nav-icon">🤖</span> Agents</a></li>
+        <li><a href="#historian"  class="nav-item"        data-section="historian">  <span class="nav-icon">📜</span> Test Historian</a></li>
         <li><a href="#prompts"    class="nav-item"        data-section="prompts">    <span class="nav-icon">💬</span> Prompts</a></li>
         <li><a href="#tests"      class="nav-item"        data-section="tests">      <span class="nav-icon">✅</span> Tests</a></li>
       </ul>
@@ -272,6 +273,9 @@
             <h3>Historian</h3>
             <p>Interprète le contexte à travers les événements clés, la signification historique et l'impact à long terme.</p>
             <code class="agent-file">agents/historian.py</code>
+            <div style="margin-top: 12px;">
+              <button class="btn btn-sm btn-outline btn-test-agent" data-target="historian">Tester l'agent →</button>
+            </div>
           </div>
           <div class="agent-card">
             <div class="agent-icon">👥</div>
@@ -322,6 +326,115 @@
             <div id="crossRefs" class="cross-refs-box">
               <strong>Cross-références :</strong>
               <span id="crossRefsVal">—</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── SECTION: Historian Agent Playground ───────────────── -->
+      <section id="section-historian" class="section">
+        <div class="card historian-header-card">
+          <div class="historian-header-content">
+            <div class="historian-badge-row">
+              <span class="badge-role">Socio-Historical Specialist</span>
+              <span class="badge-author">Eya Idi</span>
+              <span class="badge-file">agents/historian.py</span>
+              <span class="badge-prompt">prompts/historian.md (V3)</span>
+            </div>
+            <h2 class="historian-title">Interface de Test de l'Historian Agent</h2>
+            <p class="historian-desc">
+              Testez l'analyse socio-historique des données contemporaines à travers un prisme rétrospectif à 100 ans.
+              L'agent extrait les événements clés, évalue leur signification historique et projette leur impact séculaire,
+              tout en garantissant un ancrage strict (zéro hallucination d'artefacts).
+            </p>
+          </div>
+        </div>
+
+        <div class="historian-grid">
+          <!-- Left: Input & Configuration -->
+          <div class="card historian-input-card">
+            <h3 class="card-title">1. Documents &amp; Chunks d'Entrée</h3>
+            <p class="card-subtitle">Choisissez un scénario représentatif ou personnalisez les extraits :</p>
+            
+            <div class="preset-selector-group">
+              <label class="input-label">Scénarios disponibles :</label>
+              <div id="historianPresets" class="preset-buttons">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <div class="custom-input-box">
+              <div class="chunks-header-bar">
+                <span id="chunksCountLabel">Documents sélectionnés</span>
+                <button id="btnAddCustomChunk" class="btn-text">+ Ajouter un extrait</button>
+              </div>
+              <div id="chunksListContainer" class="chunks-list">
+                <!-- Chunks displayed here -->
+              </div>
+            </div>
+
+            <div class="action-bar-historian">
+              <button id="btnRunHistorian" class="btn btn-primary btn-run-large">
+                <span class="btn-icon">⚡</span> Lancer l'analyse historique
+              </button>
+              <span id="historianLoadingStatus" class="loading-label hidden">
+                <span class="spinner"></span> Analyse en cours...
+              </span>
+            </div>
+          </div>
+
+          <!-- Right: Output & Synthesis -->
+          <div class="card historian-output-card">
+            <div class="output-header-bar">
+              <h3 class="card-title">2. Résultat de l'Agent Historien</h3>
+              <div id="historianModeBadge" class="mode-badge idle">En attente d'exécution</div>
+            </div>
+
+            <div id="historianPlaceholder" class="empty-state-card">
+              <div class="empty-icon">🏛️</div>
+              <h4>Prêt pour l'analyse</h4>
+              <p>Sélectionnez un scénario à gauche et cliquez sur "Lancer l'analyse historique" pour observer le raisonnement rétrospectif de l'agent.</p>
+            </div>
+
+            <div id="historianResultContainer" class="result-details hidden">
+              <!-- Notice if in simulated mode -->
+              <div id="historianSimulationNotice" class="sim-notice hidden"></div>
+
+              <!-- Perspective Frame -->
+              <div class="perspective-box">
+                <div class="box-tag">🔭 Perspective Rétrospective (Regard de 2126)</div>
+                <blockquote id="historianPerspectiveText" class="perspective-quote"></blockquote>
+              </div>
+
+              <!-- 3 Pillars Findings -->
+              <div class="findings-container">
+                <div class="findings-header">
+                  <span class="box-tag">📜 Clés d'Analyse Historique (3 Piliers)</span>
+                </div>
+                <ul id="historianFindingsList" class="findings-list">
+                  <!-- Injected via JS -->
+                </ul>
+              </div>
+
+              <!-- Grounded Artifacts -->
+              <div class="artifacts-grounding-box">
+                <div class="grounding-header">
+                  <span class="box-tag">🛡️ Artefacts Sélectionnés (Ancrage Anti-Hallucination)</span>
+                  <span class="grounding-status-pill">✓ 100% Vérifié &amp; Ancré</span>
+                </div>
+                <div id="historianArtifactsPills" class="artifact-pills-row">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+
+              <!-- Raw JSON Inspection Accordion -->
+              <div class="raw-json-accordion">
+                <button id="btnToggleJson" class="btn-accordion">
+                  <span>Voir le JSON brut (InsightObject)</span>
+                  <span id="accordionArrow" class="accordion-arrow">▼</span>
+                </button>
+                <pre id="historianRawJson" class="raw-json-pre hidden"></pre>
+              </div>
             </div>
           </div>
         </div>

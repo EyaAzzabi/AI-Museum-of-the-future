@@ -286,8 +286,8 @@ class TestEvalRecordFieldTypes:
         records = evaluate_all(client, test_cases)
 
         assert records[0].prompt_version != ""
-        # The historian.md starts with "## v1 — 2026-10-04"
-        assert "v1" in records[0].prompt_version
+        # The prompt file starts with "## v<N> — <date>"
+        assert records[0].prompt_version.startswith("v")
 
 
 # ---------------------------------------------------------------------------
