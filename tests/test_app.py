@@ -58,3 +58,23 @@ def test_historian_analyze_endpoint(monkeypatch):
     bad_response = client.post('/api/historian/analyze', json={"chunks": []})
     assert bad_response.status_code == 400
 
+
+
+def test_embed_endpoint_returns_gemini_shaped_384_dim_vector(monkeypatch):
+    from types import SimpleNamespace
+
+    import rag.vector_store.local_embeddings as local_embeddings
+
+    fake = SimpleNamespace(embeddings=SimpleNamespace(
+        create=lambda input, **_: SimpleNamespace(data=[SimpleNamespace(embedding=[0.1] * 384)])
+    ))
+    monkeypatch.setattr(local_embeddings, "build_embedding_client", lambda: fake)
+    client = create_app().test_client()
+
+    response = client.post('/api/embed', json={"text": "Tunisie 2022"})
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert len(payload['embedding']['values']) == 384
+    assert payload['dim'] == 384
+
+    assert client.post('/api/embed', json={"text": "  "}).status_code == 400

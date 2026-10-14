@@ -124,17 +124,15 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
+        "url": "http://localhost:5000/api/embed",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ {\n  \"content\": {\n    \"parts\": [\n      {\n        \"text\": $json.content\n      }\n    ]\n  },\n  \"outputDimensionality\": 1536,\n  \"taskType\": \"RETRIEVAL_DOCUMENT\"\n} }}",
+        "jsonBody": "={{ { \"text\": $json.content } }}",
         "options": {
           "batching": {
             "batch": {
               "batchSize": 1,
-              "batchInterval": 2000
+              "batchInterval": 0
             }
           }
         }
@@ -146,13 +144,7 @@
         352
       ],
       "id": "64d2e3e7-27d9-4699-83ec-4948a04570a3",
-      "name": "HTTP Request1",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "AsN5bBu8y5rM4qiq",
-          "name": "Header Auth account 2"
-        }
-      }
+      "name": "embed (local MiniLM)"
     },
     {
       "parameters": {
@@ -2754,18 +2746,7 @@
       "main": [
         [
           {
-            "node": "HTTP Request1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request1": {
-      "main": [
-        [
-          {
-            "node": "format embedding",
+            "node": "embed (local MiniLM)",
             "type": "main",
             "index": 0
           }
@@ -3024,6 +3005,17 @@
         [
           {
             "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "embed (local MiniLM)": {
+      "main": [
+        [
+          {
+            "node": "format embedding",
             "type": "main",
             "index": 0
           }

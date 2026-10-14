@@ -252,6 +252,23 @@ def create_app() -> Flask:
         })
 
 
+    @app.post("/api/embed")
+    def embed_text() -> Any:
+        """Embed one text with the same local model the retriever queries with.
+
+        Used by the n8n ingestion workflow so its chunks match the 384-dim
+        vector(384) column in rag/schema.sql. The response mirrors Gemini's
+        embedContent shape ({"embedding": {"values": [...]}}).
+        """
+        from rag.vector_store.local_embeddings import EMBEDDING_DIM, EMBEDDING_MODEL, build_embedding_client
+
+        data = request.get_json(silent=True) or {}
+        text = data.get("text")
+        if not isinstance(text, str) or not text.strip():
+            return jsonify({"error": "Provide a non-empty 'text' string."}), 400
+        vector = build_embedding_client().embeddings.create(input=text).data[0].embedding
+        return jsonify({"embedding": {"values": vector}, "model": EMBEDDING_MODEL, "dim": EMBEDDING_DIM})
+
     @app.get("/api/validate")
     def validate_pipeline() -> Any:
         steps: list[dict[str, Any]] = []
