@@ -291,11 +291,11 @@ class TestSociologistAgent:
         assert len(result.key_findings) >= MIN_FINDINGS
 
     def test_run_with_no_llm_client(self, sample_chunks):
-        """Agent with no LLM client should return fallback InsightObject."""
+        """Agent with no LLM client raises so the pipeline marks the perspective missing."""
         agent_no_llm = SociologistAgent(openai_client=None, retriever=None)
-        result = agent_no_llm.run(sample_chunks)
-        assert isinstance(result, InsightObject)
-        assert result.agent == "sociologist"
+        with patch("time.sleep"):
+            with pytest.raises(ValueError):
+                agent_no_llm.run(sample_chunks)
 
     def test_system_prompt_contains_chain_of_thought(self, agent, sample_chunks):
         """System prompt should include CoT steps."""
@@ -370,7 +370,8 @@ class TestSociologistAgent:
             mock_completion,
         ]
         agent = SociologistAgent(openai_client=client, retriever=None)
-        result = agent.run(sample_chunks)
+        with patch("time.sleep"):
+            result = agent.run(sample_chunks)
         assert isinstance(result, InsightObject)
         assert client.chat.completions.create.call_count == 3
 
@@ -433,15 +434,11 @@ class TestSociologistLive:
 
     @pytest.fixture
     def live_agent(self):
-        """Real agent with OpenAI client — skipped if no API key."""
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            pytest.skip("OPENAI_API_KEY not set — skipping live test")
-        from dotenv import load_dotenv
-        load_dotenv()
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key)
-        return SociologistAgent(openai_client=client, retriever=None)
+        """Real agent with the configured LLM provider — skipped if no API key."""
+        if not (os.getenv("LLM_API_KEY") or os.getenv("GROQ_API_KEY")):
+            pytest.skip("LLM_API_KEY not set — skipping live test")
+        from agents.llm_config import build_llm_client
+        return SociologistAgent(openai_client=build_llm_client(), retriever=None)
 
     def test_live_run_returns_valid_insight(self, live_agent, sample_chunks):
         """Real LLM call should return valid InsightObject with quality output."""

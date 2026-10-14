@@ -35,7 +35,10 @@ def test_historian_presets_api():
     assert payload['presets'][0]['chunks'][0]['chunk_id']
 
 
-def test_historian_analyze_endpoint():
+def test_historian_analyze_endpoint(monkeypatch):
+    # Force the offline simulation path so the test never calls the real LLM
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
     client = create_app().test_client()
     # Test valid chunks
     data = {

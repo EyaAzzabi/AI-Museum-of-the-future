@@ -6,7 +6,7 @@ from typing import Any
 
 import os
 from dotenv import load_dotenv
-load_dotenv(override=True)
+load_dotenv()
 from flask import Flask, jsonify, render_template, request
 
 from agents.base_agent import InsightObject

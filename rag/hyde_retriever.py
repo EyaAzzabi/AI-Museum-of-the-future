@@ -199,7 +199,7 @@ class HyDERetriever:
 
     # ── Step 3 — Embed Hypothetical Document & Retrieve ───────────────────────
 
-    def retrieve_with_hyde(self, theme: str, query: str) -> list[Any]:
+    def retrieve_with_hyde(self, theme: str, query: str, hypo_doc: str | None = None) -> list[Any]:
         """
         Full HyDE retrieval pipeline for a single theme:
         1. Expand query
@@ -213,8 +213,9 @@ class HyDERetriever:
         # Step 1 — Expand query
         expanded_query = self.expand_query(theme, query)
 
-        # Step 2 — Generate hypothetical document
-        hypo_doc = self.generate_hypothetical_doc(theme, expanded_query)
+        # Step 2 — Generate hypothetical document (unless the caller already did)
+        if hypo_doc is None:
+            hypo_doc = self.generate_hypothetical_doc(theme, expanded_query)
 
         # Step 3 — Use hypothetical doc as search query
         # The retriever embeds it and searches Supabase
@@ -274,10 +275,10 @@ class HyDERetriever:
             expanded = self.expand_query(theme, base_query)
 
             # Generate hypothetical doc (Step 2)
-            hypo_doc = self.generate_hypothetical_doc(theme, base_query)
+            hypo_doc = self.generate_hypothetical_doc(theme, expanded)
 
             # Retrieve (Step 3)
-            chunks = self.retrieve_with_hyde(theme, base_query)
+            chunks = self.retrieve_with_hyde(theme, base_query, hypo_doc=hypo_doc)
 
             results.append(HyDEResult(
                 theme=theme,
