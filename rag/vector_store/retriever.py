@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from agents.llm_config import get_model
 from rag.vector_store.local_embeddings import EMBEDDING_MODEL
@@ -117,50 +117,36 @@ class Retriever:
 
     def _rerank(self, query: str, results: list[RetrievalResult]) -> list[RetrievalResult]:
         """Req 3.5: re-score top results with an LLM judge; fall back to original order on any failure."""
-        if not results:
-            return []
-        if self.openai_client is None:
+        return llm_rerank(self.openai_client, query, results)
+
+
+def llm_rerank(client: Any, query: str, results: list[RetrievalResult]) -> list[RetrievalResult]:
+    """Re-score results 0-10 with an LLM judge; keep the original order on any failure."""
+    if not results or client is None:
+        return results
+    try:
+        items = [{"chunk_id": r.chunk_id, "content": r.content[:500]} for r in results]
+        prompt = (
+            "Rate how relevant each chunk is to the query on a 0-10 scale.\n\n"
+            f"Query: {query}\n\n"
+            f"Chunks: {json.dumps(items, ensure_ascii=False)}\n\n"
+            'Respond with JSON only: {"scores": [{"chunk_id": "...", "score": 0-10}, ...]}'
+        )
+        completion = client.chat.completions.create(
+            model=get_model("RERANK_MODEL"),
+            response_format={"type": "json_object"},
+            messages=[{"role": "user", "content": prompt}],
+        )
+        scores = json.loads(completion.choices[0].message.content).get("scores") or []
+        score_map = {s["chunk_id"]: s["score"] for s in scores if "chunk_id" in s and "score" in s}
+        if not score_map:
             return results
-
-        try:
-            items = [{"chunk_id": r.chunk_id, "content": r.content[:500]} for r in results]
-            prompt = (
-                "Rate how relevant each chunk is to the query on a 0-10 scale.\n\n"
-                f"Query: {query}\n\n"
-                f"Chunks: {json.dumps(items)}\n\n"
-                'Respond with JSON only: {"scores": [{"chunk_id": "...", "score": 0-10}, ...]}'
-            )
-            completion = self.openai_client.chat.completions.create(
-                model=get_model("RERANK_MODEL"),
-                response_format={"type": "json_object"},
-                messages=[{"role": "user", "content": prompt}],
-            )
-            parsed = json.loads(completion.choices[0].message.content)
-            scores = parsed.get("scores")
-            if not scores:
-                return results
-
-            score_map = {
-                s["chunk_id"]: s["score"] for s in scores if "chunk_id" in s and "score" in s
-            }
-            if not score_map:
-                return results
-
-            def sort_key(r: RetrievalResult) -> float:
-                raw = score_map.get(r.chunk_id)
-                return r.similarity if raw is None else raw
-
-            reranked = sorted(results, key=sort_key, reverse=True)
-            return [
-                RetrievalResult(
-                    chunk_id=r.chunk_id,
-                    document_id=r.document_id,
-                    content=r.content,
-                    metadata=r.metadata,
-                    similarity=max(0.0, min(1.0, score_map[r.chunk_id] / 10.0)) if r.chunk_id in score_map else r.similarity,
-                )
-                for r in reranked
-            ]
-        except Exception as e:  # noqa: BLE001
-            logger.warning(f"Reranking failed, falling back to original order: {e}")
-            return results
+        reranked = sorted(results, key=lambda r: score_map.get(r.chunk_id, r.similarity * 10), reverse=True)
+        return [
+            replace(r, similarity=max(0.0, min(1.0, float(score_map[r.chunk_id]) / 10.0)))
+            if r.chunk_id in score_map else r
+            for r in reranked
+        ]
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Reranking failed, keeping fused order: %s", exc)
+        return results

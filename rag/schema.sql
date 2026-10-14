@@ -56,6 +56,12 @@ create index if not exists chunks_document_id_idx on chunks (document_id);
 create index if not exists chunks_embedding_idx
     on chunks using ivfflat (embedding vector_cosine_ops) with (lists = 4);
 
+-- Keyword (full-text) search used by rag/vector_store/hybrid_retriever.py, which queries
+-- chunks.content with PostgREST's fts(simple) filter. It works without this index
+-- (~0.5-1.5 s per query on ~7k chunks); the index makes it fast as the corpus grows.
+create index if not exists chunks_content_fts_idx
+    on chunks using gin (to_tsvector('simple', content));
+
 -- Top-k similarity search, callable from Python (supabase-py .rpc()) or n8n (Supabase node / HTTP request).
 create or replace function match_chunks (
     query_embedding vector(384),
