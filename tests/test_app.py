@@ -35,29 +35,50 @@ def test_historian_presets_api():
     assert payload['presets'][0]['chunks'][0]['chunk_id']
 
 
-def test_historian_analyze_endpoint(monkeypatch):
-    # Force the offline simulation path so the test never calls the real LLM
+def test_historian_analyze_endpoint_without_key_reports_error(monkeypatch):
+    # No canned "simulation": without a key the endpoint says so instead of inventing findings
     monkeypatch.delenv("LLM_API_KEY", raising=False)
     monkeypatch.delenv("GROQ_API_KEY", raising=False)
     client = create_app().test_client()
-    # Test valid chunks
-    data = {
-        "chunks": [
-            {"chunk_id": "test-c1", "content": "Treaty signed in 2026."}
-        ]
-    }
-    response = client.post('/api/historian/analyze', json=data)
-    assert response.status_code == 200
-    payload = response.get_json()
-    assert payload['ok'] is True
-    assert payload['insight']['agent'] == 'historian'
-    assert len(payload['insight']['selected_artifacts']) >= 1
-    assert "test-c1" in payload['insight']['selected_artifacts']
 
-    # Test empty chunks error
+    response = client.post('/api/historian/analyze', json={"chunks": [{"chunk_id": "test-c1", "content": "x"}]})
+    assert response.status_code == 503
+    assert response.get_json()['ok'] is False
+
     bad_response = client.post('/api/historian/analyze', json={"chunks": []})
     assert bad_response.status_code == 400
 
+
+def test_historian_analyze_endpoint_live_path(monkeypatch):
+    import json
+    from types import SimpleNamespace
+
+    import app as app_module
+
+    monkeypatch.setenv("LLM_API_KEY", "test-key")
+    content = json.dumps({
+        "perspective": "Vue depuis 2126.",
+        "key_findings": ["Événement Clé : test"],
+        "selected_artifacts": ["test-c1", "invented-id"],
+    })
+    fake_client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(
+        create=lambda **_: SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=content))])
+    )))
+    monkeypatch.setattr(app_module, "build_llm_client", lambda: fake_client)
+    client = app_module.create_app().test_client()
+
+    response = client.post('/api/historian/analyze', json={"chunks": [{"chunk_id": "test-c1", "content": "x"}]})
+    assert response.status_code == 200
+    payload = response.get_json()
+    assert payload['ok'] is True and payload['mode'] == 'live'
+    assert payload['insight']['selected_artifacts'] == ["test-c1"]
+
+
+def test_historian_presets_are_about_tunisia():
+    presets = create_app().test_client().get('/api/historian/presets').get_json()['presets']
+    for preset in presets:
+        for chunk in preset['chunks']:
+            assert chunk['metadata']['country'] == 'Tunisia'
 
 
 def test_embed_endpoint_returns_gemini_shaped_384_dim_vector(monkeypatch):
