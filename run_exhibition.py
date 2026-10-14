@@ -27,6 +27,7 @@ def main() -> None:
     parser.add_argument("--timeout", type=int, default=180, help="seconds for the specialists")
     parser.add_argument("--no-review", action="store_true")
     parser.add_argument("--no-fact-check", action="store_true")
+    parser.add_argument("--rerank", action="store_true", help="LLM-rerank each agent's search (1 call per agent)")
     args = parser.parse_args()
     load_dotenv()
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
@@ -34,14 +35,16 @@ def main() -> None:
     from agents.llm_config import build_llm_client, get_model
     from agents.pipeline import run_pipeline
     from agents.run_log import RunRecorder
-    from rag.vector_store.hybrid_retriever import SearchFilters, build_hybrid_retriever
+    from rag.vector_store.hybrid_retriever import SearchConfig, SearchFilters, build_hybrid_retriever
 
     llm = build_llm_client()
     filters = SearchFilters(country=args.country or None, year_from=args.year_from, year_to=args.year_to)
-    retriever = build_hybrid_retriever(llm_client=llm, filters=filters)
+    retriever = build_hybrid_retriever(llm_client=llm, filters=filters,
+                                       config=SearchConfig(rerank_agent_searches=args.rerank))
     recorder = RunRecorder(config={
         "model": get_model(), "country": filters.country, "years": [filters.year_from, filters.year_to],
         "review": not args.no_review, "fact_check": not args.no_fact_check, "timeout": args.timeout,
+        "rerank": args.rerank,
     })
 
     result = run_pipeline([], llm, timeout_secs=args.timeout, retriever=retriever, recorder=recorder,

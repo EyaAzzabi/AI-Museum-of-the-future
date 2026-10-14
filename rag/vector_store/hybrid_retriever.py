@@ -67,6 +67,9 @@ class SearchConfig:
     # results from elsewhere, marked metadata["in_scope"] = False. The corpus has
     # little country-specific material for some agents (images, technology).
     relax_country: bool = True
+    # LLM-rerank the agents' own searches. Off by default: it adds one large LLM
+    # call per agent and run, for +0.04 precision@5 in evaluation/ (0.68 -> 0.72).
+    rerank_agent_searches: bool = False
 
 
 @dataclass

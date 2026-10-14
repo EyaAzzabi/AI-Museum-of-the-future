@@ -32,6 +32,7 @@ def test_agent_adds_its_own_search_results_to_the_input():
     retriever = MagicMock()
     retriever.search_many.return_value = FOUND
     retriever.default_filters = None
+    retriever.config.rerank_agent_searches = True
     agent = TechnologyAgent(openai_client=None)
     agent.retriever = retriever
 
@@ -136,3 +137,16 @@ def test_unparseable_responses_are_recorded(tmp_path):
     except ValueError:
         pass
     assert agent.recorder.events_of("llm_call")[0]["error"] == "LLM response was not a JSON object."
+
+
+def test_agent_search_is_not_reranked_unless_enabled():
+    from rag.vector_store.hybrid_retriever import SearchConfig
+
+    retriever = MagicMock()
+    retriever.search_many.return_value = []
+    retriever.default_filters = None
+    retriever.config = SearchConfig()
+    agent = TechnologyAgent(openai_client=None)
+    agent.retriever = retriever
+    agent.gather_evidence(INPUT)
+    assert retriever.search_many.call_args.kwargs["rerank_query"] is None

@@ -216,7 +216,8 @@ class BaseAgent(ABC):
                 k=self.search_k,
                 filters=filters,
                 keywords=list(self.search_keywords) or None,
-                rerank_query=self.focus or None,
+                rerank_query=(self.focus or None) if getattr(getattr(self.retriever, "config", None),
+                                                              "rerank_agent_searches", False) else None,
             )
         except Exception as exc:  # noqa: BLE001 - own search is a bonus, never fatal
             logger.warning("[%s] own search failed: %s", self.name, exc)
