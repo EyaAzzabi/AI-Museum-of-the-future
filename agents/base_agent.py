@@ -62,7 +62,7 @@ class BaseAgent(ABC):
                 except Exception as exc:
                     last_exc = exc
                     err_msg = str(exc)
-                    if any(code in err_msg for code in ["503", "429", "high demand", "UNAVAILABLE", "quota"]):
+                    if any(code in err_msg for code in ["503", "429", "high demand", "UNAVAILABLE", "quota", "json_validate_failed"]):
                         time.sleep(1.0 * (attempt + 1))
                         continue
                     break
@@ -101,10 +101,17 @@ class BaseAgent(ABC):
             return ""
         return self.prompt_path.read_text(encoding="utf-8")
 
+    @staticmethod
+    def _format_chunk(chunk: Any) -> str:
+        """Prefix each chunk with its ID so the model can cite it in selected_artifacts."""
+        content = getattr(chunk, "content", str(chunk))
+        chunk_id = getattr(chunk, "chunk_id", "") or getattr(chunk, "document_id", "")
+        return f"[{chunk_id}] {content}" if chunk_id else content
+
     def _render_prompt(self, chunks: Any, agent_name: str, system_prompt: str) -> str:
         template = self._load_prompt_template()
         chunk_text = "\n".join(
-            getattr(chunk, "content", str(chunk)) for chunk in chunks
+            self._format_chunk(chunk) for chunk in chunks
         ) if isinstance(chunks, list) else str(chunks)
         render = template.replace("{chunks}", chunk_text).replace("{agent}", agent_name).replace("{system}", system_prompt)
         return render

@@ -10,13 +10,15 @@ System framing:
 
 Agent name: {agent}
 
-Evidence:
+Evidence (each chunk starts with its [chunk_id]):
 {chunks}
+
+For "selected_artifacts", use only chunk IDs shown in brackets above. Never invent IDs.
 
 Return JSON only with keys:
 {
   "agent": "technology",
   "perspective": "brief framing sentence",
   "key_findings": ["finding 1", "finding 2"],
-  "selected_artifacts": ["artifact-reference-1", "artifact-reference-2"]
+  "selected_artifacts": ["chunk_id_1", "chunk_id_2"]
 }

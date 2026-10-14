@@ -17,7 +17,9 @@ class VisualAgent(BaseAgent):
         payload = self._call_llm(system_prompt, user_prompt)
 
         findings = payload.get("key_findings") or ["Visual mood and aesthetics informed the curation."]
-        artifacts = payload.get("selected_artifacts") or [getattr(chunk, "chunk_id", getattr(chunk, "document_id", "")) for chunk in chunks[:1]]
+        input_ids = [cid for chunk in chunks if (cid := getattr(chunk, "chunk_id", "") or getattr(chunk, "document_id", ""))]
+        # Drop artifact IDs the model invented; fall back to the first input chunk
+        artifacts = [str(a) for a in payload.get("selected_artifacts") or [] if str(a) in input_ids] or input_ids[:1]
         return InsightObject(
             agent="visual",
             perspective=str(payload.get("perspective", "Visual and aesthetic framing of the era.")),
