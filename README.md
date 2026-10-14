@@ -1,7 +1,3 @@
-> **Sarah : commencer par [START_HERE_SARAH.md](START_HERE_SARAH.md).**
-> Cette copie conserve les modules de l’équipe et ajoute ton agent, son diagnostic et sa démonstration.
-> Confirmer les embeddings de Supabase avant d’exécuter le schéma/ingestion originaux.
-
 # AI Museum of the Future
 
 An AI-powered virtual museum that represents our current era as if curated 100 years from now. The system collects public contemporary data, analyzes it through specialized AI agents, grounds findings in a RAG knowledge base, and synthesizes a coherent virtual exhibition.
@@ -36,7 +32,8 @@ multimodal/      Image understanding & multimodal embeddings
 prompts/         Versioned prompt library (one file per prompt, with iteration history)
 n8n/             Exported n8n workflow(s) (JSON) and setup instructions
 scripts/         One-off / utility scripts
-docs/            Assignment brief, Week 1 writeup, and architecture diagram
+docs/            Assignment brief, Week 1 writeup, architecture diagram
+  culture_art/   CultureArt agent notes, audits and validation (Sarah)
 ```
 
 ## Team roles
@@ -121,9 +118,20 @@ All tests use mocked clients, so no keys or network are needed. (`hypothesis` is
 3. Embeddings are local and the vector columns are `vector(384)`. If your Supabase project was created with the old OpenAI schema (1536 dims), drop the `chunks` table, its index and `match_chunks`, re-run `rag/schema.sql`, then re-ingest. Never mix vectors from different embedding models in one table.
 4. Fetch, normalize and ingest: `python data/fetch_all.py` (`--sources gdelt`, `--skip-process`, `--skip-ingest` available). Scripts load config via `scripts/config.py`.
 
+## Specialist agents
+
+| Agent | Author | Code | Notes |
+|---|---|---|---|
+| Historian (writes in French) | Eya | [`agents/historian.py`](agents/historian.py) | Demo UI tab and `/api/historian/*` in `app.py` |
+| Sociologist | Eya Rachdi | [`agents/sociologist.py`](agents/sociologist.py) | [`agents/SOCIOLOGIST_README.md`](agents/SOCIOLOGIST_README.md) |
+| Culture & Art | Sarah | [`agents/culture_art.py`](agents/culture_art.py) | [`docs/culture_art/`](docs/culture_art/) (start with `START_HERE_SARAH.md`) |
+| Technology, Visual | team | [`agents/technology.py`](agents/technology.py), [`agents/visual.py`](agents/visual.py) | |
+
+Every agent sees each evidence chunk prefixed with its `[chunk_id]` and may only cite those IDs in `selected_artifacts`. If its LLM call fails it raises, and the curator lists it in `missing_perspectives`.
+
 ## Curator agent
 
-[`agents/curator.py`](agents/curator.py) takes the five specialist insights plus their cross-references and writes the exhibition (title, concept, 4-6 sections, selected items). Prompt: [`prompts/curator.md`](prompts/curator.md) (v3).
+[`agents/curator.py`](agents/curator.py) takes the five specialist insights plus their cross-references and writes the exhibition (title, concept, 4-6 sections, selected items). Prompt: [`prompts/curator.md`](prompts/curator.md) (v4: the exhibition is bilingual, English and French, because the historian reports in French).
 
 What changed in the latest iteration:
 
