@@ -6,7 +6,7 @@ import unicodedata
 from collections.abc import Iterable
 from typing import Any
 
-SPECIALISTS = ("historian", "sociologist", "technology", "culture_art", "visual")
+from agents.pipeline import SPECIALISTS
 
 
 def _normalize(text: str) -> str:

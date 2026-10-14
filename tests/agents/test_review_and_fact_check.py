@@ -126,3 +126,17 @@ def test_pipeline_can_skip_review_and_fact_check():
     llm = ScriptedLLM()
     run_pipeline(CHUNKS, llm, review=False, fact_check=False)
     assert "review" not in llm.calls and "fact_check" not in llm.calls
+
+
+def test_a_saved_run_can_be_curated_again(tmp_path):
+    from agents.pipeline import context_from_run
+
+    llm = ScriptedLLM()
+    recorder = RunRecorder(runs_dir=tmp_path, run_id="first")
+    run_pipeline(CHUNKS, llm, recorder=recorder, fact_check=False)
+
+    context = context_from_run(load_run(tmp_path / "first"))
+    assert {n for n, i in context.insights.items() if i.key_findings} == {
+        "historian", "sociologist", "technology", "culture_art", "visual"}
+    assert context.insights["historian"].evidence["c1"]["content"] == "Tunisia evidence 1"
+    assert context.review == {"agreements": [], "tensions": [], "weak_findings": []}

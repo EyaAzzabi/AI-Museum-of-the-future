@@ -3,6 +3,7 @@
     python run_exhibition.py                      # Tunisia, 2020-2026
     python run_exhibition.py --country ""         # no country filter (global corpus)
     python run_exhibition.py --no-review --no-fact-check
+    python run_exhibition.py --from-run runs/<run_id>   # rerun only curator + fact-check
 
 Every specialist searches the Supabase knowledge base with its own queries
 (hybrid vector + keyword search), then the peer reviewer, the curator and the
@@ -28,13 +29,14 @@ def main() -> None:
     parser.add_argument("--no-review", action="store_true")
     parser.add_argument("--no-fact-check", action="store_true")
     parser.add_argument("--rerank", action="store_true", help="LLM-rerank each agent's search (1 call per agent)")
+    parser.add_argument("--from-run", help="reuse the specialists' insights and review of a saved run")
     args = parser.parse_args()
     load_dotenv()
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
 
     from agents.llm_config import build_llm_client, get_model
-    from agents.pipeline import run_pipeline
-    from agents.run_log import RunRecorder
+    from agents.pipeline import context_from_run, curate, run_pipeline
+    from agents.run_log import RunRecorder, load_run
     from rag.vector_store.hybrid_retriever import SearchConfig, SearchFilters, build_hybrid_retriever
 
     llm = build_llm_client()
@@ -47,8 +49,20 @@ def main() -> None:
         "rerank": args.rerank,
     })
 
-    result = run_pipeline([], llm, timeout_secs=args.timeout, retriever=retriever, recorder=recorder,
-                          review=not args.no_review, fact_check=not args.no_fact_check)
+    if args.from_run:
+        recorder.config["from_run"] = args.from_run
+        source = load_run(args.from_run)
+        # Keep the specialists' events so the new run can be evaluated on its own.
+        for event in source["events"]:
+            if event["kind"] in ("evidence", "insight", "abstain", "agent_error", "review"):
+                recorder.events.append(event)
+        try:
+            result = curate(context_from_run(source), llm, recorder, fact_check=not args.no_fact_check)
+        finally:
+            recorder.save()
+    else:
+        result = run_pipeline([], llm, timeout_secs=args.timeout, retriever=retriever, recorder=recorder,
+                              review=not args.no_review, fact_check=not args.no_fact_check)
 
     print(f"\n{result.exhibition_title}\n{result.concept}\n")
     for i, section in enumerate(result.sections, 1):

@@ -11,6 +11,9 @@ from agents.shared_context import SharedContext, evidence_of
 
 MIN_SECTIONS = 4
 MAX_SECTIONS = 6
+# Evidence text shown per cited chunk. Kept short: free tiers cap tokens per
+# request/minute (a 300-character version exceeded Groq's 8k TPM for qwen3.8-27b).
+EVIDENCE_SNIPPET_CHARS = 180
 MAX_ATTEMPTS = 3  # narratives must also cite valid IDs, so allow one more correction
 
 SYSTEM_PROMPT = (
@@ -77,8 +80,7 @@ class CuratorAgent(BaseAgent):
                     name: {
                         "agent": insight.agent,
                         "perspective": insight.perspective,
-                        "key_findings": insight.key_findings,
-                        "selected_artifacts": insight.selected_artifacts,
+                        "key_findings": insight.key_findings,  # cite their artifacts inline
                     }
                     for name, insight in present.items()
                 },
@@ -86,7 +88,8 @@ class CuratorAgent(BaseAgent):
                 "unavailable_perspectives": missing,
                 "review": shared_context.review or {},
                 "evidence": {
-                    cid: {k: item.get(k) for k in ("year", "source", "title")} | {"content": (item.get("content") or "")[:300]}
+                    cid: " · ".join(str(x) for x in (item.get("year"), item.get("source")) if x)
+                         + ": " + (item.get("content") or "")[:EVIDENCE_SNIPPET_CHARS]
                     for cid, item in evidence.items()
                 },
             },

@@ -19,6 +19,8 @@ from agents.base_agent import InsightObject
 from agents.curator import CuratorAgent, ExhibitionSynthesis
 from agents.shared_context import SharedContext, compute_cross_references, evidence_of
 
+SPECIALISTS = ("historian", "sociologist", "technology", "culture_art", "visual")
+
 
 def _build_specialist_agents(openai_client: Any, retriever: Any = None, recorder: Any = None):
     from agents.culture_art import CultureArtAgent
@@ -87,25 +89,47 @@ def run_pipeline(
         )
         if review and openai_client is not None:
             shared_context.review = _peer_review(openai_client, insights, recorder)
-
-        t = time.monotonic()
-        curator = CuratorAgent(openai_client)
-        curator.recorder = recorder
-        try:
-            synthesis = curator.run(shared_context)
-        except Exception as exc:  # pragma: no cover
-            raise ValueError(f"Curator failed to synthesize exhibition: {exc}") from exc
-        _timing(recorder, "curator", t)
-
-        if fact_check and openai_client is not None:
-            synthesis = _fact_check(openai_client, curator, shared_context, synthesis, recorder)
-        _record(recorder, "result", exhibition=synthesis)
-        return synthesis
+        return curate(shared_context, openai_client, recorder, fact_check)
     finally:
         _timing(recorder, "total", started)
         if recorder is not None:
             path = recorder.save()
             logging.info("Run saved to %s", path)
+
+
+def curate(shared_context: SharedContext, openai_client: Any, recorder: Any = None,
+           fact_check: bool = True) -> ExhibitionSynthesis:
+    """Curator (+ fact-check) on finished specialist insights; also used to replay a saved run."""
+    t = time.monotonic()
+    curator = CuratorAgent(openai_client)
+    curator.recorder = recorder
+    try:
+        synthesis = curator.run(shared_context)
+    except Exception as exc:  # pragma: no cover
+        raise ValueError(f"Curator failed to synthesize exhibition: {exc}") from exc
+    _timing(recorder, "curator", t)
+
+    if fact_check and openai_client is not None:
+        synthesis = _fact_check(openai_client, curator, shared_context, synthesis, recorder)
+    _record(recorder, "result", exhibition=synthesis)
+    return synthesis
+
+
+def context_from_run(run: dict) -> SharedContext:
+    """Rebuild the specialists' insights and the peer review from a saved run (agents/run_log.py)."""
+    from agents.reviewer import EMPTY_REVIEW
+
+    insights = {name: InsightObject(name, "", [], []) for name in SPECIALISTS}
+    for event in run.get("events", []):
+        if event["kind"] == "insight" and event.get("agent") in insights:
+            data = event["insight"]
+            insights[event["agent"]] = InsightObject(
+                agent=data["agent"], perspective=data["perspective"], key_findings=data["key_findings"],
+                selected_artifacts=data["selected_artifacts"], evidence=data.get("evidence") or {},
+            )
+    review = next((e["review"] for e in reversed(run.get("events", [])) if e["kind"] == "review"), None)
+    return SharedContext(insights=insights, cross_references=compute_cross_references(insights),
+                         review=review or dict(EMPTY_REVIEW))
 
 
 def _peer_review(openai_client: Any, insights: dict[str, InsightObject], recorder: Any) -> dict:
