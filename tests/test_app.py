@@ -58,7 +58,7 @@ def test_historian_analyze_endpoint_live_path(monkeypatch):
     monkeypatch.setenv("LLM_API_KEY", "test-key")
     content = json.dumps({
         "perspective": "Vue depuis 2126.",
-        "key_findings": ["Événement Clé : test"],
+        "key_findings": ["Événement Clé : test [test-c1]"],
         "selected_artifacts": ["test-c1", "invented-id"],
     })
     fake_client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(

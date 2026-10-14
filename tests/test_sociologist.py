@@ -124,11 +124,11 @@ def mock_openai_client():
             "gender_women", "digital_social_media"
         ],
         "key_findings": [
-            "The 2021 constitutional crisis revealed Tunisia's democratic fatigue: a population exhausted by political instability chose authoritarian stability over participatory governance.",
-            "Youth unemployment exceeding 40% in rural areas created a generation with no economic future in Tunisia, making irregular migration a rational — if deadly — choice.",
-            "COVID-19 lockdowns exposed and amplified pre-existing gender inequalities, with domestic violence rising 30% and women's economic participation declining sharply.",
-            "Social media transformed from a tool of the 2011 revolution into an escape valve for youth frustration, with TikTok replacing street protest as political expression.",
-            "The cultural sector (Carthage festival, cinema) maintained surprising vitality despite economic crisis, suggesting culture functioned as social resilience infrastructure.",
+            "The 2021 constitutional crisis revealed Tunisia's democratic fatigue: a population exhausted by political instability chose authoritarian stability over participatory governance [c2].",
+            "Youth unemployment exceeding 40% in rural areas created a generation with no economic future in Tunisia, making irregular migration a rational — if deadly — choice [c1, c4].",
+            "COVID-19 lockdowns exposed and amplified pre-existing gender inequalities, with domestic violence rising 30% and women's economic participation declining sharply [c3].",
+            "Social media transformed from a tool of the 2011 revolution into an escape valve for youth frustration, with TikTok replacing street protest as political expression [c1].",
+            "The cultural sector (Carthage festival, cinema) maintained surprising vitality despite economic crisis, suggesting culture functioned as social resilience infrastructure [c4].",
         ],
         "selected_artifacts": ["c1", "c2", "c4"],
         "artifact_justification": (
@@ -284,11 +284,12 @@ class TestSociologistAgent:
         assert isinstance(result.selected_artifacts, list)
 
     def test_run_with_empty_chunks(self, agent):
-        """Agent should handle empty chunk list gracefully."""
+        """With no evidence the agent abstains without calling the LLM."""
         result = agent.run([])
         assert isinstance(result, InsightObject)
         assert result.agent == "sociologist"
-        assert len(result.key_findings) >= MIN_FINDINGS
+        assert result.key_findings == []
+        agent.openai_client.chat.completions.create.assert_not_called()
 
     def test_run_with_no_llm_client(self, sample_chunks):
         """Agent with no LLM client raises so the pipeline marks the perspective missing."""

@@ -23,21 +23,38 @@ def test_prompt_shows_chunk_ids(AgentClass) -> None:
     assert "[tn-2]" in prompt
 
 
-@pytest.mark.parametrize("AgentClass", [TechnologyAgent, VisualAgent])
+ALL_AGENTS = [HistorianAgent, TechnologyAgent, VisualAgent]
+
+
+@pytest.mark.parametrize("AgentClass", ALL_AGENTS)
 def test_invented_artifact_ids_are_dropped(AgentClass) -> None:
     payload = {
         "perspective": "p",
-        "key_findings": ["f"],
+        "key_findings": ["Digital growth [tn-2]."],
         "selected_artifacts": ["tn-2", "Startup Act 2018", "poster of the festival"],
     }
     agent = AgentClass(openai_client=None)
     with patch.object(agent, "_call_llm", return_value=payload):
-        assert agent.run(CHUNKS).selected_artifacts == ["tn-2"]
+        result = agent.run(CHUNKS)
+    assert result.selected_artifacts == ["tn-2"]
+    assert result.evidence["tn-2"]["content"] == "Startup Act and digital growth."
 
 
-@pytest.mark.parametrize("AgentClass", [TechnologyAgent, VisualAgent])
-def test_only_invented_ids_fall_back_to_first_chunk(AgentClass) -> None:
-    payload = {"perspective": "p", "key_findings": ["f"], "selected_artifacts": ["made-up"]}
+@pytest.mark.parametrize("AgentClass", ALL_AGENTS)
+@pytest.mark.parametrize("finding", ["Uncited claim.", "Claim [made-up].", "Claim [tn-1] and [made-up]."])
+def test_findings_need_only_valid_citations_else_abstain(AgentClass, finding) -> None:
+    payload = {"perspective": "p", "key_findings": [finding], "selected_artifacts": ["tn-1"]}
     agent = AgentClass(openai_client=None)
     with patch.object(agent, "_call_llm", return_value=payload):
-        assert agent.run(CHUNKS).selected_artifacts == ["tn-1"]
+        result = agent.run(CHUNKS)
+    assert result.key_findings == [] and result.selected_artifacts == []
+
+
+@pytest.mark.parametrize("AgentClass", ALL_AGENTS)
+def test_cited_ids_become_selected_artifacts(AgentClass) -> None:
+    payload = {"perspective": "p", "key_findings": ["Both events [tn-1, tn-2].", "Dropped."], "selected_artifacts": []}
+    agent = AgentClass(openai_client=None)
+    with patch.object(agent, "_call_llm", return_value=payload):
+        result = agent.run(CHUNKS)
+    assert result.key_findings == ["Both events [tn-1, tn-2]."]
+    assert result.selected_artifacts == ["tn-1", "tn-2"]

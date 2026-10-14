@@ -109,6 +109,10 @@ class SociologistAgent(BaseAgent):
     prompt_path   : Optional path to prompt template (defaults to prompts/sociologist.md)
     """
 
+    name = "sociologist"
+    focus = "Social transformations, collective behaviour and inequalities of 2020-2026"
+    max_evidence = 40  # HyDE context; _prepare_evidence keeps the 20 most relevant
+
     # ── Step 1 — Define objective ─────────────────────────────────────────────
     AGENT_OBJECTIVE = (
         "Analyze contemporary Tunisian society (2020-2026) to identify key social "
@@ -131,7 +135,7 @@ class SociologistAgent(BaseAgent):
         # Same injected client for HyDE and analysis, so the pipeline and tests control it
         self._llm_client = openai_client
 
-        # HyDE Retriever — Advanced RAG
+        # HyDE Retriever — Advanced RAG (built on first use, see search_own_evidence)
         self._hyde_retriever = HyDERetriever(
             retriever=retriever,
             llm_client=self._llm_client,
@@ -169,22 +173,10 @@ class SociologistAgent(BaseAgent):
         """
         logger.info("[SociologistAgent] Starting analysis | %d input chunks", len(chunks))
 
-        # ── Step 3a — Enrich with RAG if retriever available ─────────────────
-        all_chunks = list(chunks)
-        if self._tools_available["rag_retrieval"] and self.retriever is not None:
-            logger.info("[SociologistAgent] RAG retrieval enabled — fetching additional evidence...")
-            bundle = self._retrieve_evidence()
-            # Merge: add RAG chunks not already in input
-            existing_ids = {
-                getattr(c, "chunk_id", "") or getattr(c, "document_id", "")
-                for c in all_chunks
-            }
-            for rag_chunk in bundle.chunks:
-                cid = getattr(rag_chunk, "chunk_id", "") or getattr(rag_chunk, "document_id", "")
-                if cid not in existing_ids:
-                    all_chunks.append(rag_chunk)
-                    existing_ids.add(cid)
-            logger.info("[SociologistAgent] Total chunks after RAG enrichment: %d", len(all_chunks))
+        # ── Step 3a — Input chunks + HyDE retrieval (BaseAgent.gather_evidence) ─
+        all_chunks = self.gather_evidence(chunks)
+        if not all_chunks:
+            return self.abstain("no evidence")
 
         # ── Step 3b — Score and filter evidence ──────────────────────────────
         all_chunks = self._prepare_evidence(all_chunks)
@@ -205,6 +197,13 @@ class SociologistAgent(BaseAgent):
         return self._build_insight(payload, all_chunks)
 
     # ── Step 3 — Evidence retrieval & preparation ────────────────────────────
+
+    def search_own_evidence(self) -> list[Any]:
+        """The sociologist's own search is HyDE over its core themes."""
+        if self._hyde_retriever is None or self._hyde_retriever.retriever is not self.retriever:
+            self._hyde_retriever = HyDERetriever(retriever=self.retriever, llm_client=self.openai_client, top_k=10)
+        logger.info("[SociologistAgent] RAG retrieval enabled — fetching additional evidence...")
+        return self._retrieve_evidence().chunks
 
     def _retrieve_evidence(self) -> EvidenceBundle:
         """
@@ -303,6 +302,8 @@ STEP 5 — FORMULATE FINDINGS: Write 4-6 specific, evidence-grounded findings.
 ## OUTPUT RULES
 - Respond with valid JSON ONLY — no markdown, no explanation outside JSON
 - Minimum {MIN_FINDINGS} key_findings required
+- Every finding ends with the exact [ID] of the evidence it rests on, e.g. "... [abc-123]".
+  Findings without a valid [ID] are discarded.
 - confidence_score: float 0.0-1.0 reflecting how well evidence supports your analysis
 - If evidence is thin, say so in evidence_gaps
 """
@@ -446,8 +447,6 @@ Produce a structured sociological analysis in the JSON format specified in your 
         if not artifacts:
             artifacts = input_ids[:2]
 
-        perspective = str(payload.get("perspective", "Social patterns in Tunisian society 2020-2026."))
-
         # Analysis metadata goes to the log, not into the exhibition text
         themes   = payload.get("themes_detected", [])
         conf     = payload.get("confidence_score", 0.5)
@@ -458,12 +457,8 @@ Produce a structured sociological analysis in the JSON format specified in your 
             len(findings), len(artifacts), ", ".join(themes[:3]) if themes else "general", evidence, conf * 100
         )
 
-        return InsightObject(
-            agent="sociologist",
-            perspective=perspective,
-            key_findings=findings,
-            selected_artifacts=artifacts,
-        )
+        # Shared rule: every finding must cite the evidence (BaseAgent.finalize)
+        return self.finalize(payload, chunks)
 
     # ── Fallback ──────────────────────────────────────────────────────────────
 

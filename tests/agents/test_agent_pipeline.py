@@ -176,7 +176,7 @@ def retrieval_result_strategy(draw: st.DrawFn) -> RetrievalResult:
         whitelist_categories=("Lu", "Ll", "Nd"),
         whitelist_characters="-_",
     )))
-    content = draw(st.text(min_size=1, max_size=200))
+    content = draw(st.text(min_size=1, max_size=200).filter(lambda s: s.strip()))
     similarity = draw(st.floats(min_value=0.0, max_value=1.0, allow_nan=False))
     return RetrievalResult(
         chunk_id=chunk_id,
@@ -198,11 +198,11 @@ SPECIALIST_AGENTS = [
 
 
 def _make_mock_llm_response(chunks: list[RetrievalResult], agent_name: str) -> dict:
-    """Return a dict that _call_llm would return; uses chunk IDs as selected_artifacts."""
+    """Return a dict that _call_llm would return; the finding cites the first chunk."""
     return {
         "agent": agent_name,
         "perspective": f"Test perspective for {agent_name}.",
-        "key_findings": [f"Finding from {agent_name} agent."],
+        "key_findings": [f"Finding from {agent_name} agent [{chunks[0].chunk_id}]."],
         "selected_artifacts": [chunk.chunk_id for chunk in chunks],
     }
 
@@ -299,7 +299,7 @@ def test_specialist_agent_returns_populated_insight_object(
     mock_response = {
         "agent": agent_name,
         "perspective": f"A {agent_name} perspective on the corpus.",
-        "key_findings": ["First finding.", "Second finding."],
+        "key_findings": ["First finding [chunk-001].", "Second finding [chunk-002]."],
         "selected_artifacts": ["chunk-001", "chunk-002"],
     }
 
@@ -342,8 +342,8 @@ def test_specialist_agent_malformed_llm_response_raises(
 def test_specialist_agent_llm_response_with_missing_fields_uses_defaults(
     AgentClass, agent_name: str
 ) -> None:
-    """When _call_llm returns a dict with missing optional fields, the agent
-    falls back to sensible defaults and still returns a valid InsightObject.
+    """When _call_llm returns a dict with missing fields, the agent abstains
+    (empty lists) instead of inventing findings, and does not raise.
 
     Validates: Requirements 4.2
     """
