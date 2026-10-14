@@ -72,6 +72,73 @@ def create_app() -> Flask:
     def index() -> str:
         return render_template("index.html")
 
+    @app.get("/sociologist")
+    def sociologist_ui() -> Any:
+        """Sociologist Agent test interface."""
+        return app.send_static_file("sociologist.html")
+
+    @app.post("/api/sociologist")
+    def run_sociologist() -> Any:
+        """Run the Sociologist Agent on provided chunks and return InsightObject as JSON."""
+        from flask import request
+        import traceback
+
+        try:
+            body   = request.get_json(force=True) or {}
+            chunks_raw = body.get("chunks", [])
+
+            if not chunks_raw:
+                return jsonify({"error": "No chunks provided"}), 400
+
+            # Build mock RetrievalResult objects from the request payload
+            from rag.vector_store.retriever import RetrievalResult
+            chunks = [
+                RetrievalResult(
+                    chunk_id=c.get("chunk_id", f"c{i}"),
+                    document_id=c.get("document_id", f"d{i}"),
+                    content=c.get("content", ""),
+                    metadata={"source": c.get("source", "unknown"), "category": c.get("category", "")},
+                    similarity=float(c.get("similarity", 0.85)),
+                )
+                for i, c in enumerate(chunks_raw)
+                if c.get("content", "").strip()
+            ]
+
+            if not chunks:
+                return jsonify({"error": "All chunks are empty"}), 400
+
+            # Build LLM client (Groq)
+            from agents.llm_config import build_llm_client
+            from agents.sociologist import SociologistAgent
+
+            try:
+                llm_client = build_llm_client()
+            except Exception as e:
+                return jsonify({"error": f"LLM client error: {e}"}), 500
+
+            agent  = SociologistAgent(openai_client=llm_client, retriever=None)
+            result = agent.run(chunks)
+
+            # Parse confidence and themes from perspective
+            import re
+            conf_match = re.search(r'Confidence:\s*(\d+)%', result.perspective)
+            themes_match = re.search(r'Themes:\s*([^\]]+)\]', result.perspective)
+            confidence = int(conf_match.group(1)) / 100 if conf_match else 0.5
+            themes = [t.strip() for t in themes_match.group(1).split(",")] if themes_match else []
+
+            return jsonify({
+                "agent":              result.agent,
+                "perspective":        result.perspective,
+                "key_findings":       result.key_findings,
+                "selected_artifacts": result.selected_artifacts,
+                "themes_detected":    themes,
+                "confidence_score":   confidence,
+                "evidence_count":     len(chunks),
+            })
+
+        except Exception as e:
+            return jsonify({"error": str(e), "trace": traceback.format_exc()}), 500
+
     @app.get("/favicon.ico")
     def favicon() -> tuple[str, int]:
         return "", 204
