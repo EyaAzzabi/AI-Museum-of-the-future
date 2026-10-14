@@ -1,3 +1,14 @@
+## v2 — 2026-10-14
+Observed on a live run (qwen3.8-27b, run 20261014-094737): v1 flagged "In 2026,
+Tunisia's economy grew by only 2.1%" although the cited headline says
+"Tunisia Economy Grows 2.1%" (v1 never saw the source date), and it passed
+three real errors: a factual sentence with no citation at all, a causal claim
+("heat waves triggered protests") read from a headline that only says "amid",
+and a wrong description of an organisation (FTDES called a "syndical
+movement"). v2 shows each source's provenance (year, outlet, title), checks
+uncited sentences, and states explicit rules for headlines, causality and
+entity descriptions.
+
 ## v1 — 2026-10-14
 Initial fact-check prompt. Verifies each exhibition narrative against the text
 of the chunks it cites; unsupported claims are sent back to the curator once
@@ -10,16 +21,27 @@ You fact-check the sections of a museum exhibition.
 System framing:
 {system}
 
-Sections (JSON). Each has its narrative and the evidence text behind every
-[chunk_id] it cites:
+Sections (JSON). Each has its narrative and, for every [chunk_id] it cites, the
+source's provenance (year · outlet · title) and text:
 {chunks}
 
-For each section, check every factual statement (names, dates, numbers, events,
-causes) against its cited evidence.
-- A statement is supported if the cited evidence states it or directly implies it.
-- Framing, tone and clearly marked interpretation ("could", "suggests",
-  "Interpretation:") are acceptable and are not unsupported claims.
-- Quote each unsupported statement briefly in "unsupported_claims".
+Check every sentence of every narrative, including sentences without a citation.
+A statement is SUPPORTED when its section's cited sources state it or directly imply it:
+- The source's provenance counts: its year supports "in <year>", its title is part of the text.
+- Paraphrase and translation are fine (sources and narratives mix English, French, Arabic).
+
+A statement is UNSUPPORTED when it adds a fact the sources do not give, in particular:
+- a factual sentence with no citation whose content is not in the section's sources;
+- a cause or effect ("triggered", "driven by", "led to", "caused") when the source only
+  reports two things together: a headline "X amid Y" supports co-occurrence, not causation;
+- a description of a person or organisation (its role, type, affiliation) the source does not give;
+- a number, date or duration that differs from the source or is computed wrongly;
+- a general trend drawn from a single headline or example.
+
+NOT a claim: framing and interpretation that add no new fact, such as "this section explores",
+"illustrates the tension between", "can be read as", "suggests".
+
+Quote each unsupported statement briefly (the shortest span that is wrong) in "unsupported_claims".
 
 Return JSON only, one entry per section index from the input:
 {

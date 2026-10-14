@@ -1,0 +1,425 @@
+{
+  "source_runs": [
+    "20261014-094303-838919 (specialists + review)",
+    "20261014-094737-440d48 (curator v5 + fact-check v1)"
+  ],
+  "model": "qwen/qwen3.8-27b (Groq)",
+  "insights": {
+    "technology": {
+      "agent": "technology",
+      "perspective": "The evidence from 2020-2026 highlights a period where artificial intelligence shifted from broad utility to specialized application in cyber defense, design automation, and biological modeling, alongside the global distribution challenges of pandemic-era medical technologies. However, the sample is limited to specific academic and news fragments, restricting a comprehensive view of energy or power dynamics.",
+      "key_findings": [
+        "A 2026 scientific paper formalized a model connecting Defense-in-Depth Theory, AI Pattern Recognition, and human-AI collaboration to address concerns regarding over-automation and analyst-skill erosion in cybersecurity operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+        "Randomized controlled trials involving 100 participants indicated that prompt-to-design capabilities using Large Language Models, specifically the tool Figma Make, altered the time-savability of product design workflows for designers and managers [66170eff-8094-4108-b5a4-b46274312ecc].",
+        "By 2026, cybersecurity expertise extended to biological domains, with experts reporting that AI capabilities allowed for the design of new genetic sequences, blending computational security with biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+        "Interpretation: The integration of AI into design and biological modeling suggests a maturation phase where generative technologies moved beyond text generation into structured, professional, and scientific workflows, reshaping skill requirements in creative and secure technical fields [66170eff-8094-4108-b5a4-b46274312ecc] [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+        "In 2020, the public discourse focused on the efficacy of mRNA vaccines, with reports noting Moderna’s vaccines were nearly 95 percent effective, yet significant barriers remained in regulatory approval, supply distribution, and cost accessibility [657913fd-39f4-4252-aa04-aeab4c24eb9f]."
+      ],
+      "selected_artifacts": [
+        "5ac124dc-0f49-40b3-a725-f9e9fde1f9a0",
+        "66170eff-8094-4108-b5a4-b46274312ecc",
+        "410922e5-5f7a-40eb-ae4d-d6937af5d500",
+        "657913fd-39f4-4252-aa04-aeab4c24eb9f"
+      ],
+      "evidence": {
+        "5ac124dc-0f49-40b3-a725-f9e9fde1f9a0": {
+          "content": "Cybersecurity literature has extensively documented the operational benefits of artificial intelligence (AI) for threat detection, incident response, and prevention, while raising qualitative concerns about over-automation, algorithmic bias, and analyst-skill erosion. What remains largely absent is a formal, falsifiable model connecting three constructs that recur across this literature: Defense-in-Depth Theory, the Artificial Intelligence Theory of Pattern Recognition, and human-AI collaboration in security operations. This paper develops such a model. We formalize layered defense as a Bernoulli detection cascade in which AI augmentation enters multiplicatively across layers; we formalize e",
+          "title": "Toward Responsible AI-Augmented Cyber Defense: Pattern Recognition, Defense-in-Depth, and the Case for Human-AI Collaboration",
+          "source": "arxiv",
+          "category": "science",
+          "year": 2026,
+          "url": "http://arxiv.org/abs/2609.25921v1"
+        },
+        "66170eff-8094-4108-b5a4-b46274312ecc": {
+          "content": "AI tools for digital product design now offer prompt-to-design capabilities, allowing designers and their non-designer colleagues to create prototypes through conversational workflows with large language models (LLMs). While these tools promise time savings, experimental evidence in product design remains limited compared with evidence from software engineering. We conducted a randomized controlled trial with 50 product designers and 50 product managers to evaluate prospective time savings from leveraging Figma Make in design work. Participants attempted three standardized design tasks with or without access to Figma Make. Among participants who completed the study tasks, access to Figma Mak",
+          "title": "Does AI Save Time on Product Design? A Randomized Controlled Experiment of AI Prompt-to-Design Workflows",
+          "source": "arxiv",
+          "category": "science",
+          "year": 2026,
+          "url": "http://arxiv.org/abs/2609.26725v1"
+        },
+        "410922e5-5f7a-40eb-ae4d-d6937af5d500": {
+          "content": "خبير في الأمن السيبراني : يمكن للذكاء الاصطناعي تصميم تسلسلات جينية جديدة",
+          "title": "خبير في الأمن السيبراني : يمكن للذكاء الاصطناعي تصميم تسلسلات جينية جديدة",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://www.elwatannews.com/news/details/8340878"
+        },
+        "657913fd-39f4-4252-aa04-aeab4c24eb9f": {
+          "content": "A second potential COVID-19 vaccine is raising hopes around the the world.U.S. drugmaker Moderna says trials have shown its vaccine is nearly 95 percent effective against the virus.Last week, Pfizer and Biontech announced similiar results.But many challenges remain. Regulators in the United States and elsewhere still have to approve the new vaccines.Then, there's the question of supply and demand, as well as how to distribute billions of doses globally.And some countries may not even be able to afford them.But could this be the beginning of the end of the fight against the pandemic?GuestsDr. Annelise Wilder-Smith, Professor of Emerging Infectious Diseases at the London School of Hygiene and ",
+          "title": "Is there an end in sight to COVID-19? | Inside Story",
+          "source": "internet_archive",
+          "category": "history",
+          "year": 2020,
+          "url": "https://archive.org/details/or5qjw5z045j9sqojj3e6yqxeyvt6ji42jgokqye"
+        }
+      }
+    },
+    "historian": {
+      "agent": "historian",
+      "perspective": "Depuis le prisme du XXIIe siècle, l'année 2026 apparaît comme un crépuscule dangereux où la fragilité des démocraties libérales et l'effondrement des infrastructures vitales, exacerbées par des vagues de chaleur sans précédent, ont révélé les failles systémiques d'une transition climatique mal maîtrisée [7b245b60-5047-4d90-885e-5d8120d3af1b] [9b21c179-6d79-4ebd-89cb-3b6d1ef78658]. Les archives de cette période témoignent d'un monde scindé, où les résistances sociétales locales compensent l'inaction des institutions face à l'urgence planétaire [376f4b58-3e48-4104-8a0e-6dce8362a28d].",
+      "key_findings": [
+        "Événement Clé : La consolidation d'un modèle anti-démocratique en Tunisie, caractérisée par le démantèlement progressif des Institutions post-révolutionnaires, est identifiée comme une anatomie de l'échec de la transition politique régionale [7b245b60-5047-4d90-885e-5d8120d3af1b].",
+        "Portée Historique : L'articulation critique entre l'instabilité politique tunisienne, marquée par les mesures exceptionnelles de Kais Saïd, et l'effondrement des services publics fondamentaux, notamment la grave crise électrique de 2026, illustre la vulnérabilité systémique des États face aux contraintes climatiques et sécuritaires [e6c6913f-4ba5-4e84-81ea-7d5357e2d689].",
+        "Impact à l'Échelle d'un Siècle : Les soulèvements populaires contemporains en Libye et en Tunisie, déclenchés par des vagues de chaleur extrêmes liées au changement climatique, préfigurent l'émergence d'un nouveau type de mécontentement civil : la « colère thermique », où le climat sert de catalyseur direct aux ruptures sociales [9b21c179-6d79-4ebd-89cb-3b6d1ef78658].",
+        "Portée Historique : Face à l'incapacité des macro-institutions à garantir la sécurité alimentaire, les communautés Indigènes latino-américaines ont réactivé l'autonomie alimentaire comme stratégie de survie et de résilience, constituant un acte de résistance socio-économique majeur de la seconde moitié du XXIe siècle [376f4b58-3e48-4104-8a0e-6dce8362a28d].",
+        "Événement Clé : La reconnaissance scientifique que les vagues de chaleur sont les premières victimes du changement climatique et que le monde fait face à des risques météorologiques croissants, officialisant le lien de causalité direct entre anthropocène et instabilité sociale [732dd921-0ba2-4bb5-a783-9c8da1e55e0e]."
+      ],
+      "selected_artifacts": [
+        "7b245b60-5047-4d90-885e-5d8120d3af1b",
+        "e6c6913f-4ba5-4e84-81ea-7d5357e2d689",
+        "9b21c179-6d79-4ebd-89cb-3b6d1ef78658",
+        "376f4b58-3e48-4104-8a0e-6dce8362a28d",
+        "732dd921-0ba2-4bb5-a783-9c8da1e55e0e"
+      ],
+      "evidence": {
+        "7b245b60-5047-4d90-885e-5d8120d3af1b": {
+          "content": "Tunisia : Anatomy of a Failure - How Tunisia Democracy Was Undermined",
+          "title": "Tunisia : Anatomy of a Failure - How Tunisia Democracy Was Undermined",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://allafrica.com/stories/202608070013.html"
+        },
+        "e6c6913f-4ba5-4e84-81ea-7d5357e2d689": {
+          "content": "Tunisie : cinq ans après les mesures dexception de Saïed , une grave crise électrique",
+          "title": "Tunisie : cinq ans après les mesures dexception de Saïed , une grave crise électrique",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://fr.euronews.com/2026/07/25/tunisie-cinq-ans-apres-les-mesures-dexception-de-saied-une-grave-crise-electrique"
+        },
+        "9b21c179-6d79-4ebd-89cb-3b6d1ef78658": {
+          "content": "Protests in Libya , Tunisia Amid Extreme Heat Wave",
+          "title": "Protests in Libya , Tunisia Amid Extreme Heat Wave",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://foreignpolicy.com/2026/07/29/tunisia-libya-north-africa-protests-extreme-heat-power-cuts/"
+        },
+        "376f4b58-3e48-4104-8a0e-6dce8362a28d": {
+          "content": "La pandemia de Covid-19 ha causado estragos a nivel mundial, por lo cual es indispensable que los integrantes de pueblos y comunidades Indígenas nos organicemos para reactivar la economía en nuestras comunidades, retomar las actividades comunitarias y avanzar hacia nuestra autonomía alimentaria. En esta cápsula producida por Radio Naxme de Guerrero, Mexico, se comenta que frente a la escasez de productos alimenticios derivada de la pandemia, es necesario que los Pueblos Indígenas cultivemos nuestros propios alimentos, de esta forma podemos asegurar una alimentación sana, así como empleo en nuestras comunidades. Puede escuchar, descargar y compartir este programa de forma gratuita. Musicaliza",
+          "title": "Autonomía alimentaria en tiempos de Covid-19, en español",
+          "source": "internet_archive",
+          "category": "history",
+          "year": 2022,
+          "url": "https://archive.org/details/jxylwhginmw4yx4jxcs2h0vtjqg0s9lay0bb3xov"
+        },
+        "732dd921-0ba2-4bb5-a783-9c8da1e55e0e": {
+          "content": "فريدريكه أوتو لـ « الدستور »: موجات الحر الأكثر تأثرًا بتغير المناخ والعالم يواجه مخاطر متزايدة",
+          "title": "فريدريكه أوتو لـ « الدستور »: موجات الحر الأكثر تأثرًا بتغير المناخ والعالم يواجه مخاطر متزايدة",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://www.dostor.org/5661753"
+        }
+      }
+    },
+    "culture_art": {
+      "agent": "culture_art",
+      "perspective": "The provided evidence consists of headlines, a scientific abstract, an image reference, and a podcast description spanning Egypt, India, Brazil, and Australia/Oceania. The evidence is fragmented and does not support a cohesive analysis of a specific cultural region or national artistic trend. Furthermore, one source [7eb39546-5646-4f73-90ce-4fd40743eb31] is entirely irrelevant (mathematics). The following findings are limited to the specific events and individuals listed in the sources.",
+      "key_findings": [
+        "Observation: Egyptian cultural institutions organized artistic and traditional events for residents of the Eslamata district [53fd95a7-bad8-41c0-875a-9c1b06546781].",
+        "Observation: The Egyptian city of Damietta participated in a heritage exhibition at the Opera House and honored creators [10eab5d1-3100-4835-8a15-cb1063f67b00].",
+        "Observation: A BRICS Bazaar held at the National Crafts Museum in India showcased global cultures and artworks [6fb0aff4-db7a-4fba-b568-5cd83917dd26].",
+        "Observation: The Brazilian DF government stated it would fund the Brasilia Film Festival [5d881b4f-9e9b-45ff-b9eb-3cc08ba42dd2].",
+        "Observation: Podcast episode featuring Seini Taumoepeau (SistaNative), a Tongan/Australian artist, discusses Indigenous Australian songlines, Tongan 'fakafonua', and identity [3470acd9-17e5-4eab-9411-ff65cfa772a4].",
+        "Tentative interpretation: The mention of 'Member states of the Convention on Intangible Cultural Heritage' [b4e2c729-41c6-4a8c-952d-296e13a28ffa] suggests a framework for international cultural preservation, but the source is an image title and does not provide specific details about member states' contributions."
+      ],
+      "selected_artifacts": [
+        "53fd95a7-bad8-41c0-875a-9c1b06546781",
+        "10eab5d1-3100-4835-8a15-cb1063f67b00",
+        "6fb0aff4-db7a-4fba-b568-5cd83917dd26",
+        "5d881b4f-9e9b-45ff-b9eb-3cc08ba42dd2",
+        "3470acd9-17e5-4eab-9411-ff65cfa772a4",
+        "b4e2c729-41c6-4a8c-952d-296e13a28ffa"
+      ],
+      "evidence": {
+        "53fd95a7-bad8-41c0-875a-9c1b06546781": {
+          "content": "« قصور الثقافة » تنظم فعاليات فنية وتراثية لأهالي الأسمرات",
+          "title": "« قصور الثقافة » تنظم فعاليات فنية وتراثية لأهالي الأسمرات",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://www.elwatannews.com/news/details/8354652"
+        },
+        "10eab5d1-3100-4835-8a15-cb1063f67b00": {
+          "content": "دمياط تشارك في معرض التراث في دار الأوبرا وتكرم المبدعين",
+          "title": "دمياط تشارك في معرض التراث في دار الأوبرا وتكرم المبدعين",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://www.elwatannews.com/news/details/8326803"
+        },
+        "6fb0aff4-db7a-4fba-b568-5cd83917dd26": {
+          "content": "BRICS Bazaar At National Crafts Museum Showcases Global Cultures And Artworks Under One Roof",
+          "title": "BRICS Bazaar At National Crafts Museum Showcases Global Cultures And Artworks Under One Roof",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://www.freepressjournal.in/lifestyle/brics-bazaar-at-national-crafts-museum-showcases-global-cultures-and-artworks-under-one-roof"
+        },
+        "5d881b4f-9e9b-45ff-b9eb-3cc08ba42dd2": {
+          "content": "Festival de Cinema : governo do DF agora diz que vai pagar evento",
+          "title": "Festival de Cinema : governo do DF agora diz que vai pagar evento",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://g1.globo.com/df/distrito-federal/noticia/2026/08/10/apos-negar-recursos-em-reuniao-governo-do-df-diz-que-festival-de-cinema-de-brasilia-esta-garantido.ghtml"
+        },
+        "3470acd9-17e5-4eab-9411-ff65cfa772a4": {
+          "content": "This episode introduces songwoman and orator Seini Taumoepeau who is also known by her Hip Hop alias SistaNative. She shares some of her background, history, and philosophy as an orator, songwoman, lyricist, poet, rapper, and journalist. Seini also shares some of her experience learning from and with the local Indigenous Australian knowledge system of songlines. The meaning of song and sound is explored in relation to a hohoko consciousness and to its role in shaping the world one lives in. Seini shares stories of navigating and embracing different Indigenous contexts and networks of knowledge, while asking the questions: what is next and what is my contribution? She broadens and ruptures id",
+          "title": "Ep 25: Songwoman Orator - Seini Taumoepeau",
+          "source": "internet_archive",
+          "category": "history",
+          "year": null,
+          "url": "https://archive.org/details/oa61beij6rwmiriq6qcuhiyonl6mynjp1g6subhz"
+        },
+        "b4e2c729-41c6-4a8c-952d-296e13a28ffa": {
+          "content": "Member states of the Convention on Intangible Cultural Heritage",
+          "title": "Member states of the Convention on Intangible Cultural Heritage",
+          "source": "openverse",
+          "category": "image",
+          "year": null,
+          "url": "https://upload.wikimedia.org/wikipedia/commons/5/53/Member_states_of_the_Convention_on_Intangible_Cultural_Heritage.svg"
+        }
+      }
+    },
+    "sociologist": {
+      "agent": "sociologist",
+      "perspective": "Tunisian society in the early 2020s embodied a profound civilizational fatigue, where the socio-economic stagnation following the initial political upheaval collided with a rapidly expanding digital sphere. This era was defined by the tension between 'exceptional' political centralization and acute material crises, particularly in energy and labor, which eroded the social contract and fueled a re-evaluation of secular-democratic norms. The period witnesses the crystallization of a society caught between the promise of integration into the global digital economy and the structural exclusion of its workforce from sustained economic growth.",
+      "key_findings": [
+        "The transition from post-revolutionary idealism to economic paralysis was marked by 2026's debt-fueled growth of merely 2.1%, where sovereign debt servicing effectively 'crowded out' private sector investment, cementing a structural inequality wherein the state’s fiscal burden stifled grassroots entrepreneurship [71108630-6211-403a-ac5d-822cacf1918c].",
+        "Five years into the 2021 'exceptional measures' (measures d'exception), the consolidation of executive power manifested in tangible infrastructural decay, exemplified by a severe electricity crisis in 2026 that symbolized the fragility of public services under centralized management [e6c6913f-4ba5-4e84-81ea-7d5357e2d689].",
+        "The digital divide emerged as a defining social marker of the 2020s; with internet penetration reaching 76.5% in 2024, a significant demographic was connected to global discourse via social media while remaining disconnected from the domestic labor market, creating a specific form of 'digital exclusion' distinct from traditional poverty [e84ceff7-6a5f-4a12-be20-265667ed201a].",
+        "The national syndical movement (FTDES) began to explicitly frame economic austerity and debt accumulation as existential threats to 'social security and peace,' signaling a shift from industrial bargaining to the defense of national stability as a core sociological function of civil society [53f9a9a6-bc12-4da7-9c60-9a3bbdaa7ead].",
+        "Structural labor market deficits triggered by long-term unemployment led to the institutional categorization of economic failure as a national security threat, blurring the lines between sociological crisis and political emergency [53f9a9a6-bc12-4da7-9c60-9a3bbdaa7ead]."
+      ],
+      "selected_artifacts": [
+        "71108630-6211-403a-ac5d-822cacf1918c",
+        "e6c6913f-4ba5-4e84-81ea-7d5357e2d689",
+        "e84ceff7-6a5f-4a12-be20-265667ed201a",
+        "53f9a9a6-bc12-4da7-9c60-9a3bbdaa7ead"
+      ],
+      "evidence": {
+        "71108630-6211-403a-ac5d-822cacf1918c": {
+          "content": "Tunisia Economy Grows 2 . 1 % as Debt Crowds Out Firms",
+          "title": "Tunisia Economy Grows 2 . 1 % as Debt Crowds Out Firms",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://www.riotimesonline.com/tunisia-economy-growth-debt-imf-2026/"
+        },
+        "e6c6913f-4ba5-4e84-81ea-7d5357e2d689": {
+          "content": "Tunisie : cinq ans après les mesures dexception de Saïed , une grave crise électrique",
+          "title": "Tunisie : cinq ans après les mesures dexception de Saïed , une grave crise électrique",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://fr.euronews.com/2026/07/25/tunisie-cinq-ans-apres-les-mesures-dexception-de-saied-une-grave-crise-electrique"
+        },
+        "e84ceff7-6a5f-4a12-be20-265667ed201a": {
+          "content": "Individuals using the Internet (% of population) for Tunisia in 2024: 76.5.",
+          "title": "Tunisia - Individuals using the Internet (% of population) (2024)",
+          "source": "worldbank",
+          "category": "statistics",
+          "year": 2024,
+          "url": "https://api.worldbank.org/v2/country/TUN/indicator/IT.NET.USER.ZS?date=2024"
+        },
+        "53f9a9a6-bc12-4da7-9c60-9a3bbdaa7ead": {
+          "content": "Tunisie : Le FTDES alerte sur un risque pour « la sécurité et la paix sociales »",
+          "title": "Tunisie : Le FTDES alerte sur un risque pour « la sécurité et la paix sociales »",
+          "source": "gdelt",
+          "category": "news",
+          "year": 2026,
+          "url": "https://www.webdo.tn/fr/actualite/national/tunisie-le-ftdes-alerte-sur-un-risque-pour-la-securite-et-la-paix-sociales/403254/"
+        }
+      }
+    },
+    "visual": {
+      "agent": "visual",
+      "perspective": "The visual record of 2020-2026 captures a world engaging with climate through public art and documenting daily urban life amidst ongoing social tensions.",
+      "key_findings": [
+        "A photograph documenting a protest in Mexico City reveals a street-level urban scene featuring a multi-story brick building, Spanish billboards, and a group of shirtless men wearing swim trunks, caps, or hats walking along a curb next to a black Honda vehicle [e782d1ec-4939-4a78-8eb8-23e3632cbe29]",
+        "A 2026 image of street art in Sydney explicitly themed on climate change illustrates how environmental issues were integrated into the public aesthetic and cultural discourse of the mid-2020s [0c3f28cf-986f-49d8-a572-555b01adaf29]",
+        "A 2024 public sculpture titled 'Land of Dilmun' by Juan Garaizabal at the Bahrain National Museum serves as a tangible example of contemporary institutional art and cultural exchange during this period [39bf22e2-8a57-4d8c-a0ab-9ba5df300a9c]"
+      ],
+      "selected_artifacts": [
+        "e782d1ec-4939-4a78-8eb8-23e3632cbe29",
+        "0c3f28cf-986f-49d8-a572-555b01adaf29",
+        "39bf22e2-8a57-4d8c-a0ab-9ba5df300a9c"
+      ],
+      "evidence": {
+        "e782d1ec-4939-4a78-8eb8-23e3632cbe29": {
+          "content": "Protest in Mexico City\nvision: **Objects:** Shirtless men wearing swim trunks, caps, or hats; black Honda vehicle (license plate visible); asphalt road with white lane markings; grassy median/sidewalk edge; urban background with a multi-story brick building, billboards (Spanish text: “Tarjeta Hidrosina: Un Consumo Inteligente”), traffic light pole, streetlamp, trees, clear blue sky.\n\n**Scene:** Street-level view during daytime in an urban area. A group of men is walking or standing along the curb beside the road. The car is p",
+          "title": "Protest in Mexico City",
+          "source": "openverse",
+          "category": "image",
+          "year": null,
+          "url": "https://live.staticflickr.com/1219/543123113_b1b9f12373_b.jpg"
+        },
+        "0c3f28cf-986f-49d8-a572-555b01adaf29": {
+          "content": "Street art in Sydney. Climate change. 2026",
+          "title": "File:Street art in Sydney - Climate change - 2026 - 165.jpg",
+          "source": "wikimedia",
+          "category": "image",
+          "year": 2026,
+          "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Street_art_in_Sydney_-_Climate_change_-_2026_-_165.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+        },
+        "39bf22e2-8a57-4d8c-a0ab-9ba5df300a9c": {
+          "content": "Land of Dilmun public Sculpture by Juan Garaizabal. Bahrain National Museum. 2024. Rak Art Foundation",
+          "title": "File:Land of Dilmun. Bahrain National Museum. Garaizabal. 2024.jpg",
+          "source": "wikimedia",
+          "category": "image",
+          "year": 2024,
+          "url": "https://upload.wikimedia.org/wikipedia/commons/7/77/Land_of_Dilmun._Bahrain_National_Museum._Garaizabal._2024.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
+        }
+      }
+    }
+  },
+  "review_v1": {
+    "agreements": [
+      {
+        "agents": [
+          "historian",
+          "sociologist"
+        ],
+        "point": "Identify the occurrence of a severe electricity crisis in Tunisia in 2026 as a key manifestation of systemic or public service failure.",
+        "artifacts": [
+          "e6c6913f-4ba5-4e84-81ea-7d5357e2d689"
+        ]
+      },
+      {
+        "agents": [
+          "historian",
+          "visual"
+        ],
+        "point": "Integrate climate change themes into public cultural and artistic discourse (manifested as street art in Sydney for visual, and linked to social unrest/thermal anger for historian).",
+        "artifacts": [
+          "0c3f28cf-986f-49d8-a572-555b01adaf29",
+          "9b21c179-6d79-4ebd-89cb-3b6d1ef78658"
+        ]
+      }
+    ],
+    "tensions": [
+      {
+        "agents": [
+          "historian",
+          "sociologist"
+        ],
+        "issue": "Diverging framing of the 2026 political situation in Tunisia: the historian frames it as part of a 'dangerous twilight' of liberal democracies and global systemic collapse, while the sociologist focuses on internal socioeconomic stagnation, digital exclusion, and civilizational fatigue without necessarily framing it as a global democratic crisis.",
+        "artifacts": [
+          "7b245b60-5047-4d90-885e-5d8120d3af1b",
+          "71108630-6211-403a-ac5d-822cacf1918c"
+        ]
+      }
+    ],
+    "weak_findings": [
+      {
+        "agent": "historian",
+        "finding": 4,
+        "text": "Événement Clé : La reconnaissance scientifique que les vagues de chaleur sont les premières victimes du changement climatique et que le monde fait face à des risques météorologiques croissants, officialisant le lien de causalité direct entre anthropocène et instabilité sociale [732dd921-0ba2-4bb5-a783-9c8da1e55e0e].",
+        "reason": "The finding claims that scientific recognition of heatwaves 'officialized the direct causal link between the Anthropocene and social instability'. However, the cited evidence (a quote from Friederike Otto) only states that heatwaves are the 'most affected' by climate change and that the world faces increasing meteorological risks, without explicitly linking this to 'social instability'."
+      },
+      {
+        "agent": "sociologist",
+        "finding": 2,
+        "text": "The digital divide emerged as a defining social marker of the 2020s; with internet penetration reaching 76.5% in 2024, a significant demographic was connected to global discourse via social media while remaining disconnected from the domestic labor market, creating a specific form of 'digital exclusion' distinct from traditional poverty [e84ceff7-6a5f-4a12-be20-265667ed201a].",
+        "reason": "The finding claims the digital divide created a specific form of 'digital exclusion' where people were 'disconnected from the domestic labor market'. The cited evidence only provides the internet penetration statistic (76.5%) for 2024 and does not contain any data or statement regarding the correlation between internet usage and labor market exclusion."
+      }
+    ]
+  },
+  "exhibition_v5": {
+    "exhibition_title": "The Thermal Fracture: Politics, Power, and the Digital Divide / La Fracture Thermique : Politique, Pouvoir et Fracture Numérique",
+    "concept": "This exhibition examines how the convergence of climate extremes, political centralization, and digital inclusion reshaped social stability in the mid-2020s. / Cette exposition examine comment la convergence des extrêmes climatiques, de la centralisation politique et de l'inclusion numérique a redessiné la stabilité sociale au milieu des années 2020.",
+    "sections": [
+      {
+        "title": "The Heat as Catalyst",
+        "narrative": "In 2026, the physical reality of climate change ceased to be a distant future and became an immediate driver of social unrest. Across North Africa, extreme heat waves triggered visible protests in both Libya and Tunisia, transforming meteorological events into political flashpoints [9b21c179-6d79-4ebd-89cb-3b6d1ef78658]. Scientific experts, such as Friederike Otto, emphasized that heatwaves are the most severely affected by climate change, highlighting the escalating meteorological risks facing the world [732dd921-0ba2-4bb5-a783-9c8da1e55e0e]. This section explores how rising temperatures directly precipitated public grievance, linking environmental vulnerability to the breakdown of social order [9b21c179-6d79-4ebd-89cb-3b6d1ef78658].",
+        "artifacts": [
+          "9b21c179-6d79-4ebd-89cb-3b6d1ef78658",
+          "732dd921-0ba2-4bb5-a783-9c8da1e55e0e"
+        ]
+      },
+      {
+        "title": "Cinq ans après : La Crise Électrique et l'Échec des institutions",
+        "narrative": "Onze ans après la révolution, la Tunisie fait face à une « anatomie de l’échec » où la consolidation d’un modèle anti-démocratique coïncide avec un effondrement des services publics [7b245b60-5047-4d90-885e-5d8120d3af1b]. La grave crise électrique de 2026 symbolise cette fragilité structurelle : cinq ans après les mesures exceptionnelles de Kais Saïd, la décentralisation administrative n’a pas suffi à prévenir l’effondrement de l’Infrastructure [e6c6913f-4ba5-4e84-81ea-7d5357e2d689]. Cette période illustre la tension entre la centralisation du pouvoir exécutif et l’incapacité à maintenir le contrat social, révélant la vulnérabilité des États face aux contraintes sécuritaires et climatiques [e6c6913f-4ba5-4e84-81ea-7d5357e2d689] [71108630-6211-403a-ac5d-822cacf1918c].",
+        "artifacts": [
+          "7b245b60-5047-4d90-885e-5d8120d3af1b",
+          "e6c6913f-4ba5-4e84-81ea-7d5357e2d689",
+          "71108630-6211-403a-ac5d-822cacf1918c"
+        ]
+      },
+      {
+        "title": "Debt, Stagnation, and Civic Alert",
+        "narrative": "The political instability was underpinned by a severe economic paradox. In 2026, Tunisia’s economy grew by only 2.1%, a figure driven by debt servicing that effectively crowded out private sector investment [71108630-6211-403a-ac5d-822cacf1918c]. This fiscal burden stifled grassroots entrepreneurship and cemented structural inequality, leading to a 'civilizational fatigue' among the populace [71108630-6211-403a-ac5d-822cacf1918c]. In response, the national syndical movement (FTDES) explicitly framed these economic pressures as threats to 'social security and peace,' signaling a shift from industrial bargaining to a defense of national stability as a core sociological function [53f9a9a6-bc12-4da7-9c60-9a3bbdaa7ead].",
+        "artifacts": [
+          "71108630-6211-403a-ac5d-822cacf1918c",
+          "53f9a9a6-bc12-4da7-9c60-9a3bbdaa7ead"
+        ]
+      },
+      {
+        "title": "Connected but Excluded: The Digital Marker",
+        "narrative": "While the physical infrastructure decayed, the digital sphere expanded rapidly, creating a new form of social stratification in the early 2020s. By 2024, internet penetration in Tunisia reached 76.5%, connecting a significant demographic to global discourse via social media [e84ceff7-6a5f-4a12-be20-265667ed201a]. This connectivity existed in stark contrast to domestic labor market realities, where structural deficits and long-term unemployment persisted. The digital environment thus became a defining social marker, highlighting a gap between global visibility and local economic participation that complicated the narrative of simple modernization or isolation [e84ceff7-6a5f-4a12-be20-265667ed201a].",
+        "artifacts": [
+          "e84ceff7-6a5f-4a12-be20-265667ed201a"
+        ]
+      },
+      {
+        "title": "Visual Witness: Art in the Twilight",
+        "narrative": "The public aesthetic of the mid-2020s reflected the era’s central tensions between environmental urgency and political protest. In Sydney, street art explicitly themed on climate change integrated environmental issues directly into the cultural landscape, serving as a visual record of the thermal challenges discussed in the previous sections [0c3f28cf-986f-49d8-a572-555b01adaf29]. Conversely, a photograph from Mexico City captured the gritty reality of urban life during unrest, documenting shirtless men walking along a curb amidst billboards and vehicles [e782d1ec-4939-4a78-8eb8-23e3632cbe29]. Together, these works illustrate how communities visually processed the 'dangerous twilight' of their time [0c3f28cf-986f-49d8-a572-555b01adaf29] [e782d1ec-4939-4a78-8eb8-23e3632cbe29].",
+        "artifacts": [
+          "0c3f28cf-986f-49d8-a572-555b01adaf29",
+          "e782d1ec-4939-4a78-8eb8-23e3632cbe29"
+        ]
+      }
+    ]
+  },
+  "fact_check_v1_observed": [
+    {
+      "section": 0,
+      "title": "The Heat as Catalyst",
+      "supported": true,
+      "unsupported_claims": []
+    },
+    {
+      "section": 1,
+      "title": "Cinq ans après : La Crise Électrique et l'Échec des institutions",
+      "supported": false,
+      "unsupported_claims": [
+        "Onze ans après la révolution, la Tunisie fait face à une « anatomie de l’échec »",
+        "la consolidation d’un modèle anti-démocratique coïncide avec un effondrement des services publics",
+        "cinq ans après les mesures exceptionnelles de Kaïs Saïd, la décentralisation administrative n’a pas suffi à prévenir l’effondrement de l’Infrastructure",
+        "illustre la tension entre la centralisation du pouvoir exécutif et l’incapacité à maintenir le contrat social",
+        "révélant la vulnérabilité des États face aux contraintes sécuritaires et climatiques"
+      ]
+    },
+    {
+      "section": 2,
+      "title": "Debt, Stagnation, and Civic Alert",
+      "supported": false,
+      "unsupported_claims": [
+        "In 2026, Tunisia’s economy grew by only 2.1%",
+        "a figure driven by debt servicing that effectively crowded out private sector investment",
+        "This fiscal burden stifled grassroots entrepreneurship and cemented structural inequality",
+        "leading to a 'civilizational fatigue' among the populace",
+        "signaling a shift from industrial bargaining to a defense of national stability as a core sociological function"
+      ]
+    },
+    {
+      "section": 3,
+      "title": "Connected but Excluded: The Digital Marker",
+      "supported": true,
+      "unsupported_claims": []
+    },
+    {
+      "section": 4,
+      "title": "Visual Witness: Art in the Twilight",
+      "supported": false,
+      "unsupported_claims": [
+        "a photograph from Mexico City captured the gritty reality of urban life during unrest"
+      ]
+    }
+  ]
+}

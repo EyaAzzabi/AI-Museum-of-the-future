@@ -1,3 +1,16 @@
+## v6 — 2026-10-14
+Observed on a live run (qwen3.8-27b, run 20261014-094737): the fact-checker
+flagged statements in 3 of 5 v5 sections. Most were embellishments of short
+headlines: causation added to co-occurrence ("heat waves triggered protests"
+from "Protests ... Amid Extreme Heat Wave"), an invented role for an
+organisation (FTDES as a "syndical movement"), a wrong duration ("onze ans
+après la révolution" in 2026), invented context ("administrative
+decentralisation"), and an uncited sentence about unemployment. v6 adds
+evidence-granularity rules (adapted from the CultureArt prompt v5) and forbids
+uncited factual sentences. Separately, the evidence snippets sent with v5 were
+cut from 300 to 180 characters, because the v5 prompt (8,177 tokens) exceeded
+the free tier's 8,000 tokens-per-minute limit.
+
 ## v5 — 2026-10-14
 Added: the insights now carry "evidence" (the text behind every cited chunk ID)
 and "review" (agreements, tensions and weak findings from the peer reviewer).
@@ -51,7 +64,13 @@ Requirements:
 - Do not build a section on a finding listed in "review.weak_findings".
 - Cite sources in every narrative: put the exact [chunk_id] after each factual
   sentence, e.g. "... in 2021 [abc-123]." Use only IDs that appear in "evidence";
-  state only what that evidence text says.
+  state only what that evidence text says. A sentence without a citation may only
+  frame or connect ("this section explores..."), never state a fact.
+- Most evidence items are headlines or short excerpts. A headline supports only what
+  it states: "X amid Y" means X and Y happened together, not that Y caused X. Do not
+  add causes, effects, figures, durations or descriptions of people and organisations
+  that the evidence does not give, and do not turn one headline into a general trend.
+  Mark interpretation as interpretation ("can be read as", "suggests").
 - Order sections as an arc: opening context, development, tension or contrast,
   then a closing section looking forward.
 - Each narrative is one paragraph of 60-120 words, written for a general visitor.

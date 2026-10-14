@@ -37,7 +37,15 @@ class FactCheckAgent(BaseAgent):
                 "title": section.title,
                 "narrative": section.narrative,
                 "cited_evidence": {
-                    cid: (evidence.get(cid) or {}).get("content", "")[:600]
+                    cid: {
+                        # v1 saw only the text, and flagged a year that the source's date gives
+                        "provenance": " · ".join(str(x) for x in (
+                            (evidence.get(cid) or {}).get("year"),
+                            (evidence.get(cid) or {}).get("source"),
+                            (evidence.get(cid) or {}).get("title"),
+                        ) if x),
+                        "text": (evidence.get(cid) or {}).get("content", "")[:600],
+                    }
                     for cid in dict.fromkeys(citations_in(section.narrative) + list(section.artifacts))
                 },
             }
