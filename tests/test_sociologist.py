@@ -461,16 +461,18 @@ class TestSociologistLive:
         print("="*60)
 
 
-def test_pipeline_passes_retriever_to_sociologist():
-    """run_pipeline(retriever=...) enables the sociologist's HyDE retrieval."""
+def test_pipeline_passes_retriever_to_every_agent():
+    """run_pipeline(retriever=...) lets every agent search; the sociologist through HyDE."""
     from agents.pipeline import _build_specialist_agents
 
     retriever = MagicMock()
     agents = _build_specialist_agents(openai_client=None, retriever=retriever)
-    assert agents["sociologist"].retriever is retriever
-    assert agents["sociologist"]._hyde_retriever is not None
+    assert all(agent.retriever is retriever for agent in agents.values())
 
-    assert _build_specialist_agents(openai_client=None)["sociologist"]._hyde_retriever is None
+    sociologist = agents["sociologist"]
+    with patch.object(sociologist, "_retrieve_evidence", return_value=MagicMock(chunks=[])):
+        sociologist.search_own_evidence()
+    assert sociologist._hyde_retriever.retriever is retriever
 
 
 def test_hyde_empty_hypothetical_doc_falls_back_to_query():

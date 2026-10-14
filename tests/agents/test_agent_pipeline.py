@@ -213,7 +213,9 @@ def _make_mock_llm_response(chunks: list[RetrievalResult], agent_name: str) -> d
 # ─────────────────────────────────────────────────────────────────────────────
 
 @pytest.mark.parametrize("AgentClass,agent_name", SPECIALIST_AGENTS)
-@given(chunks=st.lists(retrieval_result_strategy(), min_size=1))
+# Up to 12 chunks: agents keep a bounded evidence set (the sociologist its 20 most
+# relevant), and the mocked finding must cite a chunk the agent actually showed the model.
+@given(chunks=st.lists(retrieval_result_strategy(), min_size=1, max_size=12))
 @settings(max_examples=100, deadline=None, suppress_health_check=[HealthCheck.too_slow])
 def test_specialist_agent_output_structure_and_grounding(
     AgentClass,
@@ -436,15 +438,18 @@ def shared_context_strategy(draw: st.DrawFn) -> SharedContext:
     return SharedContext(insights=insights, cross_references=cross_refs)
 
 
-def _make_valid_curator_payload(num_sections: int = 4) -> dict:
-    """Return a dict matching the ExhibitionSynthesis schema with the given section count."""
+def _make_valid_curator_payload(num_sections: int = 4, cite: str | None = None) -> dict:
+    """Return a dict matching the ExhibitionSynthesis schema with the given section count.
+
+    ``cite`` is a chunk ID every narrative cites (narratives must cite the specialists' IDs).
+    """
     return {
         "exhibition_title": "The Age of Transformation",
         "concept": "A journey through the defining forces of our era.",
         "sections": [
             {
                 "title": f"Section {i + 1}: A Critical Lens",
-                "narrative": f"This section explores perspective {i + 1} in depth.",
+                "narrative": f"This section explores perspective {i + 1} in depth." + (f" [{cite}]" if cite else ""),
             }
             for i in range(num_sections)
         ],
@@ -470,7 +475,9 @@ def test_curator_synthesis_structure(shared_context: SharedContext, num_sections
     - sections is a list with 4–6 items, each with non-empty title and narrative
     - selected_items is non-empty
     """
-    payload = _make_valid_curator_payload(num_sections)
+    known = sorted(a for i in shared_context.insights.values()
+                   if i.perspective or i.key_findings or i.selected_artifacts for a in i.selected_artifacts)
+    payload = _make_valid_curator_payload(num_sections, cite=known[0] if known else None)
     curator = CuratorAgent(openai_client=None)
 
     with patch.object(curator, "_call_llm", return_value=payload):

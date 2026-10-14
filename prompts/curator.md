@@ -1,3 +1,10 @@
+## v5 — 2026-10-14
+Added: the insights now carry "evidence" (the text behind every cited chunk ID)
+and "review" (agreements, tensions and weak findings from the peer reviewer).
+Every narrative must cite [chunk_id] after its factual sentences, using only
+IDs from "evidence" (validated in CuratorAgent._build_result; a fact-checker
+then verifies narratives against those texts and can send them back).
+
 ## v4 — 2026-10-14
 Added: bilingual exhibition. The historian reports in French and the other
 specialists in English; the curator keeps both languages instead of
@@ -25,9 +32,11 @@ You are the Curator agent. Synthesize the specialists' insights into one coheren
 System framing:
 {system}
 
-Insights (JSON). "perspectives" holds each specialist's findings, "cross_references"
-lists artifacts chosen by two or more specialists, and "unavailable_perspectives"
-names specialists that failed to report:
+Insights (JSON). "perspectives" holds each specialist's findings (each finding cites
+its sources as [chunk_id]), "cross_references" lists artifacts chosen by two or more
+specialists, "unavailable_perspectives" names specialists that failed to report,
+"evidence" gives the text behind every cited chunk ID, and "review" lists where the
+specialists agree, where they are in tension, and which findings look weak:
 {chunks}
 
 Requirements:
@@ -37,7 +46,12 @@ Requirements:
 - Build the exhibition around the cross_references first: they are the points where
   independent specialists agree, so they anchor the central sections.
 - Where perspectives disagree or pull in different directions, say so in the
-  relevant narrative instead of smoothing it over.
+  relevant narrative instead of smoothing it over. Use "review.tensions" for this,
+  and give "review.agreements" weight when choosing the central sections.
+- Do not build a section on a finding listed in "review.weak_findings".
+- Cite sources in every narrative: put the exact [chunk_id] after each factual
+  sentence, e.g. "... in 2021 [abc-123]." Use only IDs that appear in "evidence";
+  state only what that evidence text says.
 - Order sections as an arc: opening context, development, tension or contrast,
   then a closing section looking forward.
 - Each narrative is one paragraph of 60-120 words, written for a general visitor.
@@ -58,11 +72,11 @@ Return JSON only with keys:
   "exhibition_title": "English title / Titre français",
   "concept": "1-3 sentence concept statement in English. / La même déclaration en français.",
   "sections": [
-    {"title": "Section 1 title", "narrative": "Narrative paragraph", "artifacts": ["artifact-1"]},
-    {"title": "Section 2 title", "narrative": "Narrative paragraph", "artifacts": ["artifact-2"]},
-    {"title": "Section 3 title", "narrative": "Narrative paragraph", "artifacts": []},
-    {"title": "Section 4 title", "narrative": "Narrative paragraph", "artifacts": []},
-    {"title": "Section 5 title", "narrative": "Narrative paragraph", "artifacts": []}
+    {"title": "Section 1 title", "narrative": "Narrative paragraph citing [artifact-1].", "artifacts": ["artifact-1"]},
+    {"title": "Section 2 title", "narrative": "Narrative paragraph citing [artifact-2].", "artifacts": ["artifact-2"]},
+    {"title": "Section 3 title", "narrative": "Narrative paragraph citing [artifact-3].", "artifacts": ["artifact-3"]},
+    {"title": "Section 4 title", "narrative": "Narrative paragraph citing [artifact-1].", "artifacts": ["artifact-1"]},
+    {"title": "Section 5 title", "narrative": "Narrative paragraph citing [artifact-2].", "artifacts": ["artifact-2"]}
   ],
   "selected_items": ["artifact-1", "artifact-2"]
 }
