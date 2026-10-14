@@ -1,3 +1,7 @@
+> **Sarah : commencer par [START_HERE_SARAH.md](START_HERE_SARAH.md).**
+> Cette copie conserve les modules de l’équipe et ajoute ton agent, son diagnostic et sa démonstration.
+> Confirmer les embeddings de Supabase avant d’exécuter le schéma/ingestion originaux.
+
 # AI Museum of the Future
 
 An AI-powered virtual museum that represents our current era as if curated 100 years from now. The system collects public contemporary data, analyzes it through specialized AI agents, grounds findings in a RAG knowledge base, and synthesizes a coherent virtual exhibition.

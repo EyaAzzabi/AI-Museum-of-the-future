@@ -1,0 +1,4 @@
+[
+  {"chunk_id":"demo-art-1","document_id":"demo-doc-1","content":"An exhibition in Tunis presents digital artworks exploring local identity.","metadata":{"title":"Synthetic teaching example","source":"synthetic","category":"culture"}},
+  {"chunk_id":"demo-tech-1","document_id":"demo-doc-2","content":"A semiconductor processor has eight cores.","metadata":{"source":"synthetic","category":"technology"}}
+]
