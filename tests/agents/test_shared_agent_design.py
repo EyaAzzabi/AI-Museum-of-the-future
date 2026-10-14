@@ -104,3 +104,35 @@ def test_visual_agent_without_images_skips_vision():
     with patch("multimodal.analyze_image.analyze_image") as vision:
         VisualAgent(client).run(INPUT)
     vision.assert_not_called()
+
+
+def test_shortened_uuid_citations_resolve_to_the_full_id():
+    from agents.base_agent import resolve_citations
+
+    ids = ["71108630-9f1e-4c2a-8a55-1b2c3d4e5f60", "71108631-0000-0000-0000-000000000000", "e84ceff7-6a5b-4c1d"]
+    text, refs, unknown = resolve_citations("Growth [71108630] and access [e84ceff7, 7110].", ids)
+    assert text == "Growth [71108630-9f1e-4c2a-8a55-1b2c3d4e5f60] and access [e84ceff7-6a5b-4c1d, 7110]."
+    assert refs == [ids[0], ids[2]]
+    assert unknown == ["7110"]   # too short to be unambiguous
+
+
+def test_agent_keeps_findings_citing_an_id_prefix():
+    chunk = RetrievalResult(chunk_id="71108630-9f1e-4c2a-8a55-1b2c3d4e5f60", document_id="d", content="GDP grew 2.1%.")
+    agent = HistorianAgent(_llm({"perspective": "p", "key_findings": ["La croissance [71108630]."]}))
+    result = agent.run([chunk])
+    assert result.key_findings == ["La croissance [71108630-9f1e-4c2a-8a55-1b2c3d4e5f60]."]
+    assert result.selected_artifacts == [chunk.chunk_id]
+
+
+def test_unparseable_responses_are_recorded(tmp_path):
+    client = MagicMock()
+    client.chat.completions.create.return_value = SimpleNamespace(
+        choices=[SimpleNamespace(message=SimpleNamespace(content='["not", "an", "object"]'))]
+    )
+    agent = HistorianAgent(client)
+    agent.recorder = RunRecorder(runs_dir=tmp_path)
+    try:
+        agent._call_llm("s", "u")
+    except ValueError:
+        pass
+    assert agent.recorder.events_of("llm_call")[0]["error"] == "LLM response was not a JSON object."

@@ -19,3 +19,12 @@ def test_retries_groq_json_validate_failed() -> None:
         payload = TechnologyAgent(client)._call_llm("system", "user")
     assert payload == {"perspective": "p"}
     assert client.chat.completions.create.call_count == 2
+
+
+def test_retry_wait_follows_the_provider_and_gives_up_on_daily_limits() -> None:
+    from agents.base_agent import retry_wait
+
+    assert retry_wait("Error code: 429 ... Please try again in 12.3s.", 0) == 12.8
+    assert retry_wait("Error code: 429 ... tokens per day ... Please try again in 24m39.168s.", 0) is None
+    assert retry_wait("json_validate_failed", 1) == 4.0
+    assert retry_wait("400 invalid model", 0) is None

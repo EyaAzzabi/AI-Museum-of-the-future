@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from agents.base_agent import BaseAgent, InsightObject, citations_in
+from agents.base_agent import BaseAgent, InsightObject, resolve_citations
 from agents.shared_context import SharedContext, evidence_of
 
 MIN_SECTIONS = 4
@@ -130,8 +130,8 @@ class CuratorAgent(BaseAgent):
             artifacts = [str(a) for a in section.get("artifacts") or []]
             if known_artifacts:
                 # Narratives cite their sources like the specialists' findings do.
-                cited = citations_in(narrative)
-                unknown = sorted({c for c in cited if c not in known_artifacts})
+                narrative, cited, unknown = resolve_citations(narrative, known_artifacts)
+                unknown = sorted(set(unknown))
                 if unknown:
                     raise CuratorValidationError(
                         f"narratives may only cite the specialists' chunk IDs; unknown: {', '.join(unknown)}."

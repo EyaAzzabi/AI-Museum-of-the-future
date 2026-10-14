@@ -22,6 +22,7 @@ import json
 import logging
 import os
 import re
+import threading
 import time
 from abc import ABC
 from collections.abc import Mapping
@@ -36,6 +37,22 @@ logger = logging.getLogger(__name__)
 CITATION = re.compile(r"\[([^\[\]]+)\]")
 RETRYABLE_ERRORS = ("503", "429", "high demand", "UNAVAILABLE", "quota", "json_validate_failed")
 EVIDENCE_CHARS = 700
+LLM_ATTEMPTS = 4
+MAX_RETRY_WAIT_S = 45  # a provider asking to wait longer (e.g. a daily token limit) is not retried
+_RETRY_AFTER = re.compile(r"try again in (?:(\d+)m)?([\d.]+)s", re.IGNORECASE)
+# Free-tier providers limit tokens per minute; parallel agents share this many concurrent calls.
+_LLM_SLOTS = threading.BoundedSemaphore(int(os.getenv("LLM_MAX_CONCURRENCY", "3")))
+
+
+def retry_wait(error: str, attempt: int) -> float | None:
+    """Seconds to wait before retrying ``error``, or None when retrying cannot help."""
+    if not any(code in error for code in RETRYABLE_ERRORS):
+        return None
+    match = _RETRY_AFTER.search(error)
+    if match:
+        wait = int(match.group(1) or 0) * 60 + float(match.group(2)) + 0.5
+        return wait if wait <= MAX_RETRY_WAIT_S else None
+    return 2.0 * (attempt + 1)
 
 
 @dataclass
@@ -76,6 +93,45 @@ def as_result(chunk: Any):
         metadata=dict(metadata) if isinstance(metadata, Mapping) else {},
         similarity=float(read("similarity") or 0.0),
     )
+
+
+MIN_ID_PREFIX = 6
+
+
+def resolve_citations(text: str, known_ids) -> tuple[str, list[str], list[str]]:
+    """Map every cited ID to a known chunk ID and rewrite the text with the full IDs.
+
+    Models often shorten long UUIDs ("[71108630]" for "71108630-9f1e-..."); an
+    unambiguous prefix of at least MIN_ID_PREFIX characters resolves to the full
+    ID. Returns (rewritten text, resolved IDs, unresolved IDs).
+    """
+    known = list(known_ids)
+    resolved: list[str] = []
+    unknown: list[str] = []
+
+    def resolve(ref: str) -> str | None:
+        if ref in known:
+            return ref
+        if len(ref) >= MIN_ID_PREFIX:
+            matches = [k for k in known if k.startswith(ref)]
+            if len(matches) == 1:
+                return matches[0]
+        return None
+
+    def rewrite(match: re.Match) -> str:
+        parts = [part.strip() for part in re.split(r"[;,]", match.group(1)) if part.strip()]
+        full = []
+        for part in parts:
+            target = resolve(part)
+            if target is None:
+                unknown.append(part)
+                full.append(part)
+            else:
+                resolved.append(target)
+                full.append(target)
+        return "[" + ", ".join(full) + "]"
+
+    return CITATION.sub(rewrite, text), resolved, unknown
 
 
 def citations_in(text: str) -> list[str]:
@@ -202,11 +258,10 @@ class BaseAgent(ABC):
                 continue
             # Kept only if it cites something and every citation is real: a claim
             # resting partly on an unknown source is partly unsupported.
-            refs = citations_in(finding)
-            if not refs or any(r not in by_id for r in refs):
+            text, refs, unknown = resolve_citations(finding.strip(), by_id)
+            if not refs or unknown:
                 dropped += 1
                 continue
-            text = finding.strip()
             if text not in findings:
                 findings.append(text)
             cited.extend(r for r in refs if r not in cited)
@@ -268,24 +323,25 @@ class BaseAgent(ABC):
         response = None
         last_exc = None
         for m in models_to_try:
-            for attempt in range(3):
+            for attempt in range(LLM_ATTEMPTS):
                 try:
-                    response = self.openai_client.chat.completions.create(
-                        model=m,
-                        response_format={"type": "json_object"},
-                        messages=[
-                            {"role": "system", "content": system},
-                            {"role": "user", "content": user},
-                        ],
-                    )
+                    with _LLM_SLOTS:
+                        response = self.openai_client.chat.completions.create(
+                            model=m,
+                            response_format={"type": "json_object"},
+                            messages=[
+                                {"role": "system", "content": system},
+                                {"role": "user", "content": user},
+                            ],
+                        )
                     last_exc = None
                     break
                 except Exception as exc:
                     last_exc = exc
-                    if any(code in str(exc) for code in RETRYABLE_ERRORS):
-                        time.sleep(1.0 * (attempt + 1))
-                        continue
-                    break
+                    wait = retry_wait(str(exc), attempt)
+                    if wait is None or attempt == LLM_ATTEMPTS - 1:
+                        break
+                    time.sleep(wait)
             if last_exc is None and response is not None:
                 break
 
@@ -294,7 +350,12 @@ class BaseAgent(ABC):
                          seconds=round(time.monotonic() - started, 2))
             raise ValueError(f"LLM call failed: {last_exc}") from last_exc
 
-        parsed = self._parse_response(response)
+        try:
+            parsed = self._parse_response(response)
+        except ValueError as exc:
+            self._record("llm_call", model=self.model, system=system, user=user, error=str(exc),
+                         seconds=round(time.monotonic() - started, 2))
+            raise
         self._record("llm_call", model=self.model, system=system, user=user, response=parsed,
                      seconds=round(time.monotonic() - started, 2))
         self._cache_put(system, user, parsed)
