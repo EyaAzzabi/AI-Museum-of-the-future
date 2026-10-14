@@ -78,7 +78,7 @@ def test_retrieval_overfetches_then_filters_and_reports_counts(monkeypatch):
         {'id':'tn-2','content':'Tunisian cinema.', 'similarity':.7},
     ]
     diagnostics = {}
-    with patch('rag.vector_store.culture_retrieval.diagnose_supabase', return_value={'sample_dimensions':[384], 'chunks_count':100}), patch('rag.vector_store.culture_retrieval.embed_query',return_value=[.1]*384):
+    with patch('rag.vector_store.culture_retrieval.diagnose_supabase', return_value={'sample_dimensions':[384], 'chunks_count':100}), patch('rag.vector_store.culture_retrieval.embed_query',return_value=[.1]*384), patch('rag.vector_store.culture_retrieval._country_first_candidates',return_value=([],{})):
         results = retrieve_culture('art in Tunisia', sb, top_k=2, diagnostics=diagnostics)
     assert [r.chunk_id for r in results] == ['tn-1','tn-2']
     assert sb.rpc.call_args.args[1]['match_count'] == 20

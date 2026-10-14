@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 
 from agents.culture_art import CultureArtAgent
+from rag.vector_store.culture_reranker import CultureReranker, DEFAULT_CACHE_DIR
 from agents.culture_scope import analysis_status, resolve_country
 from agents.llm_config import build_llm_client
 from rag.vector_store.culture_retrieval import (
@@ -50,12 +51,13 @@ def create_app():
             return jsonify({"error": str(exc)}), 400
         try:
             retrieval_info = {}
-            chunks = retrieve_culture(query, build_supabase_client(), top_k, category, country=country, diagnostics=retrieval_info)
+            chunks = retrieve_culture(query, build_supabase_client(), top_k, category, country=country, diagnostics=retrieval_info,
+                                      reranker=CultureReranker(build_llm_client, cache_dir=DEFAULT_CACHE_DIR))
             # No provider call needed when retrieval returned nothing.
             client = build_llm_client() if chunks else None
             result = CultureArtAgent(client).run(chunks, query=query, country=country)
             return jsonify({"query": query,
-                            **analysis_status(result, chunks, query, country),
+                            **analysis_status(result, chunks, query, country, retrieval_info),
                             "retrieval": retrieval_info,
                             "retrieved_evidence": [asdict(chunk) for chunk in chunks],
                             "insight": asdict(result)})

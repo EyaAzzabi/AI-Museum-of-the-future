@@ -9,6 +9,7 @@ from pathlib import Path
 from unittest.mock import Mock
 
 from agents.culture_art import CultureArtAgent
+from rag.vector_store.culture_reranker import CultureReranker, DEFAULT_CACHE_DIR
 from agents.culture_scope import analysis_status, resolve_country
 
 ROOT = Path(__file__).resolve().parent
@@ -40,6 +41,7 @@ def main() -> int:
     modes.add_argument("--offline", action="store_true")
     modes.add_argument("--diagnose", action="store_true")
     modes.add_argument("--fixture", action="store_true", help="Real LLM on synthetic evidence, without Supabase")
+    parser.add_argument("--no-rerank", action="store_true", help="Explicit V4 baseline; skip LLM evidence screening")
     parser.add_argument("--top-k", type=int, default=5)
     parser.add_argument("--country", help="Explicit country scope, e.g. Tunisia; single countries in the query are detected automatically")
     parser.add_argument("--category", help="Exact chunks.metadata.category, only after checking the corpus")
@@ -65,7 +67,9 @@ def main() -> int:
                 parser.error("Provide a query or use --offline, --fixture or --diagnose.")
             from rag.vector_store.culture_retrieval import build_supabase_client, retrieve_culture
             chunks = retrieve_culture(args.query, build_supabase_client(), args.top_k, args.category,
-                                      country=args.country, diagnostics=retrieval_info)
+                                      country=args.country, diagnostics=retrieval_info,
+                                      reranker=None if args.no_rerank else CultureReranker(build_llm_client, cache_dir=DEFAULT_CACHE_DIR,
+                                          progress=lambda message: print(message, file=sys.stderr, flush=True)))
         query = args.query or "digital art and local identity in Tunisia"
         if chunks:
             client = build_llm_client()
@@ -74,7 +78,7 @@ def main() -> int:
         print_json({"mode": "real_llm_synthetic_evidence" if args.fixture else "live_supabase",
                     "query": query, "retrieved_evidence": evidence,
                     "retrieval": retrieval_info,
-                    **analysis_status(result, chunks, query, args.country),
+                    **analysis_status(result, chunks, query, args.country, retrieval_info),
                     "insight": asdict(result)})
         return 0
     except Exception as exc:

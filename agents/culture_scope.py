@@ -66,12 +66,12 @@ def evidence_warnings(chunks) -> list[str]:
     return ['Short excerpts: report only explicit facts; broader interpretation needs fuller sources.'] if any(len(str(c).split()) < 60 for c in contents) else []
 
 
-def analysis_status(insight, chunks, query: str, country: str | None = None) -> dict:
+def analysis_status(insight, chunks, query: str, country: str | None = None, retrieval: dict | None = None) -> dict:
     scope = resolve_country(query, country)
     return {
         'status': 'references_validated' if insight.selected_artifacts else 'insufficient_evidence',
         'scope_country': scope,
-        'warnings': evidence_warnings(chunks),
+        'warnings': evidence_warnings(chunks) + (retrieval or {}).get('rerank_warnings', []),
         'limitations': [
             'References are checked; factual support and topic relevance still require human review.',
             'Country matching uses explicit mentions/metadata and may miss implicit references or accept incidental mentions.',
