@@ -175,6 +175,7 @@ class BaseAgent(ABC):
             meta.get("year"),
             "/".join(str(x) for x in (meta.get("source"), meta.get("category")) if x),
             (meta.get("title") or "")[:90],
+            "outside the requested country" if meta.get("in_scope") is False else None,
         ) if p)
         content = result.content[:EVIDENCE_CHARS]
         prefix = f"[{result.chunk_id}] " if result.chunk_id else ""

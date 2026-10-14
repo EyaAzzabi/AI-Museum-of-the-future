@@ -112,10 +112,10 @@ def test_one_chunk_per_document():
 def test_year_and_country_filters_use_document_metadata():
     r = _retriever(["old-1", "ai-1", "art-1", "news-1"])
     results = r.search("x", k=5, rerank=False, filters=SearchFilters(country="Tunisia", year_from=2020, year_to=2026))
-    ids = {x.chunk_id for x in results}
-    assert "old-1" not in ids          # 1956: outside the period
-    assert "ai-1" not in ids           # does not mention Tunisia
-    assert {"art-1", "news-1"} <= ids  # undated is kept, "Tunisie" counts as Tunisia
+    in_scope = {x.chunk_id for x in results if x.metadata.get("in_scope") is not False}
+    assert "old-1" not in {x.chunk_id for x in results}   # 1956: outside the period, never returned
+    assert "ai-1" not in in_scope           # does not mention Tunisia: only as a marked top-up
+    assert {"art-1", "news-1"} <= in_scope  # undated is kept, "Tunisie" counts as Tunisia
     assert all("year" in x.metadata for x in results)
 
 
@@ -153,3 +153,35 @@ def test_helpers():
     assert keyword_query("the economy of Tunisia") == "economy | tunisia"
     assert keyword_query("x", ["Kaïs Saïed", "Startup Act"]) == "(kaïs <-> saïed) | (startup <-> act)"
     assert jaccard(tokens("Population total 2021"), tokens("Population total 2022")) == 0.5
+
+
+def test_country_filter_tops_up_with_marked_out_of_scope_results():
+    r = _retriever(["ai-1", "art-1"])
+    results = r.search("x", k=2, rerank=False, filters=SearchFilters(country="Tunisia", year_from=None, year_to=None))
+    assert [x.chunk_id for x in results] == ["art-1", "ai-1"]          # in-scope first
+    assert results[0].metadata.get("in_scope") is None
+    assert results[1].metadata["in_scope"] is False
+
+
+def test_country_top_up_can_be_disabled():
+    r = HybridRetriever(FakeSupabase(["ai-1", "art-1"]), EMBED, config=SearchConfig(relax_country=False))
+    results = r.search("x", k=2, rerank=False, filters=SearchFilters(country="Tunisia", year_from=None, year_to=None))
+    assert [x.chunk_id for x in results] == ["art-1"]
+
+
+def test_transient_database_errors_are_retried(monkeypatch):
+    import rag.vector_store.hybrid_retriever as hybrid
+
+    monkeypatch.setattr(hybrid.time, "sleep", lambda _s: None)
+    sb = FakeSupabase(["art-1"])
+    calls = {"n": 0}
+    original = sb.rpc
+
+    def flaky(name, args):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise ConnectionError("Server disconnected")
+        return original(name, args)
+
+    sb.rpc = flaky
+    assert [x.chunk_id for x in HybridRetriever(sb, EMBED).search("x", k=1, rerank=False)] == ["art-1"]

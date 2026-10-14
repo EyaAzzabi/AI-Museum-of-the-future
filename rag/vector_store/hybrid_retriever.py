@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import logging
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field, replace
 from functools import lru_cache
@@ -62,6 +63,10 @@ class SearchConfig:
     max_statistics: int = 1           # statistics rows allowed in one result set
     duplicate_threshold: float = 0.6  # token Jaccard above which two chunks are near-duplicates
     rerank_pool: int = 20             # candidates sent to the LLM reranker
+    # When the country filter leaves fewer than k results, top up with the best
+    # results from elsewhere, marked metadata["in_scope"] = False. The corpus has
+    # little country-specific material for some agents (images, technology).
+    relax_country: bool = True
 
 
 @dataclass
@@ -161,16 +166,27 @@ class HybridRetriever:
 
         candidates = self._fuse(ranked_lists)
         self._attach_documents(candidates)
-        candidates = [c for c in candidates if self._passes(c.result, filters)]
         for c in candidates:
             if self._category(c.result) == STATISTICS_CATEGORY:
                 c.score *= self.config.statistics_weight
         candidates.sort(key=lambda c: c.score, reverse=True)
 
-        diverse = self._diversify(candidates, limit=max(k, self.config.rerank_pool) if rerank_query else k)
+        in_scope = [c for c in candidates if self._passes(c.result, filters)]
+        limit = max(k, self.config.rerank_pool) if rerank_query else k
+        diverse = self._diversify(in_scope, limit=limit)
+        if filters.country and self.config.relax_country and len(diverse) < k:
+            relaxed = replace(filters, country=None)
+            taken = {id(c) for c in in_scope}
+            outside = [c for c in candidates if id(c) not in taken and self._passes(c.result, relaxed)]
+            for c in outside:
+                c.result = replace(c.result, metadata={**(c.result.metadata or {}), "in_scope": False})
+            diverse += self._diversify(outside, limit=k - len(diverse), chosen=diverse)
+
         results = [self._with_score(c) for c in diverse]
         if rerank_query:
             results = llm_rerank(self.llm_client, rerank_query, results)
+            # Keep in-scope evidence ahead of the top-up, whatever the reranker says.
+            results.sort(key=lambda r: (r.metadata or {}).get("in_scope") is False)
         return results[:k]
 
     # ── Candidate channels ───────────────────────────────────────────────────
@@ -189,7 +205,7 @@ class HybridRetriever:
         if filters.categories and len(filters.categories) == 1:
             args["filter"] = {"category": filters.categories[0]}
         try:
-            rows = self.supabase_client.rpc("match_chunks", args).execute().data or []
+            rows = _execute(lambda: self.supabase_client.rpc("match_chunks", args)).data or []
         except Exception as exc:  # noqa: BLE001
             logger.warning("match_chunks RPC failed: %s", exc)
             return []
@@ -207,7 +223,7 @@ class HybridRetriever:
             )
             if filters.categories and len(filters.categories) == 1:
                 request = request.contains("metadata", {"category": filters.categories[0]})
-            rows = request.limit(self.config.candidate_pool).execute().data or []
+            rows = _execute(lambda: request.limit(self.config.candidate_pool)).data or []
         except Exception as exc:  # noqa: BLE001
             logger.warning("Keyword search failed for %r: %s", tsquery, exc)
             return []
@@ -235,12 +251,12 @@ class HybridRetriever:
         documents: dict[str, dict] = {}
         for start in range(0, len(doc_ids), 100):
             try:
-                rows = (
+                batch = doc_ids[start:start + 100]
+                rows = _execute(lambda: (
                     self.supabase_client.table("documents")
                     .select("id,source,category,title,url,published_at,metadata")
-                    .in_("id", doc_ids[start:start + 100])
-                    .execute().data or []
-                )
+                    .in_("id", batch)
+                )).data or []
             except Exception as exc:  # noqa: BLE001
                 logger.warning("Document lookup failed: %s", exc)
                 rows = []
@@ -286,11 +302,14 @@ class HybridRetriever:
                 return False
         return True
 
-    def _diversify(self, candidates: list[_Candidate], limit: int) -> list[_Candidate]:
-        chosen: list[_Candidate] = []
-        chosen_tokens: list[set[str]] = []
-        documents: set[str] = set()
-        statistics = 0
+    def _diversify(self, candidates: list[_Candidate], limit: int,
+                   chosen: list[_Candidate] | None = None) -> list[_Candidate]:
+        """Greedy selection; ``chosen`` are earlier picks the new ones must also differ from."""
+        earlier = list(chosen or [])
+        chosen = []
+        chosen_tokens = [tokens(c.result.content) for c in earlier]
+        documents = {c.result.document_id for c in earlier}
+        statistics = sum(self._category(c.result) == STATISTICS_CATEGORY for c in earlier)
         for cand in candidates:
             if len(chosen) >= limit:
                 break
@@ -314,6 +333,20 @@ class HybridRetriever:
         meta = dict(cand.result.metadata or {})
         meta["fused_score"] = round(cand.score, 5)
         return replace(cand.result, metadata=meta)
+
+
+def _execute(build: Any, attempts: int = 3) -> Any:
+    """Execute a Supabase request, retrying transient failures ("Server disconnected").
+
+    ``build`` returns a fresh request each time.
+    """
+    for attempt in range(attempts):
+        try:
+            return build().execute()
+        except Exception:  # noqa: BLE001
+            if attempt == attempts - 1:
+                raise
+            time.sleep(0.5 * (attempt + 1))
 
 
 def _row_to_result(row: Any) -> RetrievalResult | None:
