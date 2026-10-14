@@ -1,0 +1,280 @@
+{
+  "date": "2026-10-14",
+  "model": "openai/gpt-oss-120b",
+  "evidence_items": 14,
+  "evidence": "supabase",
+  "evidence_ids": [
+    "77fd4d4d-73b9-454b-84ff-04a269967dd3",
+    "5ac124dc-0f49-40b3-a725-f9e9fde1f9a0",
+    "657913fd-39f4-4252-aa04-aeab4c24eb9f",
+    "831de05c-1cf9-469e-9867-0075619a8e69",
+    "f81224e2-e536-4b53-9722-423cbb4b4795",
+    "40d07526-19e3-4926-ae87-b6bc8af10319",
+    "77bb21ea-98e2-4a2c-9c9a-bd499aee7314",
+    "410922e5-5f7a-40eb-ae4d-d6937af5d500",
+    "b0c3bd3d-b7e1-47fd-b3cf-64a9cf7c9b45",
+    "21877da6-6b82-4e19-beb8-89ee0e73f708",
+    "220d208d-d5d4-4a15-adec-9b332ddf85cc",
+    "de15d144-b2e9-450f-b863-298310878125",
+    "dc461499-4a9f-4920-9fa5-30fa4f311466",
+    "59243175-da39-4d85-92ac-ea5f3abb189e"
+  ],
+  "runs": {
+    "v3": [
+      {
+        "findings_returned": 10,
+        "findings_kept": 10,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech",
+          "space"
+        ],
+        "overstatement_markers": 1,
+        "overstatement_detail": {
+          "guessed name (source: ليجوريا, Liguria)": [
+            "A 2026 news story announced that Legoria was enhancing renewable energy production, reflecting growth in clean power generation [831de05c-1cf9-469e-9867-0075619a8e69]."
+          ]
+        },
+        "unlabelled_readings": 3,
+        "over_budget": 5,
+        "perspective_markers": [],
+        "interpretation_labelled": 5,
+        "perspective": "The 2020‑2026 era was defined by breakthroughs across AI, digital life, health, energy, and space, while evidence on cybersecurity & privacy and outside‑technology domains is missing.",
+        "findings": [
+          "In 2026 news reported that access to social media was being responsibly regulated, indicating a shift toward more controlled digital platforms [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "Interpretation: This suggests users experienced new compliance mechanisms and possibly reduced exposure to harmful content [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "A 2026 news story announced that Legoria was enhancing renewable energy production, reflecting growth in clean power generation [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "Interpretation: Communities likely saw increased access to renewable electricity and a move away from fossil fuels [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "In 2026 a news headline reported that a SpaceX rocket collided with the Moon and NASA released new crater images, highlighting renewed lunar exploration activity [f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "Interpretation: The event signaled heightened public interest in space travel and potential future lunar missions [f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "An archive from 2020 noted that Moderna's COVID‑19 vaccine was reported to be nearly 95 percent effective, alongside similar results from Pfizer‑BioNTech, though regulators and distribution challenges remained [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: High efficacy figures drove optimism for ending the pandemic and spurred global vaccination campaigns [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "A 2026 news report quoted a cybersecurity expert stating that artificial intelligence can design new genetic sequences, linking AI capabilities to biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: This raised public awareness of AI’s potential impact on genetic research and biosecurity concerns [410922e5-5f7a-40eb-ae4d-d6937af5d500]."
+        ],
+        "returned_findings": [
+          "In 2026 news reported that access to social media was being responsibly regulated, indicating a shift toward more controlled digital platforms [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "Interpretation: This suggests users experienced new compliance mechanisms and possibly reduced exposure to harmful content [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "A 2026 news story announced that Legoria was enhancing renewable energy production, reflecting growth in clean power generation [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "Interpretation: Communities likely saw increased access to renewable electricity and a move away from fossil fuels [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "In 2026 a news headline reported that a SpaceX rocket collided with the Moon and NASA released new crater images, highlighting renewed lunar exploration activity [f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "Interpretation: The event signaled heightened public interest in space travel and potential future lunar missions [f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "An archive from 2020 noted that Moderna's COVID‑19 vaccine was reported to be nearly 95 percent effective, alongside similar results from Pfizer‑BioNTech, though regulators and distribution challenges remained [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: High efficacy figures drove optimism for ending the pandemic and spurred global vaccination campaigns [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "A 2026 news report quoted a cybersecurity expert stating that artificial intelligence can design new genetic sequences, linking AI capabilities to biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: This raised public awareness of AI’s potential impact on genetic research and biosecurity concerns [410922e5-5f7a-40eb-ae4d-d6937af5d500]."
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 10,
+        "findings_kept": 10,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech"
+        ],
+        "overstatement_markers": 2,
+        "overstatement_detail": {
+          "term added (source: 'renewable energy')": [
+            "2026 news reported that Lejoria boosted renewable energy production, indicating expanding solar and wind capacity in the region [831de05c-1cf9-469e-9867-0075619a8e69]."
+          ],
+          "guessed name (source: ليجوريا, Liguria)": [
+            "2026 news reported that Lejoria boosted renewable energy production, indicating expanding solar and wind capacity in the region [831de05c-1cf9-469e-9867-0075619a8e69]."
+          ]
+        },
+        "unlabelled_readings": 4,
+        "over_budget": 5,
+        "perspective_markers": [],
+        "interpretation_labelled": 5,
+        "perspective": "The 2020‑2026 era was shaped by breakthroughs in AI, digital connectivity, health biotechnology, and renewable energy, while evidence on cybersecurity & privacy is absent.",
+        "findings": [
+          "2026 news reported that social media access was being responsibly regulated, suggesting a shift toward more controlled digital communication [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "Interpretation: This regulation likely altered how people share and consume content online, increasing privacy and reducing misinformation [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "2020 archive documented that Moderna's vaccine was reported as nearly 95 percent effective against COVID‑19, marking a breakthrough in vaccine technology [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: The high efficacy accelerated global vaccination campaigns, contributing to the gradual easing of pandemic restrictions for the public [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "2026 news reported that Lejoria boosted renewable energy production, indicating expanding solar and wind capacity in the region [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "Interpretation: Increased renewable output reduced reliance on fossil fuels, affecting electricity prices and environmental health for communities [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "2026 news quoted a cybersecurity expert stating that artificial intelligence can design new genetic sequences, highlighting AI's emerging role in biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: This capability could accelerate drug discovery and raise biosecurity concerns, influencing future research and policy [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Archive emphasized that prompt engineering had become a critical skill for data scientists, reflecting AI‑driven changes in data‑analysis workflows [dc461499-4a9f-4920-9fa5-30fa4f311466].",
+          "Interpretation: Mastery of LLM interaction reshaped productivity and job requirements in data‑centric professions [dc461499-4a9f-4920-9fa5-30fa4f311466]."
+        ],
+        "returned_findings": [
+          "2026 news reported that social media access was being responsibly regulated, suggesting a shift toward more controlled digital communication [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "Interpretation: This regulation likely altered how people share and consume content online, increasing privacy and reducing misinformation [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "2020 archive documented that Moderna's vaccine was reported as nearly 95 percent effective against COVID‑19, marking a breakthrough in vaccine technology [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: The high efficacy accelerated global vaccination campaigns, contributing to the gradual easing of pandemic restrictions for the public [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "2026 news reported that Lejoria boosted renewable energy production, indicating expanding solar and wind capacity in the region [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "Interpretation: Increased renewable output reduced reliance on fossil fuels, affecting electricity prices and environmental health for communities [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "2026 news quoted a cybersecurity expert stating that artificial intelligence can design new genetic sequences, highlighting AI's emerging role in biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: This capability could accelerate drug discovery and raise biosecurity concerns, influencing future research and policy [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Archive emphasized that prompt engineering had become a critical skill for data scientists, reflecting AI‑driven changes in data‑analysis workflows [dc461499-4a9f-4920-9fa5-30fa4f311466].",
+          "Interpretation: Mastery of LLM interaction reshaped productivity and job requirements in data‑centric professions [dc461499-4a9f-4920-9fa5-30fa4f311466]."
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 8,
+        "findings_kept": 8,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech"
+        ],
+        "overstatement_markers": 3,
+        "overstatement_detail": {
+          "one item read as a trend": [
+            "A 2020 archive noted that a U.S. drugmaker reported its vaccine was nearly 95 percent effective against COVID‑19, highlighting a major health breakthrough and the promise of widespread immunization [657913fd-39f4-4252-aa04-aeab4c24eb9f]."
+          ],
+          "term added (source: 'renewable energy')": [
+            "Also in 2026, a news story described Legoria boosting renewable energy production through solar and wind projects on a set timeline, indicating a drive toward cleaner power [831de05c-1cf9-469e-9867-0075619a8e69]."
+          ],
+          "guessed name (source: ليجوريا, Liguria)": [
+            "Also in 2026, a news story described Legoria boosting renewable energy production through solar and wind projects on a set timeline, indicating a drive toward cleaner power [831de05c-1cf9-469e-9867-0075619a8e69]."
+          ]
+        },
+        "unlabelled_readings": 2,
+        "over_budget": 3,
+        "perspective_markers": [],
+        "interpretation_labelled": 4,
+        "perspective": "From 2020‑2026 the era was marked by rapid advances in digital connectivity, AI‑driven tools, health breakthroughs, renewable‑energy expansion, and renewed space activity, while formal research on cybersecurity lagged behind.",
+        "findings": [
+          "In 2026, headlines reported that access to social media was being regulated responsibly, aiming to shape how users interact online [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "Interpretation: This regulation suggests a shift toward more controlled digital communication, potentially reducing misinformation and protecting user privacy [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "A 2020 archive noted that a U.S. drugmaker reported its vaccine was nearly 95 percent effective against COVID‑19, highlighting a major health breakthrough and the promise of widespread immunization [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: The high efficacy implied a turning point for pandemic management, affecting public health policy and daily life worldwide [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "In 2026, a news report quoted a cybersecurity expert saying AI can design new genetic sequences, linking advanced computing to biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: This suggests emerging AI capabilities could accelerate biotech research, raising both opportunities and ethical concerns for society [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Also in 2026, a news story described Legoria boosting renewable energy production through solar and wind projects on a set timeline, indicating a drive toward cleaner power [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "Interpretation: Expanding renewable capacity likely impacted energy availability and environmental quality for communities [831de05c-1cf9-469e-9867-0075619a8e69]."
+        ],
+        "returned_findings": [
+          "In 2026, headlines reported that access to social media was being regulated responsibly, aiming to shape how users interact online [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "Interpretation: This regulation suggests a shift toward more controlled digital communication, potentially reducing misinformation and protecting user privacy [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "A 2020 archive noted that a U.S. drugmaker reported its vaccine was nearly 95 percent effective against COVID‑19, highlighting a major health breakthrough and the promise of widespread immunization [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: The high efficacy implied a turning point for pandemic management, affecting public health policy and daily life worldwide [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "In 2026, a news report quoted a cybersecurity expert saying AI can design new genetic sequences, linking advanced computing to biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: This suggests emerging AI capabilities could accelerate biotech research, raising both opportunities and ethical concerns for society [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Also in 2026, a news story described Legoria boosting renewable energy production through solar and wind projects on a set timeline, indicating a drive toward cleaner power [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "Interpretation: Expanding renewable capacity likely impacted energy availability and environmental quality for communities [831de05c-1cf9-469e-9867-0075619a8e69]."
+        ],
+        "dropped_findings": []
+      }
+    ],
+    "v4": [
+      {
+        "findings_returned": 6,
+        "findings_kept": 6,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "energy & climate tech",
+          "health & biotech",
+          "space"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "over_budget": 1,
+        "perspective_markers": [],
+        "interpretation_labelled": 1,
+        "perspective": "The 2020‑2026 era was marked by AI‑enhanced security research, breakthrough vaccine efficacy, renewable‑energy expansion, and private spaceflight milestones, while no documented evidence appears for cybersecurity‑privacy advances.",
+        "findings": [
+          "The paper develops a formal model linking Defense-in-Depth Theory, AI pattern recognition, and human‑AI collaboration in security operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "In 2026 a cybersecurity expert said AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "In 2026 a news headline reported that Liguria was increasing renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69]",
+          "In 2026 a news headline reported that a SpaceX rocket collided with the moon and NASA released new crater images [f81224e2-e536-4b53-9722-423cbb4b4795]",
+          "In 2020 an archive noted that Moderna's vaccine was reported as nearly 95% effective against COVID‑19, with similar results from Pfizer and BioNTech [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "Interpretation: Together these developments show that AI began influencing both security and biotechnology, while advances in vaccines, renewable energy, and private spaceflight directly altered public health, energy access, and humanity’s presence in space [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 410922e5-5f7a-40eb-ae4d-d6937af5d500, 831de05c-1cf9-469e-9867-0075619a8e69, f81224e2-e536-4b53-9722-423cbb4b4795, 657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+        ],
+        "returned_findings": [
+          "The paper develops a formal model linking Defense-in-Depth Theory, AI pattern recognition, and human‑AI collaboration in security operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "In 2026 a cybersecurity expert said AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "In 2026 a news headline reported that Liguria was increasing renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69]",
+          "In 2026 a news headline reported that a SpaceX rocket collided with the moon and NASA released new crater images [f81224e2-e536-4b53-9722-423cbb4b4795]",
+          "In 2020 an archive noted that Moderna's vaccine was reported as nearly 95% effective against COVID‑19, with similar results from Pfizer and BioNTech [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "Interpretation: Together these developments show that AI began influencing both security and biotechnology, while advances in vaccines, renewable energy, and private spaceflight directly altered public health, energy access, and humanity’s presence in space [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0,410922e5-5f7a-40eb-ae4d-d6937af5d500,831de05c-1cf9-469e-9867-0075619a8e69,f81224e2-e536-4b53-9722-423cbb4b4795,657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 7,
+        "findings_kept": 7,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech",
+          "space"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "over_budget": 2,
+        "perspective_markers": [],
+        "interpretation_labelled": 2,
+        "perspective": "Between 2020 and 2026 the era was marked by AI‑augmented security models, decentralized social‑media dynamics, rapid vaccine efficacy reports, scaling of renewable energy, and private lunar missions, while the record contains no contemporaneous evidence on cybersecurity and privacy technologies.",
+        "findings": [
+          "A 2026 research paper developed a formal model linking Defense‑in‑Depth Theory, the Artificial Intelligence Theory of Pattern Recognition, and human‑AI collaboration in security operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "A 2026 research paper analyzed 173 million interactions on the decentralized platform Bluesky and reported that 74 % of attention originated within follow‑hop distances [77bb21ea-98e2-4a2c-9c9a-bd499aee7314]",
+          "In 2020 a report noted that Moderna's vaccine was nearly 95 % effective against COVID‑19 [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2026 a news headline reported that Liguria was enhancing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69]",
+          "In 2026 a news headline reported that a SpaceX rocket collided with the Moon and NASA released new crater images [f81224e2-e536-4b53-9722-423cbb4b4795]",
+          "Interpretation: The convergence of AI‑augmented security modeling and decentralized social‑media attention mechanisms suggests that people’s work and communication became simultaneously more automated and more user‑controlled [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 77bb21ea-98e2-4a2c-9c9a-bd499aee7314]",
+          "Interpretation: Rapid vaccine efficacy reporting and accelerated renewable‑energy projects illustrate how scientific advances directly altered public health outcomes and energy access for populations worldwide [657913fd-39f4-4252-aa04-aeab4c24eb9f, 831de05c-1cf9-469e-9867-0075619a8e69]"
+        ],
+        "returned_findings": [
+          "A 2026 research paper developed a formal model linking Defense‑in‑Depth Theory, the Artificial Intelligence Theory of Pattern Recognition, and human‑AI collaboration in security operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "A 2026 research paper analyzed 173 million interactions on the decentralized platform Bluesky and reported that 74 % of attention originated within follow‑hop distances [77bb21ea-98e2-4a2c-9c9a-bd499aee7314]",
+          "In 2020 a report noted that Moderna's vaccine was nearly 95 % effective against COVID‑19 [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2026 a news headline reported that Liguria was enhancing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69]",
+          "In 2026 a news headline reported that a SpaceX rocket collided with the Moon and NASA released new crater images [f81224e2-e536-4b53-9722-423cbb4b4795]",
+          "Interpretation: The convergence of AI‑augmented security modeling and decentralized social‑media attention mechanisms suggests that people’s work and communication became simultaneously more automated and more user‑controlled [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 77bb21ea-98e2-4a2c-9c9a-bd499aee7314]",
+          "Interpretation: Rapid vaccine efficacy reporting and accelerated renewable‑energy projects illustrate how scientific advances directly altered public health outcomes and energy access for populations worldwide [657913fd-39f4-4252-aa04-aeab4c24eb9f, 831de05c-1cf9-469e-9867-0075619a8e69]"
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 5,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "energy & climate tech",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "over_budget": 0,
+        "perspective_markers": [],
+        "interpretation_labelled": 2,
+        "perspective": "From 2020 to 2026 the era was marked by breakthroughs in AI, health biotechnology, and renewable energy, while evidence on cybersecurity and privacy remains absent.",
+        "findings": [
+          "A 2020 archive report noted that Moderna’s vaccine was reported as nearly 95 percent effective against COVID‑19 [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "A 2026 news headline reported that the region of Liguria was increasing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "In 2026 a cybersecurity expert said in the press that AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: The convergence of AI‑driven biotechnology and discussions of social‑media regulation suggests growing influence of algorithmic decision‑making on both health and information ecosystems [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: Reported high vaccine efficacy and renewable‑energy expansion indicate tangible improvements in public health and environmental sustainability for people during the period [657913fd-39f4-4252-aa04-aeab4c24eb9f, 831de05c-1cf9-469e-9867-0075619a8e69]."
+        ],
+        "returned_findings": [
+          "A 2020 archive report noted that Moderna’s vaccine was reported as nearly 95 percent effective against COVID‑19 [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "A 2026 news headline reported that the region of Liguria was increasing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "In 2026 a cybersecurity expert said in the press that AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: The convergence of AI‑driven biotechnology and discussions of social‑media regulation suggests growing influence of algorithmic decision‑making on both health and information ecosystems [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: Reported high vaccine efficacy and renewable‑energy expansion indicate tangible improvements in public health and environmental sustainability for people during the period [657913fd-39f4-4252-aa04-aeab4c24eb9f, 831de05c-1cf9-469e-9867-0075619a8e69]."
+        ],
+        "dropped_findings": []
+      }
+    ]
+  }
+}

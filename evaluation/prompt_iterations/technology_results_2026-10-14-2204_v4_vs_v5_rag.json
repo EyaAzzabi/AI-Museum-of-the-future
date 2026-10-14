@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-14",
+  "model": "qwen/qwen3.8-27b",
+  "evidence_items": 14,
+  "evidence": "supabase",
+  "evidence_ids": [
+    "77fd4d4d-73b9-454b-84ff-04a269967dd3",
+    "5ac124dc-0f49-40b3-a725-f9e9fde1f9a0",
+    "657913fd-39f4-4252-aa04-aeab4c24eb9f",
+    "831de05c-1cf9-469e-9867-0075619a8e69",
+    "f81224e2-e536-4b53-9722-423cbb4b4795",
+    "40d07526-19e3-4926-ae87-b6bc8af10319",
+    "77bb21ea-98e2-4a2c-9c9a-bd499aee7314",
+    "410922e5-5f7a-40eb-ae4d-d6937af5d500",
+    "b0c3bd3d-b7e1-47fd-b3cf-64a9cf7c9b45",
+    "21877da6-6b82-4e19-beb8-89ee0e73f708",
+    "220d208d-d5d4-4a15-adec-9b332ddf85cc",
+    "de15d144-b2e9-450f-b863-298310878125",
+    "dc461499-4a9f-4920-9fa5-30fa4f311466",
+    "59243175-da39-4d85-92ac-ea5f3abb189e"
+  ],
+  "runs": {
+    "v4": [
+      {
+        "error": "LLM call failed: Error code: 429 - {'error': {'message': \"Request too large for model `qwen/qwen3.8-27b` in organization `org_01m4xq7e9nepma4jvm88z0vq9j` service tier `on_demand` on output tokens per minute (OTPM): Limit 1000, Requested 2048. The request's expected output tokens exceed the enforced "
+      },
+      {
+        "error": "LLM call failed: Error code: 429 - {'error': {'message': \"Request too large for model `qwen/qwen3.8-27b` in organization `org_01m4xq7e9nepma4jvm88z0vq9j` service tier `on_demand` on output tokens per minute (OTPM): Limit 1000, Requested 1140. The request's expected output tokens exceed the enforced "
+      },
+      {
+        "error": "LLM call failed: Error code: 429 - {'error': {'message': \"Request too large for model `qwen/qwen3.8-27b` in organization `org_01m4xq7e9nepma4jvm88z0vq9j` service tier `on_demand` on output tokens per minute (OTPM): Limit 1000, Requested 1140. The request's expected output tokens exceed the enforced "
+      }
+    ],
+    "v5": [
+      {
+        "findings_returned": 4,
+        "findings_kept": 4,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [],
+        "domains_cited": [
+          "AI & computing",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "unmeasured_outcomes": [],
+        "over_budget": 0,
+        "perspective_markers": [],
+        "interpretation_labelled": 1,
+        "perspective": "The technological landscape of 2020-2026, as reflected in the available evidence, was defined by breakthroughs in biomedical research and experimental modeling in AI, while records for cybersecurity and privacy remain vacant.",
+        "findings": [
+          "In 2020, an archive reported that U.S. drugmaker Moderna stated its trials showed its vaccine was nearly 95 percent effective against the virus, while Pfizer and Biontech announced similar results [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "In 2026, researchers proposing a formal, falsifiable model for AI-augmented cyber defense connected Defense-in-Depth Theory, AI pattern recognition, and human-AI collaboration, noting that a formal model linking these constructs remained largely absent from the existing literature [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "In 2026, a news headline reported that a cybersecurity expert stated that AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: The concurrent reporting of high-efficacy pandemic vaccines in 2020 and 2026 press reports on AI crossing into genetic design may suggest a period where technological capabilities in biology and computing rapidly expanded, though it does not measure the practical impact of these capabilities on public health or security [657913fd-39f4-4252-aa04-aeab4c24eb9f, 410922e5-5f7a-40eb-ae4d-d6937af5d500]."
+        ],
+        "returned_findings": [
+          "In 2020, an archive reported that U.S. drugmaker Moderna stated its trials showed its vaccine was nearly 95 percent effective against the virus, while Pfizer and Biontech announced similar results [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "In 2026, researchers proposing a formal, falsifiable model for AI-augmented cyber defense connected Defense-in-Depth Theory, AI pattern recognition, and human-AI collaboration, noting that a formal model linking these constructs remained largely absent from the existing literature [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "In 2026, a news headline reported that a cybersecurity expert stated that AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: The concurrent reporting of high-efficacy pandemic vaccines in 2020 and 2026 press reports on AI crossing into genetic design may suggest a period where technological capabilities in biology and computing rapidly expanded, though it does not measure the practical impact of these capabilities on public health or security [657913fd-39f4-4252-aa04-aeab4c24eb9f, 410922e5-5f7a-40eb-ae4d-d6937af5d500]."
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 5,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "unmeasured_outcomes": [],
+        "over_budget": 0,
+        "perspective_markers": [],
+        "interpretation_labelled": 1,
+        "perspective": "The technology landscape of 2020-2026 was defined by the formalization of AI for cyber defense, the rapid development of pandemic vaccines, and the continued expansion of renewable energy and decentralized social media, while the evidence contains no coverage of dedicated cybersecurity and privacy infrastructure.",
+        "findings": [
+          "A 2026 research paper proposes a formal, falsifiable model that connects Defense-in-Depth Theory, the Artificial Intelligence Theory of Pattern Recognition, and human-AI collaboration to address qualitative concerns about over-automation and analyst-skill erosion in security operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "In 2020, an archive noted that a U.S. drugmaker, Moderna, reported its trials showed a vaccine that is nearly 95 percent effective against the virus following a second potential vaccine raising hopes [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "A 2026 research paper measured 173 million user-author interactions on Bluesky, a decentralized microblogging platform, to determine how much user attention crosses follow ties that have not been explicitly formed [77bb21ea-98e2-4a2c-9c9a-bd499aee7314].",
+          "In 2026, a news headline reported that the region of Liguria was increasing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "Interpretation: The simultaneous formalization of AI models in cyber defense and the rise of decentralized social platforms may suggest a period where technical architectures were being rigorously re-evaluated to manage the security and structural risks of complex digital systems [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 77bb21ea-98e2-4a2c-9c9a-bd499aee7314]."
+        ],
+        "returned_findings": [
+          "A 2026 research paper proposes a formal, falsifiable model that connects Defense-in-Depth Theory, the Artificial Intelligence Theory of Pattern Recognition, and human-AI collaboration to address qualitative concerns about over-automation and analyst-skill erosion in security operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "In 2020, an archive noted that a U.S. drugmaker, Moderna, reported its trials showed a vaccine that is nearly 95 percent effective against the virus following a second potential vaccine raising hopes [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "A 2026 research paper measured 173 million user-author interactions on Bluesky, a decentralized microblogging platform, to determine how much user attention crosses follow ties that have not been explicitly formed [77bb21ea-98e2-4a2c-9c9a-bd499aee7314].",
+          "In 2026, a news headline reported that the region of Liguria was increasing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "Interpretation: The simultaneous formalization of AI models in cyber defense and the rise of decentralized social platforms may suggest a period where technical architectures were being rigorously re-evaluated to manage the security and structural risks of complex digital systems [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 77bb21ea-98e2-4a2c-9c9a-bd499aee7314]."
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 5,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "unmeasured_outcomes": [],
+        "over_budget": 0,
+        "perspective_markers": [],
+        "interpretation_labelled": 1,
+        "perspective": "The 2020–2026 period saw a shift from pandemic-driven biomedical urgency to decentralized social architectures and formalized AI models in security, while the provided evidence lacks any reporting on cybersecurity and privacy as a distinct operational domain.",
+        "findings": [
+          "In 2020, a program narrative reported that trials for the Moderna vaccine showed nearly 95 percent effectiveness against the virus, though it noted remaining challenges for regulators and global supply chains [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "A 2026 research paper proposed formalizing AI-augmented cybersecurity as a Bernoulli detection cascade, but this represents a mathematical model rather than an adopted industry standard [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "In 2026, researchers analyzing data from the decentralized platform Bluesky reported that 74 percent of user interactions occurred across attention paths outside of explicit follow graphs [77bb21ea-98e2-4a2c-9c9a-bd499aee7314].",
+          "A 2026 news headline reported that a cybersecurity expert stated that AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: the contrast between the mathematical formalization of AI defense systems in 2026 [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0] and the measured prevalence of non-followed content in decentralized social networks [77bb21ea-98e2-4a2c-9c9a-bd499aee7314] may suggest a period of increasing complexity in both digital security architectures and digital social attention."
+        ],
+        "returned_findings": [
+          "In 2020, a program narrative reported that trials for the Moderna vaccine showed nearly 95 percent effectiveness against the virus, though it noted remaining challenges for regulators and global supply chains [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "A 2026 research paper proposed formalizing AI-augmented cybersecurity as a Bernoulli detection cascade, but this represents a mathematical model rather than an adopted industry standard [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "In 2026, researchers analyzing data from the decentralized platform Bluesky reported that 74 percent of user interactions occurred across attention paths outside of explicit follow graphs [77bb21ea-98e2-4a2c-9c9a-bd499aee7314].",
+          "A 2026 news headline reported that a cybersecurity expert stated that AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: the contrast between the mathematical formalization of AI defense systems in 2026 [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0] and the measured prevalence of non-followed content in decentralized social networks [77bb21ea-98e2-4a2c-9c9a-bd499aee7314] may suggest a period of increasing complexity in both digital security architectures and digital social attention."
+        ],
+        "dropped_findings": []
+      }
+    ]
+  }
+}

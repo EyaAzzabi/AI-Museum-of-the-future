@@ -1,0 +1,84 @@
+{
+  "name": "Tasnim TechnologyAgent - integration template",
+  "nodes": [
+    {
+      "id": "technology-trigger",
+      "name": "Technology request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "technology",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "technology-call",
+      "name": "Call Python TechnologyAgent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TECHNOLOGY_API_URL || 'http://localhost:5002/api/technology' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { country: $json.body.country === undefined ? 'Tunisia' : $json.body.country, year_from: $json.body.year_from || 2020, year_to: $json.body.year_to || 2026, chunks: $json.body.chunks || null, use_rag: $json.body.use_rag !== false } }}",
+        "options": {
+          "timeout": 180000
+        }
+      }
+    },
+    {
+      "id": "technology-response",
+      "name": "Return insight",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        520,
+        0
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Technology request": {
+      "main": [
+        [
+          {
+            "node": "Call Python TechnologyAgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Python TechnologyAgent": {
+      "main": [
+        [
+          {
+            "node": "Return insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

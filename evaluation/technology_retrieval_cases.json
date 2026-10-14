@@ -1,0 +1,35 @@
+{
+  "description": "Technology agent retrieval test set: one case per search query of agents/technology.py (same order). Same format as retrieval_cases.json: a chunk is relevant when its text or title matches every group of 'relevant' (alternatives, case- and accent-insensitive, whole words). Term rules are written by hand and are a reproducible proxy for human labels.",
+  "cases": [
+    {
+      "id": "tech-ai",
+      "domain": "ai_computing",
+      "relevant": [["artificial intelligence", "ai", "machine learning", "deep learning", "llm", "llms", "language model", "language models", "chatgpt", "generative", "intelligence artificielle", "ia", "robot", "robots", "automation"]]
+    },
+    {
+      "id": "tech-digital",
+      "domain": "digital_connectivity",
+      "relevant": [["internet", "mobile", "smartphone", "smartphones", "social media", "digital", "online", "startup", "startups", "platform", "platforms", "numérique", "e-commerce", "fintech", "broadband"]]
+    },
+    {
+      "id": "tech-cyber",
+      "domain": "cybersecurity",
+      "relevant": [["cybersecurity", "cyber", "cyberattack", "cyberattacks", "hacker", "hackers", "ransomware", "privacy", "surveillance", "data protection", "cybersécurité"]]
+    },
+    {
+      "id": "tech-energy",
+      "domain": "energy_climate",
+      "relevant": [["solar", "renewable", "renewables", "wind", "electricity", "battery", "batteries", "grid", "hydrogen", "energy", "électricité", "électrique", "énergie", "solaire"]]
+    },
+    {
+      "id": "tech-health",
+      "domain": "health_biotech",
+      "relevant": [["vaccine", "vaccines", "mrna", "biotechnology", "genome", "genetic", "gene", "genes", "crispr", "telemedicine", "vaccin", "vaccins"]]
+    },
+    {
+      "id": "tech-space",
+      "domain": "space",
+      "relevant": [["space", "satellite", "satellites", "rocket", "rockets", "nasa", "orbit", "lunar", "moon", "mars", "telescope", "astronaut", "astronauts", "spacecraft"]]
+    }
+  ]
+}

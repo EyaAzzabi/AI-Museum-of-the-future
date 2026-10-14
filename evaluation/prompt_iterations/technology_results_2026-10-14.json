@@ -1,0 +1,195 @@
+{
+  "date": "2026-10-14",
+  "model": "openai/gpt-oss-120b",
+  "evidence_items": 21,
+  "runs": {
+    "v2": [
+      {
+        "findings_returned": 10,
+        "findings_kept": 10,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 5,
+        "overstatement_detail": {
+          "possibility read as fact (source: 'can')": [
+            "World Bank statistics show that 76.5% of Tunisia’s population used the Internet in 2024, reflecting deepening digital connectivity that enabled remote work, online services, and information access [e84ceff7-6a5f-4a12-be20-265667ed201a]"
+          ],
+          "one item read as a trend": [
+            "Interpretation: While still theoretical in 2026, such models foreshadowed widespread AI‑driven security monitoring that later reduced manual analyst workload [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+            "Interpretation: Such connectivity levels signaled a broader global trend where internet access became a prerequisite for participation in education, commerce, and civic life [e84ceff7-6a5f-4a12-be20-265667ed201a]"
+          ],
+          "term added (source: 'vaccine')": [
+            "News reports in 2020 highlighted Moderna’s mRNA vaccine achieving ~95% efficacy against COVID‑19, marking a pivotal biomedical breakthrough that promised to end the pandemic and shift vaccine development paradigms [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+            "Interpretation: The rapid rollout of mRNA vaccines reshaped public health, accelerating immunization campaigns and establishing mRNA as a platform for future diseases [657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+          ]
+        },
+        "interpretation_labelled": 5,
+        "perspective": "The early 2020s were marked by breakthroughs in AI and biomedicine that began reshaping security, design work, health, and digital connectivity, though our view is limited to a handful of reports from the period.",
+        "findings": [
+          "AI research proposed layered, AI‑augmented cyber‑defense models that integrate pattern‑recognition across multiple detection layers, suggesting a future shift toward automated, depth‑based security operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "Interpretation: While still theoretical in 2026, such models foreshadowed widespread AI‑driven security monitoring that later reduced manual analyst workload [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "A randomized controlled trial evaluated AI‑prompt‑to‑design tools (Figma Make) and found participants could complete design tasks faster when using the AI assistant, indicating potential productivity gains in digital product design [66170eff-8094-4108-b5a4-b46274312ecc]",
+          "Interpretation: This early evidence anticipated the broader adoption of conversational AI in creative workflows that transformed design work by lowering the skill barrier [66170eff-8094-4108-b5a4-b46274312ecc]",
+          "News reports in 2020 highlighted Moderna’s mRNA vaccine achieving ~95% efficacy against COVID‑19, marking a pivotal biomedical breakthrough that promised to end the pandemic and shift vaccine development paradigms [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "Interpretation: The rapid rollout of mRNA vaccines reshaped public health, accelerating immunization campaigns and establishing mRNA as a platform for future diseases [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "World Bank statistics show that 76.5% of Tunisia’s population used the Internet in 2024, reflecting deepening digital connectivity that enabled remote work, online services, and information access [e84ceff7-6a5f-4a12-be20-265667ed201a]",
+          "Interpretation: Such connectivity levels signaled a broader global trend where internet access became a prerequisite for participation in education, commerce, and civic life [e84ceff7-6a5f-4a12-be20-265667ed201a]",
+          "A cybersecurity expert reported that AI can design new genetic sequences, indicating emerging AI applications in synthetic biology [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "Interpretation: Though still nascent, this pointed to AI‑driven biotech that would later accelerate gene‑therapy research and bio‑manufacturing [410922e5-5f7a-40eb-ae4d-d6937af5d500]"
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 8,
+        "findings_kept": 8,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 1,
+        "overstatement_detail": {
+          "term added (source: 'vaccine')": [
+            "The rollout of mRNA COVID‑19 vaccines achieved near‑95 % efficacy, marking a pivotal health technology that began to curb the pandemic [657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+          ]
+        },
+        "interpretation_labelled": 3,
+        "perspective": "Between 2020 and 2026 the spread of digital connectivity, the deployment of mRNA vaccines, and the emergence of generative AI across security, design, and biotechnology reshaped daily life, though many of these advances remained in research or early‑adoption phases.",
+        "findings": [
+          "The rollout of mRNA COVID‑19 vaccines achieved near‑95 % efficacy, marking a pivotal health technology that began to curb the pandemic [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "By 2024, 76.5 % of Tunisians were using the Internet, illustrating the deepening penetration of digital connectivity in everyday life [e84ceff7-6a5f-4a12-be20-265667ed201a]",
+          "A 2026 arXiv paper formalized a layered, AI‑augmented cyber‑defense model that treats AI as a multiplicative factor across detection layers, highlighting both potential operational gains and concerns about over‑automation and skill erosion [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "Interpretation: While the model was not yet deployed at scale, it signaled the direction of cybersecurity research toward integrating AI throughout defense‑in‑depth architectures [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "Experimental evidence from a 2026 randomized controlled trial suggested that AI‑driven prompt‑to‑design tools such as Figma Make can reduce the time designers spend on prototyping tasks, though adoption beyond the study remained limited [66170eff-8094-4108-b5a4-b46274312ecc]",
+          "Interpretation: This indicates the early stage of generative AI reshaping product design workflows, foreshadowing broader workplace automation in later decades [66170eff-8094-4108-b5a4-b46274312ecc]",
+          "A 2026 news report highlighted an expert claim that AI can design novel genetic sequences, pointing to emerging AI applications in synthetic biology [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "Interpretation: The claim reflected nascent biotech capabilities that had not yet become routine practice by 2026 [410922e5-5f7a-40eb-ae4d-d6937af5d500]"
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 5,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 3,
+        "overstatement_detail": {
+          "possibility read as fact (source: 'can')": [
+            "News report records an mRNA COVID‑19 vaccine achieving nearly 95 % efficacy in trials, marking a rapid‑development vaccine class; Interpretation: Global rollout of such vaccines curbed pandemic severity and enabled a swift return to in‑person work and education [657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+          ],
+          "one item read as a trend": [
+            "News article reports AI systems capable of designing novel genetic sequences, showcasing emerging bio‑AI capabilities; Interpretation: Such abilities hint at future shifts in biotechnology research and therapeutic development, though widespread adoption remained nascent by 2026 [410922e5-5f7a-40eb-ae4d-d6937af5d500]"
+          ],
+          "term added (source: 'vaccine')": [
+            "News report records an mRNA COVID‑19 vaccine achieving nearly 95 % efficacy in trials, marking a rapid‑development vaccine class; Interpretation: Global rollout of such vaccines curbed pandemic severity and enabled a swift return to in‑person work and education [657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+          ]
+        },
+        "interpretation_labelled": 0,
+        "perspective": "From 2020 to 2026, AI‑driven tools, mRNA vaccine breakthroughs, and expanding internet access reshaped work, health, and security, though our view is limited to a handful of studies and reports.",
+        "findings": [
+          "Research paper proposes a formal, falsifiable model linking AI pattern‑recognition to layered cyber‑defense, treating AI augmentation as a multiplicative factor across detection layers; Interpretation: Adoption of such a model could streamline threat detection and reduce analyst bias, reshaping security operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "Randomized trial shows AI‑powered prompt‑to‑design tool (Figma Make) cuts design task time for product designers and managers; Interpretation: These time savings point to faster product development cycles and broader access to design capabilities beyond specialists [66170eff-8094-4108-b5a4-b46274312ecc]",
+          "News report records an mRNA COVID‑19 vaccine achieving nearly 95 % efficacy in trials, marking a rapid‑development vaccine class; Interpretation: Global rollout of such vaccines curbed pandemic severity and enabled a swift return to in‑person work and education [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "World Bank statistics indicate 76.5 % of Tunisia’s population used the Internet in 2024, reflecting deep digital connectivity; Interpretation: High internet penetration facilitated remote work, e‑learning, and access to AI‑enhanced services, embedding digital life into daily routines [e84ceff7-6a5f-4a12-be20-265667ed201a]",
+          "News article reports AI systems capable of designing novel genetic sequences, showcasing emerging bio‑AI capabilities; Interpretation: Such abilities hint at future shifts in biotechnology research and therapeutic development, though widespread adoption remained nascent by 2026 [410922e5-5f7a-40eb-ae4d-d6937af5d500]"
+        ],
+        "dropped_findings": []
+      }
+    ],
+    "v3": [
+      {
+        "findings_returned": 8,
+        "findings_kept": 8,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 2,
+        "overstatement_detail": {
+          "one item read as a trend": [
+            "By 2024, 76.5 % of Tunisia’s population were internet users, indicating widespread digital connectivity [e84ceff7-6a5f-4a12-be20-265667ed201a].",
+            "Interpretation: The reported efficacy foreshadowed a major shift in pandemic management, promising a path toward widespread immunisation once logistics were resolved [657913fd-39f4-4252-aa04-aeab4c24eb9f]."
+          ]
+        },
+        "interpretation_labelled": 4,
+        "perspective": "From 2020‑2026 the era was defined by rapid advances in AI‑driven tools, a surge in digital connectivity, and breakthrough health interventions, while fields such as cybersecurity‑privacy research and space technology remain undocumented in the supplied record.",
+        "findings": [
+          "By 2024, 76.5 % of Tunisia’s population were internet users, indicating widespread digital connectivity [e84ceff7-6a5f-4a12-be20-265667ed201a].",
+          "Interpretation: This high penetration suggests that daily communication, education, and commerce increasingly relied on online platforms for Tunisians [e84ceff7-6a5f-4a12-be20-265667ed201a].",
+          "A 2026 arXiv study reported a randomized controlled trial where designers using the AI‑driven Figma Make tool completed prototype tasks faster than those without it, measuring time savings in digital product design [66170eff-8094-4108-b5a4-b46274312ecc].",
+          "Interpretation: If adopted, such AI‑prompt tools could shorten design cycles and enable non‑designers to contribute to product development [66170eff-8094-4108-b5a4-b46274312ecc].",
+          "In a 2026 news article, a cybersecurity specialist warned that artificial intelligence is capable of designing new genetic sequences, highlighting a crossover between AI and biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: This claim points to emerging security concerns and potential biotechnological applications of AI that could affect public health and bio‑defense strategies [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "An archive from 2020 described Moderna’s COVID‑19 vaccine as achieving nearly 95 % efficacy in trials, while noting pending regulatory approval and distribution challenges [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: The reported efficacy foreshadowed a major shift in pandemic management, promising a path toward widespread immunisation once logistics were resolved [657913fd-39f4-4252-aa04-aeab4c24eb9f]."
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 8,
+        "findings_kept": 8,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 2,
+        "overstatement_detail": {
+          "possibility read as fact (source: 'can')": [
+            "Interpretation: Broad internet access enabled new forms of remote work, education and civic engagement for the majority of Tunisians [e84ceff7-6a5f-4a12-be20-265667ed201a]"
+          ],
+          "one item read as a trend": [
+            "Interpretation: High efficacy suggests a rapid shift toward widespread immunisation, potentially restoring normal social and economic activity [657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+          ]
+        },
+        "interpretation_labelled": 4,
+        "perspective": "The 2020‑2026 era was defined by rapid advances in AI‑driven tools, breakthrough vaccine development, and expanding internet connectivity, while evidence for dedicated cybersecurity research and space technologies remains absent.",
+        "findings": [
+          "In 2020 a vaccine trial reported nearly 95 % effectiveness against COVID‑19, sparking optimism about ending the pandemic [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "Interpretation: High efficacy suggests a rapid shift toward widespread immunisation, potentially restoring normal social and economic activity [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2024, 76.5 % of Tunisia’s population were reported as internet users, indicating deepening digital penetration [e84ceff7-6a5f-4a12-be20-265667ed201a]",
+          "Interpretation: Broad internet access enabled new forms of remote work, education and civic engagement for the majority of Tunisians [e84ceff7-6a5f-4a12-be20-265667ed201a]",
+          "In 2026 a cybersecurity expert warned that AI can design new genetic sequences, highlighting AI’s reach into biological engineering [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "Interpretation: This capability raises both opportunities for biotech innovation and concerns about bio‑security for societies [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "In 2026 a randomized controlled trial showed that designers using the AI‑powered Figma Make tool completed prototype tasks faster than peers without it [66170eff-8094-4108-b5a4-b46274312ecc]",
+          "Interpretation: Time savings in digital product design point to accelerated development cycles and shifting skill demands for designers and managers [66170eff-8094-4108-b5a4-b46274312ecc]"
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 10,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "interpretation_labelled": 0,
+        "perspective": "The 2020‑2026 era was defined by rapid advances in AI‑driven tools, breakthrough mRNA vaccines, and expanding digital connectivity, while fields such as cybersecurity‑privacy and space exploration left scant documented impact.",
+        "findings": [
+          "The 2026 arXiv paper formalizes a layered defense‑in‑depth model where AI augmentation multiplies detection probabilities across security layers, proposing a falsifiable framework for human‑AI collaboration in cyber defense [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "A 2026 arXiv randomized controlled trial measured that product designers using the AI‑powered tool Figma Make completed standardized design tasks faster than peers without it, indicating prospective time savings in digital product design [66170eff-8094-4108-b5a4-b46274312ecc]",
+          "In a 2026 news report, a cybersecurity expert warned that artificial intelligence can be used to design new genetic sequences, highlighting a cross‑domain risk where AI techniques intersect with biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "An archive from 2020 reports that the Moderna COVID‑19 vaccine showed nearly 95 % effectiveness in trials, raising expectations for ending the pandemic while noting regulatory and distribution challenges [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "World Bank statistics for 2024 show that 76.5 % of Tunisia’s population used the Internet, reflecting broad digital connectivity [e84ceff7-6a5f-4a12-be20-265667ed201a]"
+        ],
+        "dropped_findings": []
+      }
+    ]
+  }
+}
