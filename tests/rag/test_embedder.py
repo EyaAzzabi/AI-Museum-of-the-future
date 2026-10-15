@@ -371,3 +371,26 @@ class TestUpsertChunks:
         assert row["content"] == chunk.content
         assert row["embedding"] == vector
         assert row["chunk_index"] == 0
+
+
+def test_batches_embed_many_chunks_per_call_and_fall_back_per_chunk() -> None:
+    from types import SimpleNamespace
+    from unittest.mock import MagicMock
+
+    from rag.chunking.chunker import Chunk
+    from rag.vector_store.embedder import embed_chunks
+
+    chunks = [Chunk(document_id="d", chunk_index=i, content=f"text {i}") for i in range(5)]
+    client = MagicMock()
+    client.embeddings.create.side_effect = lambda input, model: SimpleNamespace(
+        data=[SimpleNamespace(embedding=[float(len(t))]) for t in (input if isinstance(input, list) else [input])]
+    )
+    result = embed_chunks(chunks, client, batch_size=2)
+    assert [c.chunk_index for c, _ in result] == [0, 1, 2, 3, 4]
+    assert client.embeddings.create.call_count == 3       # batches of 2, 2, 1
+
+    failing = MagicMock()
+    failing.embeddings.create.side_effect = [RuntimeError("batch failed")] + [
+        SimpleNamespace(data=[SimpleNamespace(embedding=[1.0])]) for _ in range(2)
+    ]
+    assert len(embed_chunks(chunks[:2], failing, batch_size=2)) == 2   # retried one by one

@@ -12,6 +12,19 @@ Public, accessible sources only (no full-internet crawling, no HTML scraping —
 
 An earlier, genuinely redundant third pipeline (`scripts/collectors/*.py` + `scripts/run_collection.py`, duplicating the same six Tunisia sources with a different, never-wired-to-ingestion implementation) has been removed rather than left alongside the canonical one.
 
+## Full text (added 2026-10-14)
+
+Most collected records were one line long (median 68 characters): GDELT gives headlines only, and
+the Wikipedia records were "most viewed pages" without text. Two scripts add real text:
+
+| Script | What it adds |
+|---|---|
+| `fetch_tunisia_wikipedia.py` | 31 articles on Tunisia 2020-2026 (politics, elections, economy, society, culture, climate) in English, French and Arabic, full plain text through the MediaWiki API: 92 articles, 1.9 M characters |
+| `process_fulltext.py` | the full text already extracted by `scripts/enrich_*_text.py` (286 news articles, 15 archive items, 1.1 M characters) as records with the same ids as their headline records |
+
+Ingest only new files with the production chunking: `python -m data.ingest data/processed/<file>.json ...`
+(`--all` for everything). When an id appears in several files, the longest text wins. See `rag/README.md`.
+
 ## Tunisia collectors (`data/`)
 
 | Script | Source | Key needed |

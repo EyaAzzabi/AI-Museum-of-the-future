@@ -33,6 +33,18 @@ First run (2026-10-14, k=5). Five of the 16 reranks fell back to the fused order
 
 The Tunisia cases stay low (precision 0.2-0.4) for every method: the corpus has only about 75 chunks that mention Tunisia, 40 of them statistics rows. Better retrieval cannot replace missing data; collecting Tunisian sources is the next step.
 
+## Chunking
+
+```bash
+python -m evaluation.compare_chunking      # local: no database writes, no LLM (~30 min on CPU)
+```
+
+Five chunking configurations on the 557 long documents, 23 passage-level questions in English, French
+and Arabic ([`chunking_cases.json`](chunking_cases.json)): a hit is a retrieved chunk that contains the
+answer itself (date, name, figure). Results and the choice (sentence packing to the embedder's 128-token
+window, with the document title) are in [`rag/README.md`](../rag/README.md#2-chunking) and
+`results/chunking_<date>.json`.
+
 ## Saved runs
 
 ```bash
