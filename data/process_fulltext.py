@@ -13,7 +13,7 @@ URL for GDELT, the identifier for the Internet Archive), so ingestion updates
 those documents instead of duplicating them (data/ingest.py keeps the longest
 text when an id appears twice). Other fields come from the headline record.
 
-    python data/process_fulltext.py
+    python -m data.process_fulltext
 """
 from __future__ import annotations
 
@@ -43,13 +43,21 @@ def headline_records() -> dict[str, dict]:
 
 
 def fulltext_records(headlines: dict[str, dict]) -> tuple[list[dict], dict]:
+    from rag.dedupe_documents import text_key
+
     out: list[dict] = []
-    stats = {"gdelt_extracted": 0, "archive_extracted": 0, "too_short": 0, "no_headline_record": 0}
+    seen_texts: set[str] = set()
+    stats = {"gdelt_extracted": 0, "archive_extracted": 0, "too_short": 0, "no_headline_record": 0,
+             "same_text_other_url": 0}
 
     def emit(record_id: str, text: str, base_fields: dict, kind: str) -> None:
         if len(text or "") < MIN_CHARS:
             stats["too_short"] += 1
             return
+        if text_key(text) in seen_texts:  # same article under another URL or channel
+            stats["same_text_other_url"] += 1
+            return
+        seen_texts.add(text_key(text))
         base = headlines.get(record_id)
         if base is None:
             stats["no_headline_record"] += 1

@@ -40,21 +40,15 @@ create table if not exists chunks (
 
 create index if not exists chunks_document_id_idx on chunks (document_id);
 
--- Approximate nearest-neighbour index for cosine similarity search.
--- `lists` must scale with row count — a rule of thumb is rows/1000 (min ~4),
--- not a fixed value. lists=100 against a table with only a few hundred rows
--- leaves ~1-2 rows per list, which silently breaks ivfflat's default
--- single-probe search: `ORDER BY embedding <=> query LIMIT n` then returns
--- ZERO rows with no error (confirmed live — ~150 rows against lists=100
--- returned nothing; dropping and rebuilding with lists=4 fixed it
--- immediately). If chunks already has data, check row count first:
---   select count(*) from chunks;
--- then pick lists accordingly (4 is reasonable up to a few thousand rows).
--- Rebuild as the table grows: `drop index chunks_embedding_idx;` then rerun
--- with an updated `lists` value (may need `set maintenance_work_mem = '128MB';`
--- first — the default 32MB can be too small even for a modest rebuild).
-create index if not exists chunks_embedding_idx
-    on chunks using ivfflat (embedding vector_cosine_ops) with (lists = 4);
+-- Approximate nearest-neighbour index for cosine similarity search: HNSW.
+-- History: an ivfflat index (lists = 4, later 8) silently returned zero rows when lists
+-- outnumbered the data, had to be rebuilt as the table grew, and at 17,156 rows returned only
+-- 67% of the exact top 10 (probes = 1). HNSW needs no training on existing rows and measured
+-- recall@10 = 1.00 on the same 39 queries (rag/migrations/2026-10-15_hnsw_and_fulltext.sql).
+-- On the Supabase free tier, build without parallel workers and with modest memory:
+--   set maintenance_work_mem = '64MB'; set max_parallel_maintenance_workers = 0;
+create index if not exists chunks_embedding_hnsw_idx
+    on chunks using hnsw (embedding vector_cosine_ops) with (m = 16, ef_construction = 64);
 
 -- Keyword (full-text) search used by rag/vector_store/hybrid_retriever.py, which queries
 -- chunks.content with PostgREST's fts(simple) filter. It works without this index
@@ -78,6 +72,10 @@ returns table (
 language plpgsql
 as $$
 begin
+    -- ef_search 100 (default 40) for recall; iterative scan (pgvector >= 0.8) applies the
+    -- metadata filter while scanning, so match_count rows are still returned.
+    perform set_config('hnsw.ef_search', greatest(100, match_count)::text, true);
+    perform set_config('hnsw.iterative_scan', 'relaxed_order', true);
     return query
     select
         chunks.id,

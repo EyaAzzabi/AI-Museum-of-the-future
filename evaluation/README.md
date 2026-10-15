@@ -31,6 +31,10 @@ First run (2026-10-14, k=5). Five of the 16 reranks fell back to the fused order
 | hybrid | 0.68 | 0.94 | 0.83 | 0.00 | 2.1 |
 | hybrid + rerank | 0.72 | 1.00 | 0.92 | 0.00 | 16.2 |
 
+**Update 2026-10-15** (new corpus, HNSW index, all 16 reranks completed): vector 0.50 / 0.88 / 0.61,
+hybrid 0.70 / 1.00 / 0.94, hybrid + rerank 0.56 / 1.00 / 0.75 (precision@5 / hit@5 / MRR). With every
+rerank actually run, reranking lowers quality; it is off by default. Details in `rag/README.md`.
+
 The Tunisia cases stay low (precision 0.2-0.4) for every method: the corpus has only about 75 chunks that mention Tunisia, 40 of them statistics rows. Better retrieval cannot replace missing data; collecting Tunisian sources is the next step.
 
 ## Chunking

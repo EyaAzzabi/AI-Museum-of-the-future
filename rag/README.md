@@ -8,7 +8,7 @@ Every choice below is measured: the scripts and results are in [`evaluation/`](.
 | Corpus | public APIs (GDELT, Wikipedia, World Bank, arXiv, Wikimedia, Openverse, Met, Internet Archive, DBpedia) + Tunisian Wikipedia full text (EN/FR/AR) + full-text news | `data/`, `scripts/` |
 | Chunking | **sentence packing up to 128 embedding tokens, 1-sentence overlap, document title prefix** | `chunking/chunker.py` (`PRODUCTION_CHUNK_CONFIG`) |
 | Embeddings | `paraphrase-multilingual-MiniLM-L12-v2`, 384 dimensions, local (fastembed) | `vector_store/local_embeddings.py` |
-| Vector store | Supabase Postgres + pgvector, ivfflat cosine index, `match_chunks` RPC | `schema.sql` |
+| Vector store | Supabase Postgres + pgvector, **HNSW** cosine index, full-text GIN index, `match_chunks` RPC | `schema.sql`, `migrations/` |
 | Retrieval | hybrid: vector + Postgres full-text, reciprocal-rank fusion, year/country/category filters, statistics down-weighted, one chunk per document, near-duplicates removed, optional LLM rerank | `vector_store/hybrid_retriever.py` |
 | Agent retrieval | each specialist searches with its own queries; the sociologist adds HyDE | `agents/base_agent.py`, `hyde_retriever.py` |
 
@@ -79,11 +79,23 @@ from the corpus. Short documents (headlines, statistics) are one chunk under eve
   local (no API key, no data sent out), multilingual (the corpus mixes English, Arabic, French,
   Chinese, Hindi...): an English question retrieves the French and Arabic passages too
   (`bouden-date`, `jcc-1966` above). Its 128-token window drove the chunking choice.
-- **Store:** Supabase (Postgres + pgvector), `documents` + `chunks` tables, ivfflat cosine index,
+- **Store:** Supabase (Postgres + pgvector 0.8), `documents` + `chunks` tables,
   `match_chunks(query_embedding, match_count, filter)` RPC (`schema.sql`). The n8n workflow embeds
-  through the same model (`POST /api/embed`), so every stored vector is comparable.
-- `schema.sql` also has an optional full-text index (`chunks_content_fts_idx`) for the keyword
-  channel of the hybrid search.
+  through the same model (`POST /api/embed`) and now chunks the same way (sentence packing), so
+  every stored vector is comparable (`python n8n/replay_embedding_path.py` checks that path).
+- **Vector index: HNSW** (`m = 16`, `ef_construction = 64`, `ef_search = 100`, iterative scan for
+  filtered queries). The former ivfflat index (`lists = 8`, one probe) returned only **67%** of the
+  exact top 10 at 17,156 chunks (recall@10 measured on 39 queries against an exact scan); HNSW
+  returns **100%**, and needs no rebuild as the table grows. Filtered calls (e.g. one category)
+  still return `match_count` rows thanks to the iterative scan.
+- **Full-text index** (`chunks_content_fts_idx`, GIN on `to_tsvector('simple', content)`) for the
+  keyword channel: median keyword query **783 ms → 57 ms**.
+- Applied with `migrations/2026-10-15_hnsw_and_fulltext.sql` (on the Supabase free tier the index
+  must be built without parallel workers and with 64 MB, a 256 MB parallel build ran out of shared
+  memory).
+- **Duplicates:** 40 documents stored twice were removed (`python -m rag.dedupe_documents`): 32 arXiv
+  papers ingested by both the Python and the n8n pipelines, which identify documents differently,
+  6 news articles under two URLs, 2 archive snapshots. Images sharing a caption are kept on purpose.
 
 ## 4. Retrieval
 
@@ -95,7 +107,7 @@ from the corpus. Short documents (headlines, statistics) are one chunk under eve
    leaves too few results, the best results from elsewhere are added and marked out of scope;
 4. statistics rows down-weighted and capped at one; one chunk per document; near-duplicates
    removed;
-5. optional LLM rerank (off for agents by default: one large call per agent for +0.04 precision).
+5. optional LLM rerank, **off by default**: on the current corpus it lowers precision (below).
 
 Measured (`python -m evaluation.evaluate_retrieval`, 16 queries, k=5, before the new corpus):
 
@@ -105,27 +117,33 @@ Measured (`python -m evaluation.evaluate_retrieval`, 16 queries, k=5, before the
 | hybrid | 0.68 | 0.94 | 0.83 | 0.00 |
 | hybrid + LLM rerank | 0.72 | 1.00 | 0.92 | 0.00 |
 
-After adding the Tunisian articles and the full-text news (2026-10-15, same 16 queries, no rerank):
+After the new corpus (2026-10-15) and the HNSW + full-text indexes, same 16 queries, k=5:
 
-| method | precision@5 | hit@5 | MRR | precision@5 on the 3 Tunisia queries |
+| method | precision@5 | hit@5 | MRR | s/query |
 |---|---|---|---|---|
-| vector | 0.41 → 0.47 | 0.75 → 0.81 | 0.52 → 0.54 | 0.13 → 0.53 |
-| hybrid | 0.68 → 0.68 | 0.94 → **1.00** | 0.83 → **0.94** | 0.13 → 0.40 |
+| vector | 0.41 → **0.50** | 0.75 → **0.88** | 0.52 → **0.61** | 0.4 |
+| hybrid (used by the agents) | 0.68 → **0.70** | 0.94 → **1.00** | 0.83 → **0.94** | 0.3 |
+| hybrid + LLM rerank | 0.72 → 0.56 | 1.00 → 1.00 | 0.92 → 0.75 | 24 |
 
-Knowledge base: 7,296 → 17,156 chunks; chunks mentioning Tunisia 75 → 3,747 (Latin script) and
-6 → 1,417 (Arabic). The hybrid search keeps one chunk per document, so on a query such as
-"Tunisia economy" it returns five different sources rather than five passages of one article,
-which caps its Tunisian precision below the vector channel's (0.40 vs 0.53).
+On the 3 Tunisia queries, precision@5 rose from 0.13 to 0.40 (hybrid). Knowledge base: 7,296 →
+16,994 chunks; chunks mentioning Tunisia 75 → 3,747 (Latin script) and 6 → 1,417 (Arabic).
 
-**Known limit.** The ivfflat index was built with `lists = 4` on the earlier, smaller table and
-searches one list by default; with 17,000 rows, rebuilding it with more lists (about rows/1000)
-and raising `ivfflat.probes` is the next step for vector recall (see the comments in `schema.sql`).
+**What did not work: LLM reranking.** The first measurement suggested a small gain (+0.04
+precision), but 5 of its 16 rerank calls had fallen back to the fused order (daily token limit).
+Measured again with all 16 reranks completed, on the new corpus, it lowers precision (0.70 → 0.56)
+and MRR (0.94 → 0.75) and costs 24 s and one large LLM call per query. The reranker sees only the
+first 500 characters of each chunk and scores general topical relevance, while the hybrid ranking
+already rewards the exact terms; it stays available (`--rerank`) but is off for the agents.
+
+The hybrid search keeps one chunk per document, so for "Tunisia economy" it returns five different
+sources rather than five passages of one article; that caps its Tunisian precision (0.40) below the
+vector channel's in some queries, a deliberate trade for source diversity in the exhibition.
 
 ## 5. Reproduce
 
 ```bash
 python data/fetch_tunisia_wikipedia.py          # Tunisian articles (EN/FR/AR)
-python data/process_fulltext.py                 # full-text news/archive records
+python -m data.process_fulltext                 # full-text news/archive records
 python -m data.ingest data/processed/tunisia_wikipedia_<date>.json data/processed/fulltext_<date>.json
 python -m evaluation.compare_chunking           # chunking comparison (local, ~30 min on CPU)
 python -m evaluation.evaluate_retrieval         # retrieval quality on the live knowledge base

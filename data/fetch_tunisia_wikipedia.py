@@ -15,6 +15,7 @@ use them. Missing titles are reported and skipped.
 
     python data/fetch_tunisia_wikipedia.py            # fetch + write data/processed/tunisia_wikipedia_<date>.json
     python data/fetch_tunisia_wikipedia.py --langs en # English only
+    python data/fetch_tunisia_wikipedia.py --only "Four Daughters (2023 film)"   # some titles, separate file
 
 Output records follow the shared processed schema (see data/README.md).
 """
@@ -63,7 +64,7 @@ ARTICLES: dict[str, str] = {
     "Cinema of Tunisia": "culture",
     "Carthage Film Festival": "culture",
     "Kaouther Ben Hania": "culture",
-    "Four Daughters (film)": "culture",
+    "Four Daughters (2023 film)": "culture",
     "The Man Who Sold His Skin": "culture",
     "Music of Tunisia": "culture",
     "Tunisian literature": "culture",
@@ -132,11 +133,13 @@ def to_record(article: dict, category: str, english_title: str) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--langs", nargs="+", default=["en", "fr", "ar"])
+    parser.add_argument("--only", nargs="+", metavar="TITLE", help="fetch only these English titles (from ARTICLES)")
     args = parser.parse_args()
+    articles = {t: c for t, c in ARTICLES.items() if not args.only or t in args.only}
 
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     records, missing = [], []
-    for english_title, category in ARTICLES.items():
+    for english_title, category in articles.items():
         english = fetch_article(english_title, "en")
         time.sleep(PAUSE_S)
         if english is None:
@@ -157,8 +160,9 @@ def main() -> None:
         print(f"  {english_title}: {sizes}")
 
     stamp = date.today().isoformat()
-    (RAW_DIR / f"articles_{stamp}.json").write_text(json.dumps(records, ensure_ascii=False, indent=1), encoding="utf-8")
-    out = PROCESSED_DIR / f"tunisia_wikipedia_{stamp}.json"
+    (RAW_DIR / f"articles_{stamp}{'_extra' if args.only else ''}.json").write_text(json.dumps(records, ensure_ascii=False, indent=1), encoding="utf-8")
+    suffix = "_extra" if args.only else ""
+    out = PROCESSED_DIR / f"tunisia_wikipedia_{stamp}{suffix}.json"
     out.write_text(json.dumps(records, ensure_ascii=False, indent=1), encoding="utf-8")
     chars = sum(len(r["text"]) for r in records)
     print(f"\n{len(records)} articles, {chars:,} characters -> {out}")
