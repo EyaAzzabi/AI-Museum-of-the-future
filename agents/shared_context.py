@@ -10,6 +10,17 @@ from agents.base_agent import InsightObject
 class SharedContext:
     insights: dict[str, InsightObject] = field(default_factory=dict)
     cross_references: list[str] = field(default_factory=list)
+    # Peer review of the insights (agents/reviewer.py): agreements, tensions, weak findings.
+    review: dict = field(default_factory=dict)
+
+
+def evidence_of(insights: dict[str, InsightObject]) -> dict[str, dict]:
+    """Every cited chunk across the insights: chunk ID -> its text and provenance."""
+    merged: dict[str, dict] = {}
+    for insight in insights.values():
+        if isinstance(insight, InsightObject):
+            merged.update(insight.evidence or {})
+    return merged
 
 
 def compute_cross_references(insights: dict[str, InsightObject]) -> list[str]:

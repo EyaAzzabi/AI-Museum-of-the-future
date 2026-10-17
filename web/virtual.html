@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#151914" />
+    <meta name="description" content="Visitez les galeries 3D du Musée du futur et explorez les archives qui racontent notre époque." />
+    <title>Visite immersive — Musée du futur</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='virtual.css') }}?v=6" />
+    <script src="{{ url_for('static', filename='pipeline-client.js') }}?v=3" defer></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+        }
+      }
+    </script>
+    <script type="module" src="{{ url_for('static', filename='virtual.js') }}?v=15"></script>
+  </head>
+  <body class="virtual-page">
+    <header class="virtual-header">
+      <a class="virtual-brand" href="/" aria-label="Retour au Musée du futur">
+        <span class="virtual-brand-mark" aria-hidden="true">M</span>
+        <span>AI MUSEUM <small>OF THE FUTURE</small></span>
+      </a>
+      <div class="virtual-header-label"><span></span> VISITE IMMERSIVE · TUNISIE, 2126</div>
+      <a class="virtual-back-link" href="/">← Retour au musée</a>
+    </header>
+
+    <main id="virtualMuseum" class="virtual-layout">
+      <section class="world-view" aria-label="Visite virtuelle en 3D">
+        <canvas id="museumCanvas" aria-label="Musée virtuel en trois dimensions. Cliquez sur une œuvre pour consulter ses archives."></canvas>
+        <div class="world-vignette" aria-hidden="true"></div>
+        <div class="world-topline">
+          <span class="world-live"><i></i> ESPACE RECONSTITUÉ EN 3D</span>
+          <span id="worldLocation">ATRIUM · MÉMOIRE DU FUTUR</span>
+        </div>
+        <div id="loadState" class="load-state" role="status">
+          <span class="load-spinner" aria-hidden="true"></span>
+          <strong>Le musée ouvre ses portes…</strong>
+          <span>Chargement de la visite 3D. Une connexion Internet est nécessaire pour le moteur graphique.</span>
+        </div>
+        <div class="world-title" aria-hidden="true">
+          <span>AI MUSEUM OF THE FUTURE</span>
+          <strong>Une époque.<br /><em>Cinq regards.</em></strong>
+        </div>
+        <button id="startWalk" class="start-walk" type="button" disabled>
+          <span aria-hidden="true">↗</span> Entrer dans le musée
+        </button>
+        <div class="world-help" id="worldHelp">
+          <span>CLAVIER <b>W A S D</b> POUR MARCHER</span>
+          <span>GLISSEZ POUR REGARDER · <b>ÉCHAP</b> POUR QUITTER</span>
+        </div>
+        <div id="touchControls" class="touch-controls" aria-label="Commandes de déplacement">
+          <button type="button" data-move="forward" aria-label="Avancer">↑</button>
+          <div>
+            <button type="button" data-move="left" aria-label="Aller à gauche">←</button>
+            <button type="button" data-move="back" aria-label="Reculer">↓</button>
+            <button type="button" data-move="right" aria-label="Aller à droite">→</button>
+          </div>
+        </div>
+        <div class="world-crosshair" aria-hidden="true"></div>
+      </section>
+
+      <aside class="museum-sidebar">
+        <div class="sidebar-intro">
+          <p class="sidebar-kicker">VOTRE PARCOURS</p>
+          <h1>Entrez dans<br /><em>l’Histoire.</em></h1>
+          <p>Déplacez-vous librement dans les salles et découvrez les archives confiées aux spécialistes du musée.</p>
+        </div>
+
+        <div class="room-list-wrap">
+          <div class="room-list-heading"><span>LES SALLES</span><span>05</span></div>
+          <nav class="immersive-rooms" id="roomButtons" aria-label="Aller directement à une salle"></nav>
+        </div>
+
+        <section class="exhibit-panel" id="exhibitPanel" aria-live="polite" aria-atomic="true">
+          <p class="sidebar-kicker" id="panelRoom">GUIDE DU MUSÉE</p>
+          <h2 id="panelTitle">Un musée à parcourir</h2>
+          <p id="panelDescription">Approchez-vous d’une œuvre et cliquez dessus pour lire les archives qui l’accompagnent.</p>
+          <div id="panelEvidence" class="panel-evidence" hidden></div>
+        </section>
+
+        <section class="agent-run-panel" aria-labelledby="agentRunTitle">
+          <p class="sidebar-kicker">ATELIER DES SPÉCIALISTES</p>
+          <h2 id="agentRunTitle">Faire travailler les agents</h2>
+          <label class="agent-theme-label" for="agentTheme">Choisissez les archives à analyser</label>
+          <select id="agentTheme" class="agent-theme-select">
+            <option value="">Chargement des récits…</option>
+          </select>
+          <button id="runAgents" class="agent-run-button" type="button" disabled>
+            Lancer les huit agents <span aria-hidden="true">↗</span>
+          </button>
+          <p class="agent-run-hint">L’analyse réelle peut durer plusieurs minutes et dépend de votre fournisseur IA.</p>
+          <div id="agentRunStatus" class="agent-run-status" role="status" aria-live="polite" hidden></div>
+          <div id="agentResults" class="agent-results" aria-live="polite" hidden></div>
+        </section>
+
+        <div class="sidebar-foot">
+          <span>DES ARCHIVES D’AUJOURD’HUI</span>
+          <span>AUX RÉCITS DE DEMAIN</span>
+        </div>
+      </aside>
+    </main>
+    <noscript><p class="no-script">Activez JavaScript pour parcourir le musée virtuel.</p></noscript>
+  </body>
+</html>

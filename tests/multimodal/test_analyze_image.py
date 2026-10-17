@@ -8,13 +8,23 @@ Covers:
 
 from __future__ import annotations
 
+import importlib
 import time
 from unittest.mock import MagicMock, patch
 
 import pytest
 from hypothesis import given, settings, strategies as st
 
-from multimodal.analyze_image import VisualDescription, analyze_image
+VISION = importlib.import_module("multimodal.analyze_image")
+
+from multimodal.analyze_image import (  # noqa: E402  — import after resolving the real module
+    HEADERS,
+    VisualDescription,
+    analyze_image,
+    load_cache,
+    parse_vision_text,
+    save_cache,
+)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -57,10 +67,18 @@ def _fake_embedding_client() -> MagicMock:
 
 
 @pytest.fixture(autouse=True)
-def _no_real_embedding_model():
-    """analyze_image embeds locally; never load the real model in unit tests."""
-    with patch("multimodal.analyze_image.build_embedding_client", side_effect=_fake_embedding_client):
-        yield
+def _no_real_embedding_model(tmp_path, monkeypatch):
+    """analyze_image embeds locally; never load the real model; isolate the disk cache.
+
+    ``import multimodal.analyze_image`` resolves to the function re-exported by
+    ``multimodal/__init__.py``, so CACHE_DIR is patched on the real module object.
+    """
+    import importlib
+
+    module = importlib.import_module("multimodal.analyze_image")
+    monkeypatch.setattr(module, "CACHE_DIR", tmp_path / "vision_cache")
+    monkeypatch.setattr(module, "build_embedding_client", _fake_embedding_client)
+    yield
 
 
 def _make_openai_client(response_text: str = MOCK_VISION_RESPONSE) -> MagicMock:
@@ -91,6 +109,7 @@ def _make_requests_get_ok(content: bytes = b"\xff\xd8\xff\xe0fake_jpeg_bytes") -
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.content = content
+    mock_response.headers = {"content-type": "application/octet-stream"}
     return MagicMock(return_value=mock_response)
 
 
@@ -110,7 +129,7 @@ def test_property12_visual_description_structure_completeness(source):
     # Feature: museum-week2-pipeline, Property 12: VisualDescription structure completeness
     client = _make_openai_client()
 
-    with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
+    with patch.object(VISION.requests, "get", _make_requests_get_ok()):
         result = analyze_image(source, openai_client=client)
 
     assert isinstance(result, VisualDescription), "Result must be a VisualDescription instance"
@@ -188,7 +207,7 @@ class TestAnalyzeImageUnit:
         url = VALID_URLS[0]
         client = _make_openai_client()
 
-        with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
+        with patch.object(VISION.requests, "get", _make_requests_get_ok()):
             result = analyze_image(url, openai_client=client)
 
         assert result.description != "", "description must be non-empty"
@@ -208,7 +227,7 @@ class TestAnalyzeImageUnit:
         url = VALID_URLS[1]
         client = _make_openai_client(MOCK_VISION_RESPONSE_2)
 
-        with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
+        with patch.object(VISION.requests, "get", _make_requests_get_ok()):
             result = analyze_image(url, openai_client=client)
 
         assert result.description != "", "description must be non-empty"
@@ -228,7 +247,7 @@ class TestAnalyzeImageUnit:
         url = VALID_URLS[2]
         client = _make_openai_client()
 
-        with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
+        with patch.object(VISION.requests, "get", _make_requests_get_ok()):
             result = analyze_image(url, openai_client=client)
 
         assert result.description != ""
@@ -246,7 +265,7 @@ class TestAnalyzeImageUnit:
         url = VALID_URLS[3]
         client = _make_openai_client(MOCK_VISION_RESPONSE_2)
 
-        with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
+        with patch.object(VISION.requests, "get", _make_requests_get_ok()):
             result = analyze_image(url, openai_client=client)
 
         assert result.description != ""
@@ -264,7 +283,7 @@ class TestAnalyzeImageUnit:
         url = VALID_URLS[4]
         client = _make_openai_client()
 
-        with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
+        with patch.object(VISION.requests, "get", _make_requests_get_ok()):
             result = analyze_image(url, openai_client=client)
 
         assert result.description != ""
@@ -280,7 +299,7 @@ class TestAnalyzeImageUnit:
         url = VALID_URLS[0]
         client = _make_openai_client()
 
-        with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
+        with patch.object(VISION.requests, "get", _make_requests_get_ok()):
             start = time.time()
             result = analyze_image(url, openai_client=client)
             elapsed = time.time() - start
@@ -301,7 +320,7 @@ class TestAnalyzeImageUnit:
         mock_response.status_code = 404
         mock_response.content = b""
 
-        with patch("multimodal.analyze_image.requests.get", return_value=mock_response):
+        with patch.object(VISION.requests, "get", return_value=mock_response):
             result = analyze_image(url, openai_client=client)
 
         assert result.description == "Image unavailable."
@@ -331,7 +350,7 @@ class TestAnalyzeImageUnit:
         url = VALID_URLS[0]
         client = _make_openai_client()
 
-        with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
+        with patch.object(VISION.requests, "get", _make_requests_get_ok()):
             result = analyze_image(url, openai_client=client)
 
         assert isinstance(result, VisualDescription)
@@ -346,11 +365,65 @@ class TestAnalyzeImageUnit:
         """When openai_client is None and LLM_API_KEY is unset, return degradation."""
         url = VALID_URLS[0]
 
-        with patch("multimodal.analyze_image.requests.get", _make_requests_get_ok()):
+        with patch.object(VISION.requests, "get", _make_requests_get_ok()):
             with patch.dict("os.environ", {}, clear=True):
                 # Remove LLM_API_KEY if present
                 import os
                 os.environ.pop("LLM_API_KEY", None)
+                os.environ.pop("GROQ_API_KEY", None)
                 result = analyze_image(url, openai_client=None)
 
         assert result.description == "Image unavailable."
+
+    def test_downloads_with_a_user_agent(self):
+        """Wikimedia answers 403 without a User-Agent."""
+        get = _make_requests_get_ok()
+        with patch.object(VISION.requests, "get", get):
+            analyze_image(VALID_URLS[0], openai_client=_make_openai_client())
+
+        assert "AIMuseumOfFuture" in get.call_args.kwargs["headers"]["User-Agent"]
+        assert get.call_args.kwargs["headers"] == HEADERS
+
+    def test_parses_json_vision_reply(self):
+        reply = (
+            '{"objects": ["shirtless men", "car"], "scene": "city street", '
+            '"description": "Shirtless men in swim trunks on a paved road; no protest.", '
+            '"tags": ["street", "mexico"], "caption_mismatch": true, '
+            '"caption_mismatch_note": "Caption says protest; image shows beach-goers."}'
+        )
+        result = parse_vision_text(reply)
+        assert result.caption_mismatch is True
+        assert "swim trunks" in result.description
+        assert result.objects[0] == "shirtless men"
+
+    def test_mexico_caption_mismatch_fixture(self):
+        """Measured multimodal case: caption claims a protest the image does not show."""
+        caption = "Protest in Mexico City"
+        vision = parse_vision_text(
+            '{"objects": ["shirtless men", "billboards"], "scene": "road under blue sky", '
+            '"description": "Shirtless men wearing swim trunks near billboards; clear blue sky.", '
+            '"tags": ["street"], "caption_mismatch": true, '
+            '"caption_mismatch_note": "No protest visible despite the caption."}'
+        )
+        assert "protest" in caption.lower()
+        assert "protest" not in vision.description.lower()
+        assert vision.caption_mismatch is True
+
+    def test_cache_hit_skips_second_llm_call(self, tmp_path):
+        url = VALID_URLS[0]
+        client = _make_openai_client()
+        with patch.object(VISION.requests, "get", _make_requests_get_ok()):
+            first = analyze_image(url, openai_client=client, cache_dir=tmp_path)
+            second = analyze_image(url, openai_client=client, cache_dir=tmp_path)
+        assert first.description == second.description
+        assert client.chat.completions.create.call_count == 1
+        assert load_cache(url, tmp_path) is not None
+
+    def test_png_mime_is_sent_to_the_model(self):
+        client = _make_openai_client()
+        png = b"\x89PNG\r\n\x1a\n" + b"\x00" * 20
+        with patch.object(VISION.requests, "get", _make_requests_get_ok(png)):
+            analyze_image("https://example.org/a.png", openai_client=client)
+        content = client.chat.completions.create.call_args.kwargs["messages"][0]["content"]
+        image_url = next(part["image_url"]["url"] for part in content if part["type"] == "image_url")
+        assert image_url.startswith("data:image/png;base64,")

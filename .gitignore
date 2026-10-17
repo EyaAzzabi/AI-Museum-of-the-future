@@ -32,3 +32,10 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 
+
+# Saved exhibition runs (agents/run_log.py) and local LLM/HyDE caches
+runs/
+.cache/
+
+# Vision analysis disk cache (multimodal/analyze_image.py)
+multimodal/cache/

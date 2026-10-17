@@ -6,20 +6,38 @@ from typing import Any
 
 import os
 from dotenv import load_dotenv
-load_dotenv(override=True)
+load_dotenv()
 from flask import Flask, jsonify, render_template, request
 
 from agents.base_agent import InsightObject
 from agents.historian import HistorianAgent
 from agents.llm_config import build_llm_client, get_model
 from agents.shared_context import compute_cross_references
+from exhibition_api import create_exhibition_blueprint
 from multimodal.analyze_image import analyze_image
 from rag.chunking.chunker import ChunkConfig, Chunker, ChunkingStrategy
 from rag.vector_store.retriever import RetrievalResult, Retriever
 
 
+def _supabase_counts() -> dict[str, int] | None:
+    """Read-only exact counts of documents and chunks; None if keys are missing or the call fails."""
+    url, key = os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    if not url or not key:
+        return None
+    try:
+        from supabase import create_client
+
+        client = create_client(url, key)
+        docs = client.table("documents").select("id", count="exact").limit(1).execute()
+        chunks = client.table("chunks").select("id", count="exact").limit(1).execute()
+        return {"documents": int(docs.count or 0), "chunks": int(chunks.count or 0)}
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def create_app() -> Flask:
     app = Flask(__name__, static_folder="web", template_folder="web")
+    app.register_blueprint(create_exhibition_blueprint())
 
     def _result(name: str, ok: bool, detail: str) -> dict[str, Any]:
         return {"name": name, "ok": ok, "detail": detail}
@@ -41,8 +59,7 @@ def create_app() -> Flask:
         version = None
         for line in text.splitlines():
             if line.startswith("## v"):
-                version = line.replace("## ", "").strip()
-                break
+                version = line.replace("## ", "").split()[0]
         return {"name": name, "found": True, "version": version}
 
     @app.get("/api/data")
@@ -75,6 +92,14 @@ def create_app() -> Flask:
 
     @app.get("/")
     def index() -> str:
+        return render_template("visitor.html")
+
+    @app.get("/visite-virtuelle")
+    def virtual_museum() -> str:
+        return render_template("virtual.html")
+
+    @app.get("/tableau-de-bord")
+    def dashboard() -> str:
         return render_template("index.html")
 
     @app.get("/favicon.ico")
@@ -83,70 +108,161 @@ def create_app() -> Flask:
 
     @app.get("/api/historian/presets")
     def get_historian_presets() -> Any:
+        # Short summaries of documented events (see the Wikipedia articles on each),
+        # used as sample evidence for the historian demo.
+        image_metadata = {
+            "governance": {
+                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Couloir_de_l%27assembl%C3%A9e_des_repr%C3%A9sentants_du_peuple_%D8%B1%D9%88%D8%A7%D9%82_%D9%85%D8%AC%D9%84%D8%B3_%D9%86%D9%88%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8.jpg/960px-Couloir_de_l%27assembl%C3%A9e_des_repr%C3%A9sentants_du_peuple_%D8%B1%D9%88%D8%A7%D9%82_%D9%85%D8%AC%D9%84%D8%B3_%D9%86%D9%88%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8.jpg",
+                "image_alt": "Couloir de l’Assemblée des représentants du peuple, au Bardo, Tunis",
+                "image_credit": "Sami Mlouhi · CC BY-SA 4.0",
+                "image_source": "https://commons.wikimedia.org/w/index.php?curid=58877833",
+            },
+            "governance_referendum": {
+                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Secretary_Blinken_Meets_With_Tunisian_President_Saied_%2852564271954%29.jpg/960px-Secretary_Blinken_Meets_With_Tunisian_President_Saied_%2852564271954%29.jpg",
+                "image_alt": "Kaïs Saïed rencontre Antony Blinken à Washington, décembre 2022",
+                "image_credit": "U.S. Department of State · domaine public",
+                "image_source": "https://commons.wikimedia.org/w/index.php?curid=126642183",
+            },
+            "governance_election": {
+                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Panorama_Assembly_of_the_Representatives_of_the_People_-_Photo_panoramique_de_l%27Assembl%C3%A9e_des_repr%C3%A9sentants_du_peuple_-_%D8%A8%D8%A7%D9%86%D9%88%D8%B1%D8%A7%D9%85%D8%A7_%D9%85%D8%AC%D9%84%D8%B3_%D9%86%D9%88%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8.jpg/960px-thumbnail.jpg",
+                "image_alt": "Panorama de l’Assemblée des représentants du peuple au Bardo, Tunis",
+                "image_credit": "Sami Mlouhi · CC BY-SA 4.0",
+                "image_source": "https://commons.wikimedia.org/w/index.php?curid=58877811",
+            },
+            "migration": {
+                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Distressed_persons_wave_after_being_transferred_to_a_Maltese_patrol_vessel..jpg/960px-Distressed_persons_wave_after_being_transferred_to_a_Maltese_patrol_vessel..jpg",
+                "image_alt": "Personnes secourues en Méditerranée transférées vers un navire maltais, 2013",
+                "image_credit": "U.S. Navy · domaine public",
+                "image_source": "https://commons.wikimedia.org/w/index.php?curid=30911859",
+            },
+            "migration_memorandum": {
+                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Lamta_sea%2C_Tunisia.JPG/960px-Lamta_sea%2C_Tunisia.JPG",
+                "image_alt": "Vue de Lamta, en Tunisie, depuis la plage avec des bateaux de pêche",
+                "image_credit": "Habib M’henni · CC BY-SA 3.0",
+                "image_source": "https://commons.wikimedia.org/w/index.php?curid=12241588",
+            },
+            "cinema": {
+                "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kaouther_Ben_Hania_%282018%29.jpg",
+                "image_alt": "Kaouther Ben Hania au Festival de Carthage, 2018",
+                "image_credit": "Houssem Abida · CC BY-SA 4.0",
+                "image_source": "https://commons.wikimedia.org/w/index.php?curid=95502631",
+            },
+            "cinema_olfa": {
+                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Kaouther_Ben_Hania_-_IFFR_2024.jpg/960px-Kaouther_Ben_Hania_-_IFFR_2024.jpg",
+                "image_alt": "Kaouther Ben Hania au Festival international du film de Rotterdam, 2024",
+                "image_credit": "Vera de Kok · CC BY-SA 4.0",
+                "image_source": "https://commons.wikimedia.org/w/index.php?curid=144692321",
+            },
+        }
         presets = [
             {
-                "id": "ai_treaty",
-                "title": "Accord Mondial de Gouvernance de l'IA (2026)",
-                "category": "Géopolitique & Technologie",
+                "id": "tunisia_2021_constitution",
+                "title": "Le 25 juillet 2021 et la nouvelle Constitution",
+                "category": "Politique & Institutions",
                 "chunks": [
                     {
-                        "chunk_id": "hist-treaty-01",
-                        "document_id": "doc-paris-ai-2026",
-                        "content": "En 2026, 85 nations ratifient à Paris le premier traité international contraignant sur la sécurité des modèles d'intelligence artificielle frontières.",
-                        "metadata": {"source": "gdelt", "category": "geopolitics"},
-                        "similarity": 0.95
+                        "chunk_id": "tn-politique-01",
+                        "document_id": "wiki-crise-politique-2021",
+                        "content": "Le 25 juillet 2021, le président Kaïs Saïed limoge le chef du gouvernement Hichem Mechichi et gèle les activités de l'Assemblée des représentants du peuple, en invoquant l'article 80 de la Constitution de 2014.",
+                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Décret présidentiel du 25 juillet 2021", **image_metadata["governance"]},
                     },
                     {
-                        "chunk_id": "hist-treaty-02",
-                        "document_id": "doc-audit-standards",
-                        "content": "Le traité impose des registres d'audit algorithmique mondiaux et une clause de non-prolifération des systèmes autonomes militarisés.",
-                        "metadata": {"source": "newsapi", "category": "policy"},
-                        "similarity": 0.91
-                    }
-                ]
+                        "chunk_id": "tn-politique-02",
+                        "document_id": "wiki-referendum-2022",
+                        "content": "Le 25 juillet 2022, une nouvelle Constitution qui renforce les pouvoirs du président est adoptée par référendum, avec une participation d'environ 30 %.",
+                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Référendum constitutionnel du 25 juillet 2022", **image_metadata["governance_referendum"]},
+                    },
+                    {
+                        "chunk_id": "tn-politique-03",
+                        "document_id": "wiki-legislatives-2022",
+                        "content": "Au premier tour des élections législatives de décembre 2022, la participation est d'environ 11 %.",
+                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Participation aux législatives de décembre 2022", **image_metadata["governance_election"]},
+                    },
+                ],
             },
             {
-                "id": "climate_energy",
-                "title": "Rupture Climatique & Micro-Réseaux Renouvelables",
-                "category": "Environnement & Société",
+                "id": "tunisia_migration",
+                "title": "Migrations en Méditerranée centrale",
+                "category": "Société & Migration",
                 "chunks": [
                     {
-                        "chunk_id": "hist-clim-01",
-                        "document_id": "doc-ipcc-heatwave",
-                        "content": "Des canicules records frappent l'Europe du Sud et l'Afrique du Nord, dépassant 48°C et accélérant l'abandon des énergies fossiles dans les métropoles.",
-                        "metadata": {"source": "gdelt", "category": "climate"},
-                        "similarity": 0.93
+                        "chunk_id": "tn-migration-01",
+                        "document_id": "wiki-migration-mediterranee",
+                        "content": "En 2023, la Tunisie devient le principal point de départ des traversées irrégulières de la Méditerranée centrale vers l'Italie, devant la Libye.",
+                        "metadata": {"source": "wikipedia", "category": "migration", "country": "Tunisia", "title": "Départs migratoires de Tunisie en 2023", **image_metadata["migration"]},
                     },
                     {
-                        "chunk_id": "hist-clim-02",
-                        "document_id": "doc-decentralized-solar",
-                        "content": "Le déploiement massif de micro-réseaux solaires communautaires en Afrique du Nord et en Asie du Sud transforme la souveraineté énergétique des territoires.",
-                        "metadata": {"source": "worldbank", "category": "energy"},
-                        "similarity": 0.89
-                    }
-                ]
+                        "chunk_id": "tn-migration-02",
+                        "document_id": "wiki-memorandum-ue-tunisie",
+                        "content": "Le 16 juillet 2023, l'Union européenne et la Tunisie signent un mémorandum d'entente portant notamment sur la migration et la coopération économique.",
+                        "metadata": {"source": "wikipedia", "category": "migration", "country": "Tunisia", "title": "Mémorandum UE–Tunisie sur la migration", **image_metadata["migration_memorandum"]},
+                    },
+                ],
             },
             {
-                "id": "cognitive_labor",
-                "title": "Mutation du Travail Intellectuel par les Agents Autonomes",
-                "category": "Économie & Savoir",
+                "id": "tunisia_cinema",
+                "title": "Le cinéma tunisien sur la scène mondiale",
+                "category": "Culture & Arts",
                 "chunks": [
                     {
-                        "chunk_id": "hist-work-01",
-                        "document_id": "doc-cognitive-shift",
-                        "content": "L'automatisation à grande échelle de la recherche médicale, du conseil juridique et du développement logiciel redéfinit le rôle de l'expertise humaine.",
-                        "metadata": {"source": "arxiv", "category": "labor"},
-                        "similarity": 0.94
+                        "chunk_id": "tn-cinema-01",
+                        "document_id": "wiki-homme-vendu-sa-peau",
+                        "content": "En 2021, « L'Homme qui a vendu sa peau » de Kaouther Ben Hania devient le premier film tunisien nommé à l'Oscar du meilleur film international.",
+                        "metadata": {"source": "wikipedia", "category": "culture", "country": "Tunisia", "title": "L’Homme qui a vendu sa peau", **image_metadata["cinema"]},
                     },
                     {
-                        "chunk_id": "hist-work-02",
-                        "document_id": "doc-education-reform",
-                        "content": "Les universités réforment leurs cursus pour privilégier l'épistémologie critique, la créativité et la supervision éthique des synthèses de machines.",
-                        "metadata": {"source": "wikipedia", "category": "education"},
-                        "similarity": 0.88
-                    }
-                ]
-            }
+                        "chunk_id": "tn-cinema-02",
+                        "document_id": "wiki-filles-olfa",
+                        "content": "« Les Filles d'Olfa » de Kaouther Ben Hania, en compétition au Festival de Cannes 2023, y reçoit L'Œil d'or puis est nommé à l'Oscar du meilleur film documentaire en 2024.",
+                        "metadata": {"source": "wikipedia", "category": "culture", "country": "Tunisia", "title": "Les Filles d’Olfa", **image_metadata["cinema_olfa"]},
+                    },
+                ],
+            },
+            {
+                "id": "tunisia_revolution",
+                "title": "La révolution tunisienne de 2010-2011",
+                "category": "Histoire & Société",
+                "chunks": [
+                    {
+                        "chunk_id": "tn-revolution-01",
+                        "document_id": "wiki-revolution-tunisienne",
+                        "content": "Les manifestations déclenchées en décembre 2010 à Sidi Bouzid s'étendent à la Tunisie. Le président Zine el-Abidine Ben Ali quitte le pays le 14 janvier 2011.",
+                        "metadata": {"source": "wikipedia", "category": "history", "country": "Tunisia", "title": "Révolution tunisienne"},
+                    },
+                    {
+                        "chunk_id": "tn-revolution-02",
+                        "document_id": "wiki-assemblee-constituante-tunisie-2011",
+                        "content": "L'élection du 23 octobre 2011 désigne une Assemblée constituante chargée de rédiger une nouvelle Constitution.",
+                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Élection de l'Assemblée constituante tunisienne de 2011"},
+                    },
+                ],
+            },
+            {
+                "id": "tunisia_national_dialogue",
+                "title": "Le Dialogue national et le prix Nobel de la paix",
+                "category": "Société & Histoire",
+                "chunks": [
+                    {
+                        "chunk_id": "tn-dialogue-01",
+                        "document_id": "nobel-quartet-tunisia-2015",
+                        "content": "Le Quartet du Dialogue national tunisien reçoit le prix Nobel de la paix 2015 pour sa contribution décisive à la construction d'une démocratie pluraliste après la révolution de 2011.",
+                        "metadata": {"source": "Nobel Prize", "category": "society", "country": "Tunisia", "title": "Le Quartet du Dialogue national tunisien, prix Nobel de la paix 2015"},
+                    },
+                ],
+            },
+            {
+                "id": "tunisia_el_jem",
+                "title": "El Jem, mémoire romaine en Tunisie",
+                "category": "Patrimoine & Culture",
+                "chunks": [
+                    {
+                        "chunk_id": "tn-el-jem-01",
+                        "document_id": "unesco-amphitheatre-el-jem",
+                        "content": "L'amphithéâtre d'El Jem, construit au IIIe siècle, est l'un des monuments romains les mieux conservés d'Afrique du Nord. Il est inscrit au patrimoine mondial de l'UNESCO depuis 1979.",
+                        "metadata": {"source": "UNESCO", "category": "culture", "country": "Tunisia", "title": "Amphithéâtre d'El Jem"},
+                    },
+                ],
+            },
         ]
         return jsonify({"presets": presets})
 
@@ -170,77 +286,21 @@ def create_app() -> Flask:
         if not chunks:
             return jsonify({"ok": False, "error": "Aucun document ou chunk fourni pour l'analyse historique."}), 400
 
-        api_key = os.getenv("LLM_API_KEY") or os.getenv("GROQ_API_KEY")
-        fallback_notice = None
-        if api_key:
-            try:
-                client = build_llm_client()
-                agent = HistorianAgent(openai_client=client)
-                insight = agent.run(chunks)
-                return jsonify({
-                    "ok": True,
-                    "mode": "live",
-                    "model": get_model(),
-                    "insight": {
-                        "agent": insight.agent,
-                        "perspective": insight.perspective,
-                        "key_findings": insight.key_findings,
-                        "selected_artifacts": insight.selected_artifacts,
-                    },
-                    "grounded_artifacts": insight.selected_artifacts,
-                    "input_chunk_ids": [c.chunk_id for c in chunks],
-                })
-            except Exception as exc:
-                fallback_notice = f"Attention : Le fournisseur d'IA a rejeté la requête ({exc}). Affichage généré via le moteur de simulation dynamique."
+        # No canned fallback: an analysis is either produced by the model or reported as unavailable.
+        if not (os.getenv("LLM_API_KEY") or os.getenv("GROQ_API_KEY")):
+            return jsonify({
+                "ok": False,
+                "error": "Aucune clé LLM_API_KEY configurée : définissez-la dans le fichier .env pour lancer l'agent historien.",
+            }), 503
+        try:
+            insight = HistorianAgent(openai_client=build_llm_client()).run(chunks)
+        except Exception as exc:
+            return jsonify({"ok": False, "error": f"Le fournisseur d'IA a rejeté la requête : {exc}"}), 502
 
-        # Mode simulation enrichi : analyse dynamique du contenu
-        combined_text = " ".join(c.content.lower() for c in chunks)
-        
-        words = set(combined_text.split())
-        if any(w in combined_text for w in ["climati", "chaleur", "canicule", "solair", "énergie", "écolog", "heatwave"]):
-            theme_perspective = "Vue depuis 2126 : l'accélération des chocs climatiques et la transition énergétique des années 2020 marquent le tournant historique où la civilisation a dû adapter son métabolisme industriel face aux limites biosphériques."
-            finding_1 = "Événement clé : Franchissement de seuils thermiques historiques et mobilisation pour les micro-réseaux décentralisés."
-            finding_2 = "Signification historique : Redéfinition de la souveraineté territoriale par l'autonomie énergétique communautaire."
-            finding_3 = "Héritage à 100 ans : Le 22e siècle retient cette phase comme la genèse de l'écologie régénérative globale."
-        elif any(w in combined_text for w in ["travail", "emploi", "métier", "labor", "cogniti", "automat", "école", "éducat"]):
-            theme_perspective = "Vue depuis 2126 : la redistribution du travail intellectuel au profit d'agents cognitifs autonomes a initié la plus grande mutation des compétences humaines depuis la révolution industrielle."
-            finding_1 = "Événement clé : Déploiement à grande échelle des systèmes cognitifs autonomes dans les métiers du savoir."
-            finding_2 = "Signification historique : Rupture épistémologique redéfinissant la valeur de l'expertise et de l'intelligence humaine."
-            finding_3 = "Héritage à 100 ans : Fondation des modèles de société post-pénurie et de coopération homme-machine."
-        elif any(w in combined_text for w in ["art", "culture", "musée", "exposi", "médias", "identit"]):
-            theme_perspective = "Vue depuis 2126 : l'explosion des arts numériques et des expressions décentralisées des années 2020 a démantelé les monopoles culturels traditionnels au profit d'identités hybrides mondialisées."
-            finding_1 = "Événement clé : Émergence d'espaces artistiques et mémoriels numériques transversaux à travers le Sud global."
-            finding_2 = "Signification historique : Décolonisation des archives muséales par les technologies de préservation numérique."
-            finding_3 = "Héritage à 100 ans : Les collections contemporaines préservent ces artefacts comme les premières traces de l'art hybride synthétique."
-        elif "ia" in words or any(w in combined_text for w in ["intelligence artificielle", "traité", "accord", "gouvern", "loi", "régulat", "treaty"]):
-            theme_perspective = "Vue depuis 2126 : les premiers accords internationaux de gouvernance des systèmes autonomes des années 2020 ont jeté les bases constitutionnelles de la cohabitation entre humains et algorithmes."
-            finding_1 = "Événement clé : Signature de traités multilatéraux et mise en place de standards d'audit algorithmique mondiaux."
-            finding_2 = "Signification historique : Prise de conscience collective des risques systémiques et primauté du droit éthique."
-            finding_3 = "Héritage à 100 ans : Ces cadres juridiques sont considérés comme la Magna Carta de l'ère algorithmique."
-        else:
-            first_chunk = chunks[0].content[:100].strip()
-            theme_perspective = f"Vue depuis 2126 : les archives de cette période témoignent d'un moment de bascule centré sur : « {first_chunk}... »."
-            finding_1 = f"Événement clé : Transition documentée dans les sources contemporaines ({chunks[0].chunk_id})."
-            finding_2 = "Signification historique : Tensions et réorganisations des structures sociales et techniques de l'époque."
-            finding_3 = "Héritage à 100 ans : Intégration de ce témoignage singulier dans le récit rétrospectif du 22e siècle."
-
-        mock_payload = {
-            "agent": "historian",
-            "perspective": theme_perspective,
-            "key_findings": [finding_1, finding_2, finding_3],
-            "selected_artifacts": [chunks[0].chunk_id] + ([chunks[1].chunk_id] if len(chunks) > 1 else []),
-        }
-        from unittest.mock import patch
-        agent = HistorianAgent(openai_client=None)
-        with patch.object(agent, "_call_llm", return_value=mock_payload):
-            insight = agent.run(chunks)
-
-        notice_msg = fallback_notice or "Exécuté en mode simulation locale (définissez une clé LLM_API_KEY valide dans le fichier .env pour activer le modèle en direct)."
         return jsonify({
             "ok": True,
-            "mode": "simulated",
-            "notice": notice_msg,
-            "model": "Simulation (HistorianAgent V3)",
+            "mode": "live",
+            "model": get_model(),
             "insight": {
                 "agent": insight.agent,
                 "perspective": insight.perspective,
@@ -251,20 +311,39 @@ def create_app() -> Flask:
             "input_chunk_ids": [c.chunk_id for c in chunks],
         })
 
+    @app.post("/api/embed")
+    def embed_text() -> Any:
+        """Embed one text with the same local model the retriever queries with.
+
+        Used by the n8n ingestion workflow so its chunks match the 384-dim
+        vector(384) column in rag/schema.sql. The response mirrors Gemini's
+        embedContent shape ({"embedding": {"values": [...]}}).
+        """
+        from rag.vector_store.local_embeddings import EMBEDDING_DIM, EMBEDDING_MODEL, build_embedding_client
+
+        data = request.get_json(silent=True) or {}
+        text = data.get("text")
+        if not isinstance(text, str) or not text.strip():
+            return jsonify({"error": "Provide a non-empty 'text' string."}), 400
+        vector = build_embedding_client().embeddings.create(input=text).data[0].embedding
+        return jsonify({"embedding": {"values": vector}, "model": EMBEDDING_MODEL, "dim": EMBEDDING_DIM})
 
     @app.get("/api/validate")
     def validate_pipeline() -> Any:
         steps: list[dict[str, Any]] = []
 
-        # 1 — Corpus
+        # 1 — Corpus (local files, or read-only counts from Supabase when processed is empty)
         processed_dir = Path("data/processed")
         json_files = sorted(processed_dir.glob("*.json")) if processed_dir.exists() else []
         corpus_files = [_corpus_file_info(f) for f in json_files]
-        steps.append(_result(
-            "Corpus collected",
-            bool(json_files),
-            f"{len(json_files)} fichier(s) JSON in data/processed",
-        ))
+        corpus_detail = f"{len(json_files)} fichier(s) JSON in data/processed"
+        corpus_ok = bool(json_files)
+        if not json_files:
+            counts = _supabase_counts()
+            if counts:
+                corpus_ok = True
+                corpus_detail = f"{counts['documents']} documents, {counts['chunks']} chunks dans Supabase"
+        steps.append(_result("Corpus collected", corpus_ok, corpus_detail))
 
         # 2 — Chunking
         sample_record = {
@@ -302,14 +381,20 @@ def create_app() -> Flask:
 
         # 5 — Prompts
         prompt_names = [
-            "system.md", "historian.md", "sociologist.md",
-            "technology.md", "culture_art.md", "visual.md", "curator.md",
+            "system.md", "historian.md", "sociologist.md", "technology.md", "culture_art.md",
+            "visual.md", "reviewer.md", "curator.md", "fact_checker.md",
         ]
         prompt_infos = [_prompt_file_info(n) for n in prompt_names]
         prompt_ok = all(p["found"] for p in prompt_infos)
         found_count = sum(1 for p in prompt_infos if p["found"])
-        steps.append(_result("Prompts V1 defined and tested", prompt_ok,
-                              f"{found_count} prompt(s) détecté(s)"))
+        detail = ", ".join(
+            f"{p['name'].removesuffix('.md')} {p['version'] or '?'}" for p in prompt_infos if p["found"]
+        )
+        steps.append(_result(
+            "Prompts versioned and measured",
+            prompt_ok,
+            f"{found_count}/{len(prompt_names)} prompt(s) : {detail}",
+        ))
 
         # 6 — Multimodal
         vision = analyze_image("https://example.com/does-not-exist.jpg")

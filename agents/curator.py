@@ -6,12 +6,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from agents.base_agent import BaseAgent, InsightObject
-from agents.shared_context import SharedContext
+from agents.base_agent import BaseAgent, InsightObject, resolve_citations
+from agents.shared_context import SharedContext, evidence_of
 
 MIN_SECTIONS = 4
 MAX_SECTIONS = 6
-MAX_ATTEMPTS = 2
+# Evidence text shown per cited chunk. Kept short: free tiers cap tokens per
+# request/minute (a 300-character version exceeded Groq's 8k TPM for qwen3.8-27b).
+EVIDENCE_SNIPPET_CHARS = 100
+MAX_ATTEMPTS = 3  # narratives must also cite valid IDs, so allow one more correction
 
 SYSTEM_PROMPT = (
     "You are the chief curator of a museum of the present age. You write for a general "
@@ -38,6 +41,8 @@ class ExhibitionSynthesis:
     sections: list[SectionObject] = field(default_factory=list)
     selected_items: list[str] = field(default_factory=list)
     missing_perspectives: list[str] = field(default_factory=list)
+    review: dict = field(default_factory=dict)            # peer review the curator worked from
+    fact_check: list[dict] = field(default_factory=list)  # per-section verdicts (agents/fact_checker.py)
 
 
 def _is_empty(insight: Any) -> bool:
@@ -49,6 +54,7 @@ def _is_empty(insight: Any) -> bool:
 
 class CuratorAgent(BaseAgent):
     model_env_var = "CURATOR_MODEL"
+    name = "curator"
 
     def __init__(self, openai_client: Any, prompt_path: str | Path | None = None):
         prompt_root = Path(__file__).resolve().parents[1] / "prompts"
@@ -60,36 +66,46 @@ class CuratorAgent(BaseAgent):
         head, sep, body = template.partition("\n---\n")
         return body.lstrip() if sep else template
 
-    def run(self, shared_context: SharedContext) -> ExhibitionSynthesis:
+    def run(self, shared_context: SharedContext, feedback: str = "") -> ExhibitionSynthesis:
+        """Write the exhibition. ``feedback`` (e.g. from the fact-checker) is appended to the prompt."""
         insights = shared_context.insights or {}
         missing = sorted(name for name, insight in insights.items() if _is_empty(insight))
         present = {name: insight for name, insight in insights.items() if name not in missing}
         known_artifacts = {a for insight in present.values() for a in insight.selected_artifacts}
+        evidence = evidence_of(present)
 
         quoted_insights = json.dumps(
             {
                 "perspectives": {
                     name: {
                         "agent": insight.agent,
-                        "perspective": insight.perspective,
-                        "key_findings": insight.key_findings,
-                        "selected_artifacts": insight.selected_artifacts,
+                        "perspective": insight.perspective[:500],
+                        "key_findings": [str(finding)[:260] for finding in insight.key_findings[:2]],
                     }
                     for name, insight in present.items()
                 },
                 "cross_references": shared_context.cross_references or [],
                 "unavailable_perspectives": missing,
+                "review": shared_context.review or {},
+                "evidence": {
+                    cid: " · ".join(str(x) for x in (item.get("year"), item.get("source")) if x)
+                         + ": " + (item.get("content") or "")[:EVIDENCE_SNIPPET_CHARS]
+                    for cid, item in evidence.items()
+                },
             },
             ensure_ascii=False,
         )
         base_prompt = self._render_prompt(quoted_insights, "curator", SYSTEM_PROMPT)
-
+        if feedback:
+            base_prompt += f"\n\n{feedback}"
         feedback = ""
         last_error: CuratorValidationError | None = None
         for attempt in range(1, MAX_ATTEMPTS + 1):
             payload = self._call_llm(SYSTEM_PROMPT, base_prompt + feedback)
             try:
-                return self._build_result(payload, shared_context, known_artifacts, missing)
+                result = self._build_result(payload, shared_context, known_artifacts, missing)
+                self._record("exhibition", exhibition=result)
+                return result
             except CuratorValidationError as exc:
                 last_error = exc
                 logging.warning("Curator attempt %d/%d rejected: %s", attempt, MAX_ATTEMPTS, exc)
@@ -113,13 +129,26 @@ class CuratorAgent(BaseAgent):
         for section in payload.get("sections") or []:
             if not isinstance(section, dict):
                 continue
+            narrative = str(section.get("narrative", "")).strip()
             artifacts = [str(a) for a in section.get("artifacts") or []]
             if known_artifacts:
+                # Narratives cite their sources like the specialists' findings do.
+                narrative, cited, unknown = resolve_citations(narrative, known_artifacts)
+                unknown = sorted(set(unknown))
+                if unknown:
+                    raise CuratorValidationError(
+                        f"narratives may only cite the specialists' chunk IDs; unknown: {', '.join(unknown)}."
+                    )
+                if not cited:
+                    raise CuratorValidationError(
+                        "every narrative must cite at least one [chunk_id] from the evidence."
+                    )
                 artifacts = [a for a in artifacts if a in known_artifacts]
+                artifacts += [c for c in dict.fromkeys(cited) if c not in artifacts]
             sections.append(
                 SectionObject(
                     title=str(section.get("title", "")).strip(),
-                    narrative=str(section.get("narrative", "")).strip(),
+                    narrative=narrative,
                     artifacts=artifacts,
                 )
             )
@@ -150,4 +179,5 @@ class CuratorAgent(BaseAgent):
             sections=sections,
             selected_items=selected,
             missing_perspectives=missing,
+            review=shared_context.review or {},
         )

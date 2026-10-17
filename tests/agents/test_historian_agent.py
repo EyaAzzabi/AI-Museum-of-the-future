@@ -61,15 +61,15 @@ def test_historian_agent_strips_changelog_header_from_prompt():
 
 
 def test_historian_agent_output_structure(sample_chunks):
-    """Verify that HistorianAgent returns a well-structured InsightObject."""
+    """Verify that HistorianAgent returns a well-structured, cited InsightObject."""
     agent = HistorianAgent(openai_client=None)
     mock_payload = {
         "agent": "historian",
         "perspective": "The 2020s marked a pivotal epoch of technological convergence and environmental response.",
         "key_findings": [
-            "Key Event: Historic multilateral AI governance accord established.",
-            "Historical Significance: Shift from national regulation to global multilateralism.",
-            "Century-Scale Impact: Laid foundations for 22nd-century human-machine coexistence.",
+            "Key Event: Historic multilateral AI governance accord established [hist-001].",
+            "Historical Significance: Cities adapted to climate heatwaves [hist-002].",
+            "Century-Scale Impact: Foundations for 22nd-century human-machine coexistence [hist-001].",
         ],
         "selected_artifacts": ["hist-001", "hist-002"],
     }
@@ -82,6 +82,7 @@ def test_historian_agent_output_structure(sample_chunks):
     assert "2020s marked a pivotal epoch" in insight.perspective
     assert len(insight.key_findings) == 3
     assert insight.selected_artifacts == ["hist-001", "hist-002"]
+    assert set(insight.evidence) == {"hist-001", "hist-002"}
 
 
 def test_historian_agent_filters_hallucinated_artifacts(sample_chunks):
@@ -90,7 +91,7 @@ def test_historian_agent_filters_hallucinated_artifacts(sample_chunks):
     mock_payload = {
         "agent": "historian",
         "perspective": "Historical overview.",
-        "key_findings": ["Significant shift."],
+        "key_findings": ["Significant shift [hist-002]."],
         # 'invented-chunk-999' is not in sample_chunks
         "selected_artifacts": ["invented-chunk-999", "hist-002"],
     }
@@ -103,36 +104,32 @@ def test_historian_agent_filters_hallucinated_artifacts(sample_chunks):
     assert insight.selected_artifacts == ["hist-002"]
 
 
-def test_historian_agent_falls_back_when_all_artifacts_hallucinated(sample_chunks):
-    """When all returned artifacts are invalid, agent falls back to top input chunks."""
+def test_historian_agent_abstains_when_findings_cite_invented_ids(sample_chunks):
+    """Findings resting on invented sources are dropped; with none left the agent abstains."""
     agent = HistorianAgent(openai_client=None)
     mock_payload = {
         "agent": "historian",
         "perspective": "Historical overview.",
-        "key_findings": ["Significant shift."],
+        "key_findings": ["Significant shift [ghost-id-1]."],
         "selected_artifacts": ["ghost-id-1", "ghost-id-2"],
     }
 
     with patch.object(agent, "_call_llm", return_value=mock_payload):
         insight = agent.run(sample_chunks)
 
-    # Must fall back to available chunks from sample_chunks
-    assert len(insight.selected_artifacts) > 0
-    for artifact in insight.selected_artifacts:
-        assert artifact in {"hist-001", "hist-002"}
+    assert insight.key_findings == [] and insight.selected_artifacts == []
 
 
 def test_historian_agent_handles_empty_or_missing_llm_fields(sample_chunks):
-    """Gracefully handle empty LLM payload with sensible historical defaults."""
+    """An empty LLM payload makes the agent abstain instead of inventing default findings."""
     agent = HistorianAgent(openai_client=None)
     with patch.object(agent, "_call_llm", return_value={}):
         insight = agent.run(sample_chunks)
 
     assert insight.agent == "historian"
-    assert insight.perspective != ""
-    assert len(insight.key_findings) >= 1
-    assert len(insight.selected_artifacts) >= 1
-    assert insight.selected_artifacts[0] in {"hist-001", "hist-002"}
+    assert insight.perspective == ""
+    assert insight.key_findings == []
+    assert insight.selected_artifacts == []
 
 
 def test_historian_agent_propagates_llm_errors(sample_chunks):

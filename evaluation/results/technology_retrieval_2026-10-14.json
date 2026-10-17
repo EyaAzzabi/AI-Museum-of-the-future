@@ -1,0 +1,292 @@
+{
+  "date": "2026-10-14",
+  "k": 5,
+  "by_country": {
+    "Tunisia": {
+      "per_query": {
+        "mean": {
+          "precision": 0.667,
+          "hit": 1.0,
+          "rr": 0.833,
+          "diversity": 1.0,
+          "statistics_share": 0.0,
+          "returned": 5.0
+        },
+        "cases": [
+          {
+            "id": "tech-ai",
+            "query": "artificial intelligence large language models impact on work and society",
+            "precision": 0.8,
+            "hit": 1.0,
+            "rr": 1.0,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "Where-OPD: Spatially Guided On-Policy Self-Distillation of MLLMs with Synthetic Scenes",
+              "Le langage de lintelligence artificielle",
+              "TACO: Ternary Absolute-max Column-wise One-sparse Optimizer for LLM Fine-Tuning",
+              "Why Every Data Science Student Should Learn Prompt Engineering",
+              "The Missing Primitive: Diagnosing and Repairing Mathematical Reasoning in Large Language M"
+            ]
+          },
+          {
+            "id": "tech-digital",
+            "query": "internet mobile social media digital services startups adoption",
+            "precision": 1.0,
+            "hit": 1.0,
+            "rr": 1.0,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "Great Job Near Stanford University ! Digital and Social Media Specialist",
+              "Responsibly regulated access to social media",
+              "Use social media , AI responsibly : Students told at MGUG | Varanasi News",
+              "न्यूजीलैंड में 16 साल से कम उम्र के बच्चों के लिए बैन होगा सोशल मीडिया , बिल लाने की तैयार",
+              "Out-of-Network Attention Dynamics on Bluesky"
+            ]
+          },
+          {
+            "id": "tech-cyber",
+            "query": "cybersecurity cyberattack data privacy surveillance",
+            "precision": 0.4,
+            "hit": 1.0,
+            "rr": 0.5,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "इंटरनेट की दुनिया में कितनी बदल गई सुरक्षा की परिभाषा ? ऐसे एक - दूसरे की डिजिटल ढाल बन रह",
+              "Decoding the Legalese: A Scalable and Quantitative Framework for Analyzing Corporate Priva",
+              "Responsibly regulated access to social media",
+              "On the security and privacy of LLMs in Mobility",
+              "लाइक्स - व्यूज और साइबर क्राइम की दुनिया ...."
+            ]
+          },
+          {
+            "id": "tech-energy",
+            "query": "renewable energy solar electricity grid climate technology",
+            "precision": 0.6,
+            "hit": 1.0,
+            "rr": 1.0,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "A New Framework for Modeling Solar Flares from MHD to Kinetic Processes",
+              "Cost-augmented Schrödinger bridges on graphs are exactly solvable: a Feynman-Kac tilt repl",
+              "ليجوريا تعزز انتاج الطاقة المتجددة - طاقة",
+              "PhysDEM: Physics-Defined Energy-Matching Diffusion for Spatiotemporal Field Generation und",
+              "وزير الكهرباء : تنفيذ مشروعات الطاقة الشمسية والرياح وفقًا لخطة زمنية محددة"
+            ]
+          },
+          {
+            "id": "tech-health",
+            "query": "vaccines biotechnology genetics health technology",
+            "precision": 1.0,
+            "hit": 1.0,
+            "rr": 1.0,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "Is there an end in sight to COVID-19? | Inside Story",
+              "Biotechnology",
+              "Biotechnology : The Career Path Many Biology Students Overlook",
+              "BIOHK2026 ( Hong Kong International Biotechnology Conference and Exhibition ), 9 - 12 Sept",
+              "ISARJMRS 1(1)"
+            ]
+          },
+          {
+            "id": "tech-space",
+            "query": "space exploration satellite launch scientific breakthrough",
+            "precision": 0.2,
+            "hit": 1.0,
+            "rr": 0.5,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "SpaceX火箭撞擊月球 NASA公布最新坑洞影像 | 國際",
+              "Decentralized Power-Optimal Coordination for Spacecraft Swarms Using Time-Varying Magnetor",
+              "ScholarCatalyst: A Benchmark for Retrieving Papers That Inspire New Research",
+              "国际地月立方星座大科学计划启动 如何为月球基地建设提供数据支撑 ？",
+              "FERPO: Forward Entropy-Regularized Policy Optimization"
+            ]
+          }
+        ]
+      },
+      "balance": {
+        "pool": 36,
+        "before": {
+          "items": 14,
+          "domains_covered": 2,
+          "largest_domain_share": 0.643,
+          "research_share": 0.286,
+          "not_technology_share": 0.071,
+          "in_scope_share": 0.0
+        },
+        "after": {
+          "items": 14,
+          "domains_covered": 5,
+          "largest_domain_share": 0.214,
+          "research_share": 0.143,
+          "not_technology_share": 0.143,
+          "in_scope_share": 0.0
+        },
+        "after_domains": {
+          "digital_connectivity": 3,
+          "ai_computing": 3,
+          "health_biotech": 3,
+          "energy_climate": 2,
+          "space": 1,
+          "other": 2
+        }
+      }
+    },
+    "none": {
+      "per_query": {
+        "mean": {
+          "precision": 0.667,
+          "hit": 1.0,
+          "rr": 0.833,
+          "diversity": 1.0,
+          "statistics_share": 0.0,
+          "returned": 5.0
+        },
+        "cases": [
+          {
+            "id": "tech-ai",
+            "query": "artificial intelligence large language models impact on work and society",
+            "precision": 0.8,
+            "hit": 1.0,
+            "rr": 1.0,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "Where-OPD: Spatially Guided On-Policy Self-Distillation of MLLMs with Synthetic Scenes",
+              "Le langage de lintelligence artificielle",
+              "TACO: Ternary Absolute-max Column-wise One-sparse Optimizer for LLM Fine-Tuning",
+              "Why Every Data Science Student Should Learn Prompt Engineering",
+              "The Missing Primitive: Diagnosing and Repairing Mathematical Reasoning in Large Language M"
+            ]
+          },
+          {
+            "id": "tech-digital",
+            "query": "internet mobile social media digital services startups adoption",
+            "precision": 1.0,
+            "hit": 1.0,
+            "rr": 1.0,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "Great Job Near Stanford University ! Digital and Social Media Specialist",
+              "Responsibly regulated access to social media",
+              "Use social media , AI responsibly : Students told at MGUG | Varanasi News",
+              "न्यूजीलैंड में 16 साल से कम उम्र के बच्चों के लिए बैन होगा सोशल मीडिया , बिल लाने की तैयार",
+              "Out-of-Network Attention Dynamics on Bluesky"
+            ]
+          },
+          {
+            "id": "tech-cyber",
+            "query": "cybersecurity cyberattack data privacy surveillance",
+            "precision": 0.4,
+            "hit": 1.0,
+            "rr": 0.5,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "इंटरनेट की दुनिया में कितनी बदल गई सुरक्षा की परिभाषा ? ऐसे एक - दूसरे की डिजिटल ढाल बन रह",
+              "Decoding the Legalese: A Scalable and Quantitative Framework for Analyzing Corporate Priva",
+              "Responsibly regulated access to social media",
+              "On the security and privacy of LLMs in Mobility",
+              "लाइक्स - व्यूज और साइबर क्राइम की दुनिया ...."
+            ]
+          },
+          {
+            "id": "tech-energy",
+            "query": "renewable energy solar electricity grid climate technology",
+            "precision": 0.6,
+            "hit": 1.0,
+            "rr": 1.0,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "A New Framework for Modeling Solar Flares from MHD to Kinetic Processes",
+              "Cost-augmented Schrödinger bridges on graphs are exactly solvable: a Feynman-Kac tilt repl",
+              "ليجوريا تعزز انتاج الطاقة المتجددة - طاقة",
+              "PhysDEM: Physics-Defined Energy-Matching Diffusion for Spatiotemporal Field Generation und",
+              "وزير الكهرباء : تنفيذ مشروعات الطاقة الشمسية والرياح وفقًا لخطة زمنية محددة"
+            ]
+          },
+          {
+            "id": "tech-health",
+            "query": "vaccines biotechnology genetics health technology",
+            "precision": 1.0,
+            "hit": 1.0,
+            "rr": 1.0,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "Is there an end in sight to COVID-19? | Inside Story",
+              "Biotechnology",
+              "Biotechnology : The Career Path Many Biology Students Overlook",
+              "BIOHK2026 ( Hong Kong International Biotechnology Conference and Exhibition ), 9 - 12 Sept",
+              "ISARJMRS 1(1)"
+            ]
+          },
+          {
+            "id": "tech-space",
+            "query": "space exploration satellite launch scientific breakthrough",
+            "precision": 0.2,
+            "hit": 1.0,
+            "rr": 0.5,
+            "diversity": 1.0,
+            "statistics_share": 0.0,
+            "returned": 5,
+            "top": [
+              "SpaceX火箭撞擊月球 NASA公布最新坑洞影像 | 國際",
+              "Decentralized Power-Optimal Coordination for Spacecraft Swarms Using Time-Varying Magnetor",
+              "ScholarCatalyst: A Benchmark for Retrieving Papers That Inspire New Research",
+              "国际地月立方星座大科学计划启动 如何为月球基地建设提供数据支撑 ？",
+              "FERPO: Forward Entropy-Regularized Policy Optimization"
+            ]
+          }
+        ]
+      },
+      "balance": {
+        "pool": 36,
+        "before": {
+          "items": 14,
+          "domains_covered": 2,
+          "largest_domain_share": 0.643,
+          "research_share": 0.286,
+          "not_technology_share": 0.071,
+          "in_scope_share": 1.0
+        },
+        "after": {
+          "items": 14,
+          "domains_covered": 5,
+          "largest_domain_share": 0.214,
+          "research_share": 0.143,
+          "not_technology_share": 0.143,
+          "in_scope_share": 1.0
+        },
+        "after_domains": {
+          "digital_connectivity": 3,
+          "ai_computing": 3,
+          "health_biotech": 3,
+          "energy_climate": 2,
+          "space": 1,
+          "other": 2
+        }
+      }
+    }
+  }
+}

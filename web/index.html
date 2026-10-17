@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Museum of the Future — Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='exhibition.css') }}?v=1" />
   </head>
   <body>
 
@@ -20,6 +21,7 @@
         <li><a href="#corpus"     class="nav-item"        data-section="corpus">     <span class="nav-icon">📚</span> Corpus</a></li>
         <li><a href="#data"      class="nav-item"        data-section="data">      <span class="nav-icon">🗂️</span> Données</a></li>
         <li><a href="#agents"     class="nav-item"        data-section="agents">     <span class="nav-icon">🤖</span> Agents</a></li>
+        <li><a href="#exhibition" class="nav-item"        data-section="exhibition"> <span class="nav-icon">🏛️</span> Exposition</a></li>
         <li><a href="#historian"  class="nav-item"        data-section="historian">  <span class="nav-icon">📜</span> Test Historian</a></li>
         <li><a href="#prompts"    class="nav-item"        data-section="prompts">    <span class="nav-icon">💬</span> Prompts</a></li>
         <li><a href="#tests"      class="nav-item"        data-section="tests">      <span class="nav-icon">✅</span> Tests</a></li>
@@ -332,6 +334,56 @@
       </section>
 
       <!-- ── SECTION: Historian Agent Playground ───────────────── -->
+      <!-- ── SECTION: Exhibition (exhibition.js, API in exhibition_api.py) ── -->
+      <section id="section-exhibition" class="section">
+        <div class="card">
+          <h2 class="card-title">🏛️ Exposition du musée</h2>
+          <p class="card-subtitle">Lance le pipeline complet (5 agents → revue → curateur → fact-check), charge un run sauvegardé, ou rejoue seulement le curateur.</p>
+          <div class="ex-controls">
+            <label class="ex-label">Pays <input id="exCountry" class="ex-input" value="Tunisia" /></label>
+            <label class="ex-label">De <input id="exYearFrom" class="ex-input ex-year" type="number" value="2020" /></label>
+            <label class="ex-label">À <input id="exYearTo" class="ex-input ex-year" type="number" value="2026" /></label>
+            <label class="ex-check"><input id="exReview" type="checkbox" checked /> Revue croisée</label>
+            <label class="ex-check"><input id="exFactCheck" type="checkbox" checked /> Fact-check</label>
+            <button id="exRun" class="btn btn-primary"><span class="btn-icon">▶</span> Lancer un run</button>
+            <button id="exStop" class="btn-page ex-stop hidden">■ Arrêter le run</button>
+          </div>
+          <div class="ex-controls">
+            <select id="exSaved" class="ex-select"><option value="">Chargement des runs…</option></select>
+            <button id="exLoad" class="btn-page">Charger</button>
+            <button id="exReplay" class="btn-page" title="Relance seulement le curateur et le fact-check">Rejouer le curateur</button>
+            <button id="exLatest" class="btn-page">Dernière exposition</button>
+          </div>
+          <div id="exStatus" class="ex-status hidden"></div>
+        </div>
+
+        <div id="exPlaceholder" class="card empty-state-card">
+          <div class="empty-icon">🏛️</div>
+          <h4>Aucune exposition chargée</h4>
+          <p>Lancez un run ou chargez un run sauvegardé pour afficher le titre, les sections, les images et ce que l'IA voit.</p>
+        </div>
+
+        <div id="exResult" class="hidden">
+          <div class="card ex-hero">
+            <div id="exMeta" class="ex-meta"></div>
+            <h2 id="exTitle" class="ex-title"></h2>
+            <p id="exConcept" class="ex-concept"></p>
+            <div id="exMissing" class="ex-missing"></div>
+            <div id="exGallery" class="ex-gallery"></div>
+            <button id="exVision" class="btn-page ex-vision-btn hidden">👁 Analyser les images (IA)</button>
+          </div>
+          <div id="exSections"></div>
+          <div class="card">
+            <h3 class="card-title">Revue croisée</h3>
+            <div id="exReviewBox"></div>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Agents</h3>
+            <div id="exAgents"></div>
+          </div>
+        </div>
+      </section>
+
       <section id="section-historian" class="section">
         <div class="card historian-header-card">
           <div class="historian-header-content">
@@ -540,6 +592,7 @@ Retournez uniquement du JSON conforme au schéma InsightObject.</pre>
 
     </main>
 
-    <script src="{{ url_for('static', filename='app.js') }}?v=4"></script>
+    <script src="{{ url_for('static', filename='app.js') }}?v=5"></script>
+    <script src="{{ url_for('static', filename='exhibition.js') }}?v=1"></script>
   </body>
 </html>

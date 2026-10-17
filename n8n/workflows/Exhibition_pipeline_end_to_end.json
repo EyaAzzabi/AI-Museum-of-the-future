@@ -1,0 +1,272 @@
+{
+  "name": "Exhibition pipeline - end to end",
+  "nodes": [
+    {
+      "id": "ex-webhook",
+      "name": "Exhibition request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "3d9a6c2e-5b1f-4e8a-9c47-0e1b2a3c4d50",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "exhibition",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "ex-schedule",
+      "name": "Every Monday 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 220],
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "weeks", "triggerAtDay": [1], "triggerAtHour": 9 }]
+        }
+      }
+    },
+    {
+      "id": "ex-ingest",
+      "name": "Ingest new data (optional)",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [240, 220],
+      "disabled": true,
+      "parameters": {
+        "source": "database",
+        "workflowId": ""
+      }
+    },
+    {
+      "id": "ex-start",
+      "name": "Start pipeline run",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [260, 0],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.EXHIBITION_API_URL || 'http://127.0.0.1:5000') + '/api/exhibition' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.EXHIBITION_API_TOKEN || '' }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { country: ($json.body && $json.body.country) || 'Tunisia', year_from: ($json.body && $json.body.year_from) || 2020, year_to: ($json.body && $json.body.year_to) || 2026, review: ($json.body && $json.body.review) !== false, fact_check: ($json.body && $json.body.fact_check) !== false, from_run: ($json.body && $json.body.from_run) || undefined } }}",
+        "options": { "timeout": 30000, "response": { "response": { "neverError": true } } }
+      }
+    },
+    {
+      "id": "ex-start-sched",
+      "name": "Start scheduled run",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 220],
+      "executeOnce": true,
+      "parameters": {
+        "method": "POST",
+        "url": "={{ ($env.EXHIBITION_API_URL || 'http://127.0.0.1:5000') + '/api/exhibition' }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $env.EXHIBITION_API_TOKEN || '' }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { country: 'Tunisia', year_from: 2020, year_to: 2026, review: true, fact_check: true } }}",
+        "options": { "timeout": 30000, "response": { "response": { "neverError": true } } }
+      }
+    },
+    {
+      "id": "ex-respond",
+      "name": "Return run id",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [520, 0],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": "={{ $json.run_id ? 202 : 400 }}"
+        }
+      }
+    },
+    {
+      "id": "ex-started",
+      "name": "Run started?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [720, 120],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "has-run",
+              "leftValue": "={{ $json.run_id }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "ex-wait",
+      "name": "Wait 60 s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [960, 40],
+      "webhookId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "parameters": {
+        "amount": 60,
+        "unit": "seconds"
+      }
+    },
+    {
+      "id": "ex-status",
+      "name": "Get run status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 40],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ ($env.EXHIBITION_API_URL || 'http://127.0.0.1:5000') + '/api/exhibition/' + $json.run_id }}",
+        "options": { "timeout": 30000, "response": { "response": { "neverError": true } } }
+      }
+    },
+    {
+      "id": "ex-running",
+      "name": "Still running?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1440, 40],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "is-running",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "running",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "ex-has-ex",
+      "name": "Exhibition written?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1680, 120],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "has-ex",
+              "leftValue": "={{ $json.exhibition }}",
+              "rightValue": "",
+              "operator": { "type": "object", "operation": "notEmpty", "singleValue": true }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "ex-ok",
+      "name": "Exhibition summary",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1920, 40],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "run_id", "value": "={{ $json.run_id }}", "type": "string" },
+            { "id": "2", "name": "title", "value": "={{ $json.exhibition.title }}", "type": "string" },
+            { "id": "3", "name": "sections", "value": "={{ $json.exhibition.sections.length }}", "type": "number" },
+            { "id": "4", "name": "status", "value": "success", "type": "string" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ex-fail",
+      "name": "Run failed",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1920, 220],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "1", "name": "run_id", "value": "={{ $json.run_id }}", "type": "string" },
+            { "id": "2", "name": "error", "value": "={{ $json.error || 'no exhibition' }}", "type": "string" },
+            { "id": "3", "name": "status", "value": "failed", "type": "string" }
+          ]
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Exhibition request": {
+      "main": [[{ "node": "Start pipeline run", "type": "main", "index": 0 }]]
+    },
+    "Every Monday 09:00": {
+      "main": [[{ "node": "Ingest new data (optional)", "type": "main", "index": 0 }]]
+    },
+    "Ingest new data (optional)": {
+      "main": [[{ "node": "Start scheduled run", "type": "main", "index": 0 }]]
+    },
+    "Start pipeline run": {
+      "main": [[{ "node": "Return run id", "type": "main", "index": 0 }]]
+    },
+    "Return run id": {
+      "main": [[{ "node": "Run started?", "type": "main", "index": 0 }]]
+    },
+    "Start scheduled run": {
+      "main": [[{ "node": "Run started?", "type": "main", "index": 0 }]]
+    },
+    "Run started?": {
+      "main": [
+        [{ "node": "Wait 60 s", "type": "main", "index": 0 }],
+        [{ "node": "Run failed", "type": "main", "index": 0 }]
+      ]
+    },
+    "Wait 60 s": {
+      "main": [[{ "node": "Get run status", "type": "main", "index": 0 }]]
+    },
+    "Get run status": {
+      "main": [[{ "node": "Still running?", "type": "main", "index": 0 }]]
+    },
+    "Still running?": {
+      "main": [
+        [{ "node": "Wait 60 s", "type": "main", "index": 0 }],
+        [{ "node": "Exhibition written?", "type": "main", "index": 0 }]
+      ]
+    },
+    "Exhibition written?": {
+      "main": [
+        [{ "node": "Exhibition summary", "type": "main", "index": 0 }],
+        [{ "node": "Run failed", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}
