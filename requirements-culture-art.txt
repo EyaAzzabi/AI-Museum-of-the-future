@@ -1,0 +1,9 @@
+# Minimal installation for offline/live agent, Gemini retrieval and optional API.
+# For local MiniLM retrieval add fastembed; full project uses requirements.txt.
+python-dotenv>=1.0.1
+requests>=2.32.3
+supabase>=2.10.0
+openai>=1.51.0
+Flask==3.1.0
+pytest==8.2.2
+hypothesis==6.108.5

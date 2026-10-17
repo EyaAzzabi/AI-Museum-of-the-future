@@ -1,16 +1,168 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any
 
-from flask import Flask, jsonify, render_template
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from flask import Flask, jsonify, render_template, request
 
 from agents.base_agent import InsightObject
+from agents.historian import HistorianAgent
+from agents.llm_config import build_llm_client, get_model
 from agents.shared_context import compute_cross_references
 from multimodal.analyze_image import analyze_image
 from rag.chunking.chunker import ChunkConfig, Chunker, ChunkingStrategy
-from rag.vector_store.retriever import Retriever
+from rag.vector_store.retriever import RetrievalResult, Retriever
+
+
+# ============================================================================
+# Museum 3D: Data Loading and Utilities
+# ============================================================================
+
+GALLERIES = [
+    {
+        "id": "historian",
+        "name": "History & Politics",
+        "agent": "Historian",
+        "description": "Historical events, political systems, and societal transformations.",
+        "theme_color": "#1e40af",  # Blue
+        "accent_color": "#3b82f6",
+        "keywords": ["history", "politics", "government", "war", "revolution"]
+    },
+    {
+        "id": "sociologist",
+        "name": "Society & Social Change",
+        "agent": "Sociologist",
+        "description": "Social structures, demographics, cultural movements, and collective behavior.",
+        "theme_color": "#16a34a",  # Green
+        "accent_color": "#4ade80",
+        "keywords": ["society", "social", "culture", "community", "behavior"]
+    },
+    {
+        "id": "technology",
+        "name": "Science & Innovation",
+        "agent": "Technology",
+        "description": "Scientific discoveries, technological advancements, and engineering breakthroughs.",
+        "theme_color": "#7c3aed",  # Purple
+        "accent_color": "#a78bfa",
+        "keywords": ["technology", "science", "innovation", "engineering", "research"]
+    },
+    {
+        "id": "culture_art",
+        "name": "Culture & Arts",
+        "agent": "Culture & Art",
+        "description": "Cultural expressions, artistic movements, literature, and creative works.",
+        "theme_color": "#ea580c",  # Orange
+        "accent_color": "#fb923c",
+        "keywords": ["art", "culture", "literature", "music", "cinema"]
+    },
+    {
+        "id": "visual",
+        "name": "Visual Culture",
+        "agent": "Visual",
+        "description": "Visual representations, design, photography, and visual media.",
+        "theme_color": "#be185d",  # Pink
+        "accent_color": "#ec4899",
+        "keywords": ["visual", "image", "design", "photography", "media"]
+    },
+    {
+        "id": "curator",
+        "name": "Museum Synthesis",
+        "agent": "Curator",
+        "description": "Cross-disciplinary connections and synthesized insights from all galleries.",
+        "theme_color": "#b45309",  # Gold
+        "accent_color": "#f59e0b",
+        "keywords": ["synthesis", "interdisciplinary", "connections", "overview"]
+    },
+]
+
+
+def _load_all_corpus() -> list[dict[str, Any]]:
+    """Load all corpus records from data/processed/*.json."""
+    records: list[dict[str, Any]] = []
+    processed_dir = Path("data/processed")
+    if not processed_dir.exists():
+        return records
+    
+    for json_file in sorted(processed_dir.glob("*.json")):
+        try:
+            with open(json_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    records.extend(data)
+        except Exception:
+            pass
+    
+    return records
+
+
+def _categorize_record(record: dict[str, Any]) -> str | None:
+    """Determine which gallery a record belongs to based on keywords."""
+    title_lower = (record.get("title") or "").lower()
+    text_lower = (record.get("text") or "")[:500].lower()
+    tags = [t.lower() for t in (record.get("tags") or [])]
+    combined = f"{title_lower} {text_lower} {' '.join(tags)}"
+    
+    for gallery in GALLERIES:
+        for keyword in gallery["keywords"]:
+            if keyword.lower() in combined:
+                return gallery["id"]
+    
+    # Default based on category field
+    category = (record.get("category") or "").lower()
+    if "history" in category or "politics" in category:
+        return "historian"
+    if "social" in category or "society" in category:
+        return "sociologist"
+    if "technology" in category or "science" in category or "cs." in category:
+        return "technology"
+    if "art" in category or "culture" in category or "cinema" in category:
+        return "culture_art"
+    if "image" in category or "visual" in category:
+        return "visual"
+    
+    return None
+
+
+def _generate_gallery_insights(gallery_id: str, records: list[dict[str, Any]]) -> InsightObject:
+    """Generate simulated insights for a gallery from its records."""
+    gallery = next((g for g in GALLERIES if g["id"] == gallery_id), None)
+    if not gallery:
+        gallery = GALLERIES[0]
+    
+    agent = gallery["agent"]
+    titles = [r.get("title", "Untitled")[:50] for r in records[:3]]
+    
+    perspective = f"Examining {len(records)} records through the lens of {agent}, focusing on: {', '.join(titles)}"
+    key_findings = [
+        f"Analysis of {len(records)} artifacts in {gallery['name']}",
+        f"Key themes: {', '.join(gallery['keywords'][:3])}",
+        f"Cross-references with other galleries to establish connections",
+    ]
+    selected_artifacts = [r.get("id", f"artifact-{i}") for i, r in enumerate(records[:5])]
+    
+    return InsightObject(
+        agent=agent,
+        perspective=perspective,
+        key_findings=key_findings,
+        selected_artifacts=selected_artifacts
+    )
+
+
+# Cache corpus at module load time
+_CORPUS_CACHE: list[dict[str, Any]] | None = None
+
+
+def get_corpus() -> list[dict[str, Any]]:
+    """Get cached corpus or load it."""
+    global _CORPUS_CACHE
+    if _CORPUS_CACHE is None:
+        _CORPUS_CACHE = _load_all_corpus()
+    return _CORPUS_CACHE
 
 
 def create_app() -> Flask:
@@ -73,9 +225,288 @@ def create_app() -> Flask:
     def index() -> str:
         return render_template("index.html")
 
+    @app.get("/landing")
+    def landing() -> str:
+        return render_template("landing.html")
+
+    @app.get("/museum")
+    def museum_3d() -> str:
+        return render_template("museum-3d-v2.html")
+
+    @app.get("/api/museum/meta")
+    def api_museum_meta() -> Any:
+        """Return museum metadata: galleries, themes, agents."""
+        return jsonify({
+            "name": "AI Museum of the Future",
+            "description": "An immersive 3D museum showcasing a dynamic corpus through six AI perspectives.",
+            "galleries": [
+                {
+                    "id": g["id"],
+                    "name": g["name"],
+                    "agent": g["agent"],
+                    "description": g["description"],
+                    "theme_color": g["theme_color"],
+                    "accent_color": g["accent_color"],
+                }
+                for g in GALLERIES
+            ],
+            "total_exhibits": len(get_corpus()),
+        })
+
+    @app.get("/api/museum/galleries")
+    def api_museum_galleries() -> Any:
+        """Return gallery definitions with 3D positioning data."""
+        galleries = []
+        for i, gallery in enumerate(GALLERIES):
+            angle = (360 / len(GALLERIES)) * i
+            angle_rad = math.radians(angle)
+            radius = 25
+            x = radius * math.cos(angle_rad)
+            z = radius * math.sin(angle_rad)
+            
+            galleries.append({
+                "id": gallery["id"],
+                "name": gallery["name"],
+                "agent": gallery["agent"],
+                "description": gallery["description"],
+                "theme_color": gallery["theme_color"],
+                "accent_color": gallery["accent_color"],
+                "position": {"x": x, "y": 0, "z": z},
+                "rotation": angle,
+                "walls": {
+                    "front": {"position": {"x": x, "y": 2, "z": z + 3}, "size": {"width": 8, "height": 4}},
+                    "side": {"position": {"x": x + 2, "y": 2, "z": z}, "size": {"width": 8, "height": 4}},
+                },
+                "niches": [
+                    {"position": {"x": x - 2, "y": 0.5, "z": z + 2}, "size": 0.8},
+                    {"position": {"x": x, "y": 0.5, "z": z + 2.5}, "size": 0.8},
+                    {"position": {"x": x + 2, "y": 0.5, "z": z + 2}, "size": 0.8},
+                    {"position": {"x": x - 1.5, "y": 1.8, "z": z + 2}, "size": 0.7},
+                    {"position": {"x": x + 1.5, "y": 1.8, "z": z + 2}, "size": 0.7},
+                    {"position": {"x": x, "y": 2.8, "z": z + 2}, "size": 0.6},
+                ],
+            })
+        
+        return jsonify({"galleries": galleries})
+
+    @app.get("/api/museum/exhibits/<gallery_id>")
+    def api_museum_exhibits(gallery_id: str) -> Any:
+        """Return exhibits (corpus records) for a specific gallery."""
+        page = request.args.get("page", 1, type=int)
+        page_size = request.args.get("pageSize", 12, type=int)
+        
+        corpus = get_corpus()
+        gallery_records = [r for r in corpus if _categorize_record(r) == gallery_id]
+        
+        start = (page - 1) * page_size
+        end = start + page_size
+        paginated = gallery_records[start:end]
+        
+        exhibits = []
+        for record in paginated:
+            exhibits.append({
+                "id": record.get("id", "unknown"),
+                "title": record.get("title", "Untitled"),
+                "text": (record.get("text") or "")[:300],
+                "source": record.get("source", "unknown"),
+                "category": record.get("category", ""),
+                "date": record.get("date", ""),
+                "url": record.get("url", ""),
+                "image_url": record.get("image_url"),
+                "tags": record.get("tags", [])[:3],
+            })
+        
+        gallery = next((g for g in GALLERIES if g["id"] == gallery_id), None)
+        insights = _generate_gallery_insights(gallery_id, gallery_records) if gallery else None
+        
+        return jsonify({
+            "gallery_id": gallery_id,
+            "gallery_name": gallery["name"] if gallery else "Unknown",
+            "page": page,
+            "page_size": page_size,
+            "total": len(gallery_records),
+            "exhibits": exhibits,
+            "insights": {
+                "agent": insights.agent,
+                "perspective": insights.perspective,
+                "key_findings": insights.key_findings,
+                "selected_artifacts": insights.selected_artifacts,
+            } if insights else None,
+        })
+
+    @app.get("/api/museum/search")
+    def api_museum_search() -> Any:
+        """Search exhibits across galleries."""
+        query = request.args.get("query", "", type=str).lower()
+        gallery_id = request.args.get("gallery", None, type=str)
+        page_size = request.args.get("pageSize", 12, type=int)
+        
+        if not query:
+            return jsonify({"error": "query parameter required"}), 400
+        
+        corpus = get_corpus()
+        
+        if gallery_id:
+            corpus = [r for r in corpus if _categorize_record(r) == gallery_id]
+        
+        results = []
+        for record in corpus:
+            title = (record.get("title") or "").lower()
+            text = (record.get("text") or "")[:500].lower()
+            if query in title or query in text:
+                results.append({
+                    "id": record.get("id", "unknown"),
+                    "title": record.get("title", "Untitled"),
+                    "text": (record.get("text") or "")[:300],
+                    "source": record.get("source", "unknown"),
+                    "category": record.get("category", ""),
+                    "gallery": _categorize_record(record) or "unknown",
+                    "image_url": record.get("image_url"),
+                })
+        
+        return jsonify({
+            "query": request.args.get("query", ""),
+            "gallery_filter": gallery_id,
+            "total": len(results),
+            "results": results[:page_size],
+        })
+
     @app.get("/favicon.ico")
     def favicon() -> tuple[str, int]:
         return "", 204
+
+    @app.get("/api/historian/presets")
+    def get_historian_presets() -> Any:
+        # Short summaries of documented events (see the Wikipedia articles on each),
+        # used as sample evidence for the historian demo.
+        presets = [
+            {
+                "id": "tunisia_2021_constitution",
+                "title": "Le 25 juillet 2021 et la nouvelle Constitution",
+                "category": "Politique & Institutions",
+                "chunks": [
+                    {
+                        "chunk_id": "tn-politique-01",
+                        "document_id": "wiki-crise-politique-2021",
+                        "content": "Le 25 juillet 2021, le président Kaïs Saïed limoge le chef du gouvernement Hichem Mechichi et gèle les activités de l'Assemblée des représentants du peuple, en invoquant l'article 80 de la Constitution de 2014.",
+                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia"},
+                    },
+                    {
+                        "chunk_id": "tn-politique-02",
+                        "document_id": "wiki-referendum-2022",
+                        "content": "Le 25 juillet 2022, une nouvelle Constitution qui renforce les pouvoirs du président est adoptée par référendum, avec une participation d'environ 30 %.",
+                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia"},
+                    },
+                    {
+                        "chunk_id": "tn-politique-03",
+                        "document_id": "wiki-legislatives-2022",
+                        "content": "Au premier tour des élections législatives de décembre 2022, la participation est d'environ 11 %.",
+                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia"},
+                    },
+                ],
+            },
+            {
+                "id": "tunisia_migration",
+                "title": "Migrations en Méditerranée centrale",
+                "category": "Société & Migration",
+                "chunks": [
+                    {
+                        "chunk_id": "tn-migration-01",
+                        "document_id": "wiki-migration-mediterranee",
+                        "content": "En 2023, la Tunisie devient le principal point de départ des traversées irrégulières de la Méditerranée centrale vers l'Italie, devant la Libye.",
+                        "metadata": {"source": "wikipedia", "category": "migration", "country": "Tunisia"},
+                    },
+                    {
+                        "chunk_id": "tn-migration-02",
+                        "document_id": "wiki-memorandum-ue-tunisie",
+                        "content": "Le 16 juillet 2023, l'Union européenne et la Tunisie signent un mémorandum d'entente portant notamment sur la migration et la coopération économique.",
+                        "metadata": {"source": "wikipedia", "category": "migration", "country": "Tunisia"},
+                    },
+                ],
+            },
+            {
+                "id": "tunisia_cinema",
+                "title": "Le cinéma tunisien sur la scène mondiale",
+                "category": "Culture & Arts",
+                "chunks": [
+                    {
+                        "chunk_id": "tn-cinema-01",
+                        "document_id": "wiki-homme-vendu-sa-peau",
+                        "content": "En 2021, « L'Homme qui a vendu sa peau » de Kaouther Ben Hania devient le premier film tunisien nommé à l'Oscar du meilleur film international.",
+                        "metadata": {"source": "wikipedia", "category": "culture", "country": "Tunisia"},
+                    },
+                    {
+                        "chunk_id": "tn-cinema-02",
+                        "document_id": "wiki-filles-olfa",
+                        "content": "« Les Filles d'Olfa » de Kaouther Ben Hania, en compétition au Festival de Cannes 2023, y reçoit L'Œil d'or puis est nommé à l'Oscar du meilleur film documentaire en 2024.",
+                        "metadata": {"source": "wikipedia", "category": "culture", "country": "Tunisia"},
+                    },
+                ],
+            },
+        ]
+        return jsonify({"presets": presets})
+
+    @app.post("/api/historian/analyze")
+    def analyze_historian() -> Any:
+        data = request.get_json(silent=True) or {}
+        raw_chunks = data.get("chunks", [])
+
+        chunks: list[RetrievalResult] = []
+        for i, c in enumerate(raw_chunks):
+            if isinstance(c, dict):
+                cid = str(c.get("chunk_id") or f"c_{i+1}")
+                did = str(c.get("document_id") or f"doc_{i+1}")
+                cnt = str(c.get("content") or "")
+                meta = c.get("metadata") if isinstance(c.get("metadata"), dict) else {}
+                sim = float(c.get("similarity", 0.9))
+                chunks.append(RetrievalResult(chunk_id=cid, document_id=did, content=cnt, metadata=meta, similarity=sim))
+            elif isinstance(c, str):
+                chunks.append(RetrievalResult(chunk_id=f"c_{i+1}", document_id=f"doc_{i+1}", content=c, metadata={}, similarity=0.9))
+
+        if not chunks:
+            return jsonify({"ok": False, "error": "Aucun document ou chunk fourni pour l'analyse historique."}), 400
+
+        # No canned fallback: an analysis is either produced by the model or reported as unavailable.
+        if not (os.getenv("LLM_API_KEY") or os.getenv("GROQ_API_KEY")):
+            return jsonify({
+                "ok": False,
+                "error": "Aucune clé LLM_API_KEY configurée : définissez-la dans le fichier .env pour lancer l'agent historien.",
+            }), 503
+        try:
+            insight = HistorianAgent(openai_client=build_llm_client()).run(chunks)
+        except Exception as exc:
+            return jsonify({"ok": False, "error": f"Le fournisseur d'IA a rejeté la requête : {exc}"}), 502
+
+        return jsonify({
+            "ok": True,
+            "mode": "live",
+            "model": get_model(),
+            "insight": {
+                "agent": insight.agent,
+                "perspective": insight.perspective,
+                "key_findings": insight.key_findings,
+                "selected_artifacts": insight.selected_artifacts,
+            },
+            "grounded_artifacts": insight.selected_artifacts,
+            "input_chunk_ids": [c.chunk_id for c in chunks],
+        })
+
+    @app.post("/api/embed")
+    def embed_text() -> Any:
+        """Embed one text with the same local model the retriever queries with.
+
+        Used by the n8n ingestion workflow so its chunks match the 384-dim
+        vector(384) column in rag/schema.sql. The response mirrors Gemini's
+        embedContent shape ({"embedding": {"values": [...]}}).
+        """
+        from rag.vector_store.local_embeddings import EMBEDDING_DIM, EMBEDDING_MODEL, build_embedding_client
+
+        data = request.get_json(silent=True) or {}
+        text = data.get("text")
+        if not isinstance(text, str) or not text.strip():
+            return jsonify({"error": "Provide a non-empty 'text' string."}), 400
+        vector = build_embedding_client().embeddings.create(input=text).data[0].embedding
+        return jsonify({"embedding": {"values": vector}, "model": EMBEDDING_MODEL, "dim": EMBEDDING_DIM})
 
     @app.get("/api/validate")
     def validate_pipeline() -> Any:

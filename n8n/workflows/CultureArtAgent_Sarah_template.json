@@ -1,0 +1,85 @@
+{
+  "name": "Sarah CultureArtAgent - integration template",
+  "nodes": [
+    {
+      "id": "culture-trigger",
+      "name": "Culture request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "culture-art",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "culture-call",
+      "name": "Call Python CultureArtAgent",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        260,
+        0
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.CULTURE_ART_API_URL }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { query: $json.body.query, top_k: $json.body.top_k || 5, category: $json.body.category || null, country: $json.body.country || null } }}",
+        "options": {
+          "timeout": 120000
+        }
+      }
+    },
+    {
+      "id": "culture-response",
+      "name": "Return insight",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        520,
+        0
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "Culture request": {
+      "main": [
+        [
+          {
+            "node": "Call Python CultureArtAgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Python CultureArtAgent": {
+      "main": [
+        [
+          {
+            "node": "Return insight",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

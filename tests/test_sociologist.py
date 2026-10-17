@@ -124,11 +124,11 @@ def mock_openai_client():
             "gender_women", "digital_social_media"
         ],
         "key_findings": [
-            "The 2021 constitutional crisis revealed Tunisia's democratic fatigue: a population exhausted by political instability chose authoritarian stability over participatory governance.",
-            "Youth unemployment exceeding 40% in rural areas created a generation with no economic future in Tunisia, making irregular migration a rational — if deadly — choice.",
-            "COVID-19 lockdowns exposed and amplified pre-existing gender inequalities, with domestic violence rising 30% and women's economic participation declining sharply.",
-            "Social media transformed from a tool of the 2011 revolution into an escape valve for youth frustration, with TikTok replacing street protest as political expression.",
-            "The cultural sector (Carthage festival, cinema) maintained surprising vitality despite economic crisis, suggesting culture functioned as social resilience infrastructure.",
+            "The 2021 constitutional crisis revealed Tunisia's democratic fatigue: a population exhausted by political instability chose authoritarian stability over participatory governance [c2].",
+            "Youth unemployment exceeding 40% in rural areas created a generation with no economic future in Tunisia, making irregular migration a rational — if deadly — choice [c1, c4].",
+            "COVID-19 lockdowns exposed and amplified pre-existing gender inequalities, with domestic violence rising 30% and women's economic participation declining sharply [c3].",
+            "Social media transformed from a tool of the 2011 revolution into an escape valve for youth frustration, with TikTok replacing street protest as political expression [c1].",
+            "The cultural sector (Carthage festival, cinema) maintained surprising vitality despite economic crisis, suggesting culture functioned as social resilience infrastructure [c4].",
         ],
         "selected_artifacts": ["c1", "c2", "c4"],
         "artifact_justification": (
@@ -284,18 +284,19 @@ class TestSociologistAgent:
         assert isinstance(result.selected_artifacts, list)
 
     def test_run_with_empty_chunks(self, agent):
-        """Agent should handle empty chunk list gracefully."""
+        """With no evidence the agent abstains without calling the LLM."""
         result = agent.run([])
         assert isinstance(result, InsightObject)
         assert result.agent == "sociologist"
-        assert len(result.key_findings) >= MIN_FINDINGS
+        assert result.key_findings == []
+        agent.openai_client.chat.completions.create.assert_not_called()
 
     def test_run_with_no_llm_client(self, sample_chunks):
-        """Agent with no LLM client should return fallback InsightObject."""
+        """Agent with no LLM client raises so the pipeline marks the perspective missing."""
         agent_no_llm = SociologistAgent(openai_client=None, retriever=None)
-        result = agent_no_llm.run(sample_chunks)
-        assert isinstance(result, InsightObject)
-        assert result.agent == "sociologist"
+        with patch("time.sleep"):
+            with pytest.raises(ValueError):
+                agent_no_llm.run(sample_chunks)
 
     def test_system_prompt_contains_chain_of_thought(self, agent, sample_chunks):
         """System prompt should include CoT steps."""
@@ -321,8 +322,8 @@ class TestSociologistAgent:
         for key in ["agent", "key_findings", "selected_artifacts", "confidence_score"]:
             assert key in fixed
 
-    def test_validate_pads_findings(self, agent, sample_chunks):
-        """_validate_and_fix should pad findings if below minimum."""
+    def test_validate_does_not_pad_findings(self, agent, sample_chunks):
+        """_validate_and_fix keeps short output instead of inventing placeholder findings."""
         payload = {
             "agent": "sociologist",
             "perspective": "Test",
@@ -332,7 +333,7 @@ class TestSociologistAgent:
             "confidence_score": 0.5,
         }
         fixed = agent._validate_and_fix(payload, sample_chunks)
-        assert len(fixed["key_findings"]) >= MIN_FINDINGS
+        assert fixed["key_findings"] == ["Only one finding"]
 
     def test_validate_clamps_confidence(self, agent, sample_chunks):
         """_validate_and_fix should clamp confidence_score to [0, 1]."""
@@ -370,7 +371,8 @@ class TestSociologistAgent:
             mock_completion,
         ]
         agent = SociologistAgent(openai_client=client, retriever=None)
-        result = agent.run(sample_chunks)
+        with patch("time.sleep"):
+            result = agent.run(sample_chunks)
         assert isinstance(result, InsightObject)
         assert client.chat.completions.create.call_count == 3
 
@@ -398,17 +400,17 @@ class TestSociologistOutputQuality:
             word_count = len(finding.split())
             assert word_count >= 8, f"Finding too short ({word_count} words): {finding}"
 
-    def test_insight_metadata_present(self, agent, sample_chunks):
-        """Perspective should include metadata injected by the agent."""
+    def test_perspective_has_no_metadata_tags(self, agent, sample_chunks):
+        """Perspective is exhibition text: no [Themes:...] / [Evidence:...] tags."""
         result = agent.run(sample_chunks)
-        # Agent enriches perspective with [Themes:...] and [Evidence:...]
-        assert "Themes:" in result.perspective or len(result.perspective) > 50
+        assert "[Themes:" not in result.perspective
+        assert "[Evidence:" not in result.perspective
 
-    def test_confidence_score_logged(self, agent, sample_chunks):
-        """Agent should log confidence score (perspective contains it)."""
-        result = agent.run(sample_chunks)
-        # Confidence is embedded in perspective by _build_insight
-        assert "Confidence:" in result.perspective or "%" in result.perspective
+    def test_confidence_score_logged(self, agent, sample_chunks, caplog):
+        """Agent logs themes, evidence count and confidence instead."""
+        with caplog.at_level("INFO", logger="agents.sociologist"):
+            agent.run(sample_chunks)
+        assert "confidence=82%" in caplog.text
 
     def test_no_duplicate_findings(self, agent, sample_chunks):
         """Findings should not be exact duplicates."""
@@ -433,15 +435,11 @@ class TestSociologistLive:
 
     @pytest.fixture
     def live_agent(self):
-        """Real agent with OpenAI client — skipped if no API key."""
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            pytest.skip("OPENAI_API_KEY not set — skipping live test")
-        from dotenv import load_dotenv
-        load_dotenv()
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key)
-        return SociologistAgent(openai_client=client, retriever=None)
+        """Real agent with the configured LLM provider — skipped if no API key."""
+        if not (os.getenv("LLM_API_KEY") or os.getenv("GROQ_API_KEY")):
+            pytest.skip("LLM_API_KEY not set — skipping live test")
+        from agents.llm_config import build_llm_client
+        return SociologistAgent(openai_client=build_llm_client(), retriever=None)
 
     def test_live_run_returns_valid_insight(self, live_agent, sample_chunks):
         """Real LLM call should return valid InsightObject with quality output."""
@@ -461,3 +459,57 @@ class TestSociologistLive:
             print(f"  {i}. {f[:100]}...")
         print(f"\nArtifacts: {result.selected_artifacts}")
         print("="*60)
+
+
+def test_pipeline_passes_retriever_to_every_agent():
+    """run_pipeline(retriever=...) lets every agent search; the sociologist through HyDE."""
+    from agents.pipeline import _build_specialist_agents
+
+    retriever = MagicMock()
+    agents = _build_specialist_agents(openai_client=None, retriever=retriever)
+    assert all(agent.retriever is retriever for agent in agents.values())
+
+    sociologist = agents["sociologist"]
+    with patch.object(sociologist, "_retrieve_evidence", return_value=MagicMock(chunks=[])):
+        sociologist.search_own_evidence()
+    assert sociologist._hyde_retriever.retriever is retriever
+
+
+def test_hyde_empty_hypothetical_doc_falls_back_to_query():
+    """Reasoning models can return empty content; HyDE must still search."""
+    from rag.hyde_retriever import HyDERetriever
+
+    empty = MagicMock()
+    empty.choices = [MagicMock()]
+    empty.choices[0].message.content = ""
+    llm = MagicMock()
+    llm.chat.completions.create.return_value = empty
+    retriever = MagicMock()
+    retriever.retrieve.side_effect = lambda query, rerank=False: [MagicMock(chunk_id="x")] if query.strip() else []
+
+    hyde = HyDERetriever(retriever=retriever, llm_client=llm, top_k=5)
+    assert hyde.generate_hypothetical_doc("gender_women", "Tunisia women") == "Tunisia women"
+    assert len(hyde.retrieve_with_hyde("gender_women", "Tunisia women")) == 1
+
+
+def test_hyde_documents_are_cached_and_themes_run_in_parallel(tmp_path, monkeypatch):
+    """A hypothetical document is generated once per (model, theme, query), then read from disk."""
+    from rag.hyde_retriever import HyDERetriever
+
+    monkeypatch.setenv("HYDE_CACHE_DIR", str(tmp_path))
+    doc = MagicMock()
+    doc.choices = [MagicMock()]
+    doc.choices[0].message.content = "Hypothetical passage about Tunisian youth."
+    llm = MagicMock()
+    llm.chat.completions.create.return_value = doc
+    retriever = MagicMock()
+    retriever.retrieve.return_value = [MagicMock(chunk_id="x")]
+
+    hyde = HyDERetriever(retriever=retriever, llm_client=llm, top_k=5)
+    themes = ["politics_civic", "gender_women", "youth_education"]
+    first = hyde.retrieve_all_themes(themes)
+    second = hyde.retrieve_all_themes(themes)
+
+    assert [r.theme for r in first] == themes            # order kept despite parallel execution
+    assert llm.chat.completions.create.call_count == 3   # second run answered from the cache
+    assert second[0].hypothetical_document == "Hypothetical passage about Tunisian youth."

@@ -1,0 +1,259 @@
+{
+  "date": "2026-10-14",
+  "model": "openai/gpt-oss-120b",
+  "evidence_items": 14,
+  "evidence": "supabase",
+  "evidence_ids": [
+    "77fd4d4d-73b9-454b-84ff-04a269967dd3",
+    "5ac124dc-0f49-40b3-a725-f9e9fde1f9a0",
+    "657913fd-39f4-4252-aa04-aeab4c24eb9f",
+    "831de05c-1cf9-469e-9867-0075619a8e69",
+    "f81224e2-e536-4b53-9722-423cbb4b4795",
+    "40d07526-19e3-4926-ae87-b6bc8af10319",
+    "77bb21ea-98e2-4a2c-9c9a-bd499aee7314",
+    "410922e5-5f7a-40eb-ae4d-d6937af5d500",
+    "b0c3bd3d-b7e1-47fd-b3cf-64a9cf7c9b45",
+    "21877da6-6b82-4e19-beb8-89ee0e73f708",
+    "220d208d-d5d4-4a15-adec-9b332ddf85cc",
+    "de15d144-b2e9-450f-b863-298310878125",
+    "dc461499-4a9f-4920-9fa5-30fa4f311466",
+    "59243175-da39-4d85-92ac-ea5f3abb189e"
+  ],
+  "runs": {
+    "v3": [
+      {
+        "findings_returned": 10,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech",
+          "space"
+        ],
+        "overstatement_markers": 1,
+        "overstatement_detail": {
+          "guessed name (source: ليجوريا, Liguria)": [
+            "In 2026 news from Leguria announced an increase in renewable energy production, reflecting a shift toward sustainable power sources [831de05c-1cf9-469e-9867-0075619a8e69]."
+          ]
+        },
+        "unlabelled_readings": 3,
+        "over_budget": 5,
+        "perspective_markers": [],
+        "interpretation_labelled": 0,
+        "perspective": "From 2020‑2026 the era was marked by breakthroughs in digital communication, health vaccines, renewable energy, space operations, and AI‑driven biotech, while evidence on cybersecurity & privacy remains scarce.",
+        "findings": [
+          "In 2026 news reported that social media access was being regulated responsibly, indicating new governance of digital platforms [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "In 2020 an archive noted that Moderna’s COVID‑19 vaccine was reported as nearly 95 percent effective, highlighting a major health‑technology milestone [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "In 2026 news from Leguria announced an increase in renewable energy production, reflecting a shift toward sustainable power sources [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "In 2026 a news headline reported that a SpaceX rocket struck the Moon and NASA released new crater images, evidencing active commercial lunar missions [f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "In 2026 a cybersecurity expert warned in the press that AI can design new genetic sequences, linking artificial intelligence to biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500]."
+        ],
+        "returned_findings": [
+          "In 2026 news reported that social media access was being regulated responsibly, indicating new governance of digital platforms [77fd4d4d-73b9-454b-84ff-04a269967dd3].",
+          "Interpretation: Such regulation could reshape how people share and consume content online, potentially enhancing privacy and reducing harmful misinformation.",
+          "In 2020 an archive noted that Moderna’s COVID‑19 vaccine was reported as nearly 95 percent effective, highlighting a major health‑technology milestone [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: The high efficacy suggested a pathway toward ending pandemic restrictions and restoring normal social and economic activity.",
+          "In 2026 news from Leguria announced an increase in renewable energy production, reflecting a shift toward sustainable power sources [831de05c-1cf9-469e-9867-0075619a8e69].",
+          "Interpretation: Expanding renewables likely reduced reliance on fossil fuels, impacting employment in green sectors and lowering emissions for communities.",
+          "In 2026 a news headline reported that a SpaceX rocket struck the Moon and NASA released new crater images, evidencing active commercial lunar missions [f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "Interpretation: Increased lunar activity opened new possibilities for scientific research and future resource utilization, inspiring public interest in space.",
+          "In 2026 a cybersecurity expert warned in the press that AI can design new genetic sequences, linking artificial intelligence to biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: This capability raised concerns about biosecurity and suggested that AI could accelerate both therapeutic development and potential misuse."
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 8,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [
+          "Interpretation: These initiatives likely lowered electricity costs and reduced carbon emissions for households and industry [831de05c-1cf9-469e-9867-0075619a8e69, 21877da6-6b82-4e19-beb8-89ee0e73f708]",
+          "A 2026 news report quotes a cybersecurity expert saying AI can design new genetic sequences, linking AI capability to biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "Interpretation: This capability raises biosecurity concerns and may reshape societal regulation of synthetic biology [410922e5-5f7a-40eb-ae4d-d6937af5d500]"
+        ],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech"
+        ],
+        "overstatement_markers": 2,
+        "overstatement_detail": {
+          "term added (source: 'renewable energy')": [
+            "In 2026 Legoria announced enhanced renewable energy production, and a national electricity minister outlined a timed rollout of solar and wind projects, signaling accelerated clean‑energy transition [831de05c-1cf9-469e-9867-0075619a8e69, 21877da6-6b82-4e19-beb8-89ee0e73f708]"
+          ],
+          "guessed name (source: ليجوريا, Liguria)": [
+            "In 2026 Legoria announced enhanced renewable energy production, and a national electricity minister outlined a timed rollout of solar and wind projects, signaling accelerated clean‑energy transition [831de05c-1cf9-469e-9867-0075619a8e69, 21877da6-6b82-4e19-beb8-89ee0e73f708]"
+          ]
+        },
+        "unlabelled_readings": 1,
+        "over_budget": 3,
+        "perspective_markers": [],
+        "interpretation_labelled": 2,
+        "perspective": "The 2020‑2026 era was defined by rapid advances in digital connectivity, health biotechnology, renewable energy, and AI‑driven computing, while cybersecurity & privacy remain undocumented in the present evidence.",
+        "findings": [
+          "In 2026 regulators announced responsibly regulated access to social media platforms, aiming to balance user freedom with oversight [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "Interpretation: This shift likely altered how people share information and engage online, introducing new gatekeeping mechanisms while promising greater protection against misuse [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "A 2020 archive reports that a COVID‑19 vaccine trial showed nearly 95 percent effectiveness, raising hopes for ending the pandemic while noting supply, demand, and distribution challenges [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "Interpretation: The high efficacy contributed to a rapid rollout that transformed public health and daily life, enabling a return to in‑person activities [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2026 Legoria announced enhanced renewable energy production, and a national electricity minister outlined a timed rollout of solar and wind projects, signaling accelerated clean‑energy transition [831de05c-1cf9-469e-9867-0075619a8e69, 21877da6-6b82-4e19-beb8-89ee0e73f708]"
+        ],
+        "returned_findings": [
+          "In 2026 regulators announced responsibly regulated access to social media platforms, aiming to balance user freedom with oversight [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "Interpretation: This shift likely altered how people share information and engage online, introducing new gatekeeping mechanisms while promising greater protection against misuse [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "A 2020 archive reports that a COVID‑19 vaccine trial showed nearly 95 percent effectiveness, raising hopes for ending the pandemic while noting supply, demand, and distribution challenges [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "Interpretation: The high efficacy contributed to a rapid rollout that transformed public health and daily life, enabling a return to in‑person activities [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2026 Legoria announced enhanced renewable energy production, and a national electricity minister outlined a timed rollout of solar and wind projects, signaling accelerated clean‑energy transition [831de05c-1cf9-469e-9867-0075619a8e69, 21877da6-6b82-4e19-beb8-89ee0e73f708]",
+          "Interpretation: These initiatives likely lowered electricity costs and reduced carbon emissions for households and industry [831de05c-1cf9-469e-9867-0075619a8e69, 21877da6-6b82-4e19-beb8-89ee0e73f708]",
+          "A 2026 news report quotes a cybersecurity expert saying AI can design new genetic sequences, linking AI capability to biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "Interpretation: This capability raises biosecurity concerns and may reshape societal regulation of synthetic biology [410922e5-5f7a-40eb-ae4d-d6937af5d500]"
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 4,
+        "findings_kept": 4,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 2,
+        "over_budget": 0,
+        "perspective_markers": [],
+        "interpretation_labelled": 1,
+        "perspective": "The 2020‑2026 period was marked by rapid advances in digital life, artificial intelligence, and health biotechnology, while our source set records no evidence on cybersecurity & privacy.",
+        "findings": [
+          "In 2026 regulators promoted responsibly regulated access to social media, indicating a shift toward more controlled digital communication environments [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "A cybersecurity expert reported in 2026 that artificial intelligence can design new genetic sequences, highlighting emerging AI capabilities in biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "COVID‑19 vaccine trials in 2020 showed nearly 95% effectiveness, though regulators and global distribution challenges were still pending [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "Interpretation: These developments suggest that by the mid‑2020s people experienced tighter platform controls, the prospect of AI‑driven biotech innovation, and a turning point in pandemic health outcomes, reshaping daily life, work, and societal trust [77fd4d4d-73b9-454b-84ff-04a269967dd3, 410922e5-5f7a-40eb-ae4d-d6937af5d500, 657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+        ],
+        "returned_findings": [
+          "In 2026 regulators promoted responsibly regulated access to social media, indicating a shift toward more controlled digital communication environments [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "A cybersecurity expert reported in 2026 that artificial intelligence can design new genetic sequences, highlighting emerging AI capabilities in biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "COVID‑19 vaccine trials in 2020 showed nearly 95% effectiveness, though regulators and global distribution challenges were still pending [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "Interpretation: These developments suggest that by the mid‑2020s people experienced tighter platform controls, the prospect of AI‑driven biotech innovation, and a turning point in pandemic health outcomes, reshaping daily life, work, and societal trust [77fd4d4d-73b9-454b-84ff-04a269967dd3,410922e5-5f7a-40eb-ae4d-d6937af5d500,657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+        ],
+        "dropped_findings": []
+      }
+    ],
+    "v4": [
+      {
+        "findings_returned": 6,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [
+          "In 2026 a news headline reported that a cybersecurity expert said AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500]"
+        ],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "over_budget": 1,
+        "perspective_markers": [],
+        "interpretation_labelled": 2,
+        "perspective": "From 2020‑2026 the era was defined by AI‑augmented defense models, high‑efficacy vaccine breakthroughs, responsible regulation of social media, and claims that AI can design genetic sequences, while the record contains no evidence on cybersecurity & privacy.",
+        "findings": [
+          "In 2026 a news headline reported that access to social media was being regulated responsibly [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "In 2026 a research paper proposed a formal model linking Defense-in-Depth Theory, AI pattern recognition, and human‑AI collaboration for cyber defense [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "In 2020 an archive document reported that Moderna’s vaccine was nearly 95 percent effective against COVID‑19 and that Pfizer‑BioNTech showed similar results [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "Interpretation: These developments suggest that AI began to shape both security operations and biotechnology, while regulated social media aimed to protect user interactions, indicating a shift toward more algorithm‑mediated daily life [77fd4d4d-73b9-454b-84ff-04a269967dd3, 5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "Interpretation: The reported high efficacy of COVID‑19 vaccines indicates a rapid health breakthrough that likely reduced pandemic impacts on work and travel during the period [657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+        ],
+        "returned_findings": [
+          "In 2026 a news headline reported that access to social media was being regulated responsibly [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "In 2026 a research paper proposed a formal model linking Defense-in-Depth Theory, AI pattern recognition, and human‑AI collaboration for cyber defense [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "In 2020 an archive document reported that Moderna’s vaccine was nearly 95 percent effective against COVID‑19 and that Pfizer‑BioNTech showed similar results [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2026 a news headline reported that a cybersecurity expert said AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "Interpretation: These developments suggest that AI began to shape both security operations and biotechnology, while regulated social media aimed to protect user interactions, indicating a shift toward more algorithm‑mediated daily life [77fd4d4d-73b9-454b-84ff-04a269967dd3,5ac124dc-0f49-40b3-a725-f9e9fde1f9a0,410922e5-5f7a-40eb-ae4d-d6937af5d500]",
+          "Interpretation: The reported high efficacy of COVID‑19 vaccines indicates a rapid health breakthrough that likely reduced pandemic impacts on work and travel during the period [657913fd-39f4-4252-aa04-aeab4c24eb9f]"
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 5,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "over_budget": 0,
+        "perspective_markers": [],
+        "interpretation_labelled": 1,
+        "perspective": "The 2020‑2026 era was marked by AI‑augmented security models, experiments in regulated social‑media access, breakthrough vaccine efficacy, and expanding renewable‑energy projects, while no evidence is present for a separate cybersecurity & privacy domain.",
+        "findings": [
+          "In 2026 a research paper titled \"Toward Responsible AI‑Augmented Cyber Defense…\" proposed a formal model linking Defense‑in‑Depth Theory, the Artificial Intelligence Theory of Pattern Recognition, and human‑AI collaboration, formalizing layered defense as a Bernoulli detection cascade with AI augmentation entering multiplicatively across layers [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "In 2026 a news article reported the headline “Responsibly regulated access to social media” [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "In 2020 an archive record noted that the Moderna vaccine was reported as “nearly 95 percent effective” against COVID‑19, and that Pfizer/BioNTech announced similar results, while also mentioning pending regulatory approvals and distribution challenges [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2026 a news headline reported that the region of Liguria was increasing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69]",
+          "Interpretation: Together these developments suggest that during 2020‑2026 AI began to be embedded in security and data‑science workflows, societies experimented with regulating digital platforms, and breakthroughs in vaccine efficacy and renewable‑energy deployment started to reshape public health and energy access for people [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 77fd4d4d-73b9-454b-84ff-04a269967dd3, 657913fd-39f4-4252-aa04-aeab4c24eb9f, 831de05c-1cf9-469e-9867-0075619a8e69]"
+        ],
+        "returned_findings": [
+          "In 2026 a research paper titled \"Toward Responsible AI‑Augmented Cyber Defense…\" proposed a formal model linking Defense‑in‑Depth Theory, the Artificial Intelligence Theory of Pattern Recognition, and human‑AI collaboration, formalizing layered defense as a Bernoulli detection cascade with AI augmentation entering multiplicatively across layers [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "In 2026 a news article reported the headline “Responsibly regulated access to social media” [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "In 2020 an archive record noted that the Moderna vaccine was reported as “nearly 95 percent effective” against COVID‑19, and that Pfizer/BioNTech announced similar results, while also mentioning pending regulatory approvals and distribution challenges [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2026 a news headline reported that the region of Liguria was increasing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69]",
+          "Interpretation: Together these developments suggest that during 2020‑2026 AI began to be embedded in security and data‑science workflows, societies experimented with regulating digital platforms, and breakthroughs in vaccine efficacy and renewable‑energy deployment started to reshape public health and energy access for people [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0,77fd4d4d-73b9-454b-84ff-04a269967dd3,657913fd-39f4-4252-aa04-aeab4c24eb9f,831de05c-1cf9-469e-9867-0075619a8e69]"
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 6,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [
+          "In 2026 a news headline reported that a SpaceX rocket impacted the Moon and NASA released new crater images [f81224e2-e536-4b53-9722-423cbb4b4795]"
+        ],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech",
+          "space"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "over_budget": 1,
+        "perspective_markers": [],
+        "interpretation_labelled": 1,
+        "perspective": "Between 2020 and 2026, advances across AI, digital connectivity, health, energy, and space redefined work, communication, wellbeing, power, and exploration, while the period left little documented evidence on cybersecurity & privacy.",
+        "findings": [
+          "A 2026 research paper developed a formal model linking layered defense, AI pattern recognition, and human‑AI collaboration for cyber defense [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "In 2026 a news article titled “Responsibly regulated access to social media” was reported [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "In 2020 an archive noted that a second COVID‑19 vaccine trial reported nearly 95 percent effectiveness against the virus [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2026 a news headline reported that Liguria was increasing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69]",
+          "Interpretation: These developments suggest that AI began to augment security work, social media use became more regulated, effective vaccines transformed public health, renewable projects altered local energy landscapes, and commercial lunar activity expanded public imagination about space, collectively reshaping daily life for people [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 77fd4d4d-73b9-454b-84ff-04a269967dd3, 657913fd-39f4-4252-aa04-aeab4c24eb9f, 831de05c-1cf9-469e-9867-0075619a8e69, f81224e2-e536-4b53-9722-423cbb4b4795]"
+        ],
+        "returned_findings": [
+          "A 2026 research paper developed a formal model linking layered defense, AI pattern recognition, and human‑AI collaboration for cyber defense [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0]",
+          "In 2026 a news article titled “Responsibly regulated access to social media” was reported [77fd4d4d-73b9-454b-84ff-04a269967dd3]",
+          "In 2020 an archive noted that a second COVID‑19 vaccine trial reported nearly 95 percent effectiveness against the virus [657913fd-39f4-4252-aa04-aeab4c24eb9f]",
+          "In 2026 a news headline reported that Liguria was increasing its renewable energy production [831de05c-1cf9-469e-9867-0075619a8e69]",
+          "In 2026 a news headline reported that a SpaceX rocket impacted the Moon and NASA released new crater images [f81224e2-e536-4b53-9722-423cbb4b4795]",
+          "Interpretation: These developments suggest that AI began to augment security work, social media use became more regulated, effective vaccines transformed public health, renewable projects altered local energy landscapes, and commercial lunar activity expanded public imagination about space, collectively reshaping daily life for people [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0,77fd4d4d-73b9-454b-84ff-04a269967dd3,657913fd-39f4-4252-aa04-aeab4c24eb9f,831de05c-1cf9-469e-9867-0075619a8e69,f81224e2-e536-4b53-9722-423cbb4b4795]"
+        ],
+        "dropped_findings": []
+      }
+    ]
+  }
+}

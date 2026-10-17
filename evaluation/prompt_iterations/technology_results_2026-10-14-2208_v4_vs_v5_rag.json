@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-14",
+  "model": "qwen/qwen3.8-27b",
+  "evidence_items": 14,
+  "evidence": "supabase",
+  "evidence_ids": [
+    "77fd4d4d-73b9-454b-84ff-04a269967dd3",
+    "5ac124dc-0f49-40b3-a725-f9e9fde1f9a0",
+    "657913fd-39f4-4252-aa04-aeab4c24eb9f",
+    "831de05c-1cf9-469e-9867-0075619a8e69",
+    "f81224e2-e536-4b53-9722-423cbb4b4795",
+    "40d07526-19e3-4926-ae87-b6bc8af10319",
+    "77bb21ea-98e2-4a2c-9c9a-bd499aee7314",
+    "410922e5-5f7a-40eb-ae4d-d6937af5d500",
+    "b0c3bd3d-b7e1-47fd-b3cf-64a9cf7c9b45",
+    "21877da6-6b82-4e19-beb8-89ee0e73f708",
+    "220d208d-d5d4-4a15-adec-9b332ddf85cc",
+    "de15d144-b2e9-450f-b863-298310878125",
+    "dc461499-4a9f-4920-9fa5-30fa4f311466",
+    "59243175-da39-4d85-92ac-ea5f3abb189e"
+  ],
+  "runs": {
+    "v4": [
+      {
+        "findings_returned": 4,
+        "findings_kept": 3,
+        "dropped_by_figure_guardrail": 1,
+        "dropped_by_budget": [],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "unmeasured_outcomes": [],
+        "over_budget": 0,
+        "perspective_markers": [
+          "term added (source: 'vaccine')"
+        ],
+        "interpretation_labelled": 0,
+        "perspective": "The 2020–2026 era was defined by the formalization of AI-assisted defense models, the exploration of decentralized social media attention, and the development of mRNA vaccines, while no evidence was provided regarding cybersecurity or privacy infrastructure.",
+        "findings": [
+          "A 2026 research paper formalized a model connecting Defense-in-Depth Theory, AI pattern recognition, and human-AI collaboration in security operations, describing layered defense as a Bernoulli detection cascade [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "In 2026, a study analyzed 173 million user-author interactions on the decentralized platform Bluesky to document how much attention crosses ties users have not explicitly formed [77bb21ea-98e2-4a2c-9c9a-bd499aee7314].",
+          "In 2020, an archived article reported that U.S. drugmaker Moderna stated its vaccine trials showed nearly 95 percent effectiveness, alongside similar announcements from Pfizer and Biontech [657913fd-39f4-4252-aa04-aeab4c24eb9f]."
+        ],
+        "returned_findings": [
+          "A 2026 research paper formalized a model connecting Defense-in-Depth Theory, AI pattern recognition, and human-AI collaboration in security operations, describing layered defense as a Bernoulli detection cascade [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "In 2026, a study analyzed 173 million user-author interactions on the decentralized platform Bluesky to document how much attention crosses ties users have not explicitly formed [77bb21ea-98e2-4a2c-9c9a-bd499aee7314].",
+          "In 2020, an archived article reported that U.S. drugmaker Moderna stated its vaccine trials showed nearly 95 percent effectiveness, alongside similar announcements from Pfizer and Biontech [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: The 2020 declaration of highly effective vaccines marked a pivotal point in global health security efforts, while the formalization of AI defense models and the study of decentralized social attention in 2026 suggest a maturation of how societies conceptualize digital protection and information flow [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 77bb21ea-98e2-4a2c-9c9a-bd499aee7314]."
+        ],
+        "dropped_findings": [
+          "Interpretation: The 2020 declaration of highly effective vaccines marked a pivotal point in global health security efforts, while the formalization of AI defense models and the study of decentralized social attention in 2026 suggest a maturation of how societies conceptualize digital protection and information flow [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0, 77bb21ea-98e2-4a2c-9c9a-bd499aee7314]."
+        ]
+      },
+      {
+        "findings_returned": 6,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [
+          "Interpretation: The presence of articles on \"responsibly regulated access\" [77fd4d4d-73b9-454b-84ff-04a269967dd3] and \"solar and wind\" projects [21877da6-6b82-4e19-beb8-89ee0e73f708] indicates that by 2026, the primary societal concerns shifted from the creation of these powerful technologies to their ethical oversight and their use in a global climate of conflict and economic disparity."
+        ],
+        "domains_cited": [
+          "AI & computing",
+          "digital life & connectivity",
+          "energy & climate tech",
+          "health & biotech"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "unmeasured_outcomes": [],
+        "over_budget": 1,
+        "perspective_markers": [],
+        "interpretation_labelled": 1,
+        "perspective": "The 2020-2026 era in technology is characterized in this evidence by the rapid maturation of generative AI applications and security modeling, the global push toward renewable energy, and the emergence of novel social platforms, though the evidence lacks any direct data on cybersecurity and privacy.\nThis period demonstrates a period of rapid integration where AI moved from theoretical models into specific professional fields, while traditional biological and environmental challenges were addressed through new technological and global health strategies.",
+        "findings": [
+          "In 2026, researchers proposed a formal model for AI-augmented cyber defense that formalized layered defense as a \"Bernoulli detection cascade\" to address the over-automation and skill erosion seen in previous security literature [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "A 2026 study of the decentralized platform Bluesky, which analyzes 173 million user-author interactions, found that interaction data could be decomposed by \"attention-path length\" to measure how much user attention crossed social ties that had not been explicitly formed [77bb21ea-98e2-4a2c-9c9a-bd499aee7314].",
+          "In the late 2020 timeline, public interest in health technology peaked as researchers announced that a second potential vaccine by Moderna was \"nearly 95 percent effective,\" while noting that commercial and regulatory \"challenges remain\" [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "By 2026, AI was influencing not only digital spheres but also biological research, as a cybersecurity expert stated in the press that \"AI can design new genetic sequences\" [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: These developments suggest that for people in this era, technology shifted from simple utility to a structural \"lens\"—altering how secure networks were created [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0], how social connections were understood [77bb21ea-98e2-4a2c-9c9a-bd499aee7314], and even how biological life was conceived and protected [410922e5-5f7a-40eb-ae4d-d6937af5d500, 657913fd-39f4-4252-aa04-aeab4c24eb9f]."
+        ],
+        "returned_findings": [
+          "In 2026, researchers proposed a formal model for AI-augmented cyber defense that formalized layered defense as a \"Bernoulli detection cascade\" to address the over-automation and skill erosion seen in previous security literature [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "A 2026 study of the decentralized platform Bluesky, which analyzes 173 million user-author interactions, found that interaction data could be decomposed by \"attention-path length\" to measure how much user attention crossed social ties that had not been explicitly formed [77bb21ea-98e2-4a2c-9c9a-bd499aee7314].",
+          "In the late 2020 timeline, public interest in health technology peaked as researchers announced that a second potential vaccine by Moderna was \"nearly 95 percent effective,\" while noting that commercial and regulatory \"challenges remain\" [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "By 2026, AI was influencing not only digital spheres but also biological research, as a cybersecurity expert stated in the press that \"AI can design new genetic sequences\" [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: These developments suggest that for people in this era, technology shifted from simple utility to a structural \"lens\"—altering how secure networks were created [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0], how social connections were understood [77bb21ea-98e2-4a2c-9c9a-bd499aee7314], and even how biological life was conceived and protected [410922e5-5f7a-40eb-ae4d-d6937af5d500, 657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "Interpretation: The presence of articles on \"responsibly regulated access\" [77fd4d4d-73b9-454b-84ff-04a269967dd3] and \"solar and wind\" projects [21877da6-6b82-4e19-beb8-89ee0e73f708] indicates that by 2026, the primary societal concerns shifted from the creation of these powerful technologies to their ethical oversight and their use in a global climate of conflict and economic disparity."
+        ],
+        "dropped_findings": []
+      },
+      {
+        "findings_returned": 5,
+        "findings_kept": 5,
+        "dropped_by_figure_guardrail": 0,
+        "dropped_by_budget": [],
+        "domains_cited": [
+          "AI & computing",
+          "health & biotech",
+          "space"
+        ],
+        "overstatement_markers": 0,
+        "overstatement_detail": {},
+        "unlabelled_readings": 0,
+        "unmeasured_outcomes": [],
+        "over_budget": 0,
+        "perspective_markers": [],
+        "interpretation_labelled": 2,
+        "perspective": "The technological record of the 2020–2026 period in this evidence set is defined by global developments in AI, health & biotech, and space, with no technological evidence provided for early 2020s cybersecurity & privacy or energy consumption patterns.",
+        "findings": [
+          "In 2020, the U.S. drugmaker Moderna and a partner, Pfizer and Biontech, announced their respective vaccines showed nearly 95 percent effectiveness and similar results against the virus [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "In 2026, SpaceX rocket debris crashed into the Moon, and NASA released the latest imagery of the resulting crater [f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "In 2026, a cybersecurity expert stated in a press headline that AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: The rapid implementation of high-effectiveness vaccines during the 2020 health crisis and the 2026 interplanetary impact of a SpaceX rocket illustrate the rapid scaling of global scientific and commercial technologies within this short six-year window [657913fd-39f4-4252-aa04-aeab4c24eb9f, f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "Interpretation: The convergence of frontier technologies, such as a cybersecurity professional stating that AI can design new genetic sequences, represented a significant transition in 2026 where software capabilities directly encroached upon and expanded into the biological sciences [410922e5-5f7a-40eb-ae4d-d6937af5d500]."
+        ],
+        "returned_findings": [
+          "In 2020, the U.S. drugmaker Moderna and a partner, Pfizer and Biontech, announced their respective vaccines showed nearly 95 percent effectiveness and similar results against the virus [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "In 2026, SpaceX rocket debris crashed into the Moon, and NASA released the latest imagery of the resulting crater [f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "In 2026, a cybersecurity expert stated in a press headline that AI can design new genetic sequences [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "Interpretation: The rapid implementation of high-effectiveness vaccines during the 2020 health crisis and the 2026 interplanetary impact of a SpaceX rocket illustrate the rapid scaling of global scientific and commercial technologies within this short six-year window [657913fd-39f4-4252-aa04-aeab4c24eb9f, f81224e2-e536-4b53-9722-423cbb4b4795].",
+          "Interpretation: The convergence of frontier technologies, such as a cybersecurity professional stating that AI can design new genetic sequences, represented a significant transition in 2026 where software capabilities directly encroached upon and expanded into the biological sciences [410922e5-5f7a-40eb-ae4d-d6937af5d500]."
+        ],
+        "dropped_findings": []
+      }
+    ]
+  }
+}

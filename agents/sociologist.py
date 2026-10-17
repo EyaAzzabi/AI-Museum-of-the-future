@@ -3,7 +3,7 @@ Sociologist Agent — AI Museum of the Future
 =============================================
 Author  : EyaRachdi
 Branch  : EyaRachdi_sociologistAgent
-Model   : gpt-4o-mini
+Model   : configured via agents/llm_config.py (LLM_MODEL)
 Purpose : Analyze contemporary Tunisian society (2020-2026) through a sociological
           lens, identify social patterns, and produce structured insights for the
           museum exhibition.
@@ -51,7 +51,6 @@ logger = logging.getLogger(__name__)
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
-LLM_MODEL      = "gpt-4o-mini"      # Step 2 — Model choice
 MAX_RETRIES    = 3                   # Retries on LLM failure
 MIN_FINDINGS   = 3                   # Minimum findings required
 MIN_CONFIDENCE = 0.4                 # Minimum confidence score to accept output
@@ -110,6 +109,10 @@ class SociologistAgent(BaseAgent):
     prompt_path   : Optional path to prompt template (defaults to prompts/sociologist.md)
     """
 
+    name = "sociologist"
+    focus = "Social transformations, collective behaviour and inequalities of 2020-2026"
+    max_evidence = 40  # HyDE context; _prepare_evidence keeps the 20 most relevant
+
     # ── Step 1 — Define objective ─────────────────────────────────────────────
     AGENT_OBJECTIVE = (
         "Analyze contemporary Tunisian society (2020-2026) to identify key social "
@@ -129,14 +132,10 @@ class SociologistAgent(BaseAgent):
         # Step 4 — Tools & actions
         self.retriever = retriever
 
-        # Build Groq LLM client for internal use (HyDE + analysis)
-        try:
-            from agents.llm_config import build_llm_client
-            self._llm_client = build_llm_client()
-        except Exception:
-            self._llm_client = openai_client
+        # Same injected client for HyDE and analysis, so the pipeline and tests control it
+        self._llm_client = openai_client
 
-        # HyDE Retriever — Advanced RAG
+        # HyDE Retriever — Advanced RAG (built on first use, see search_own_evidence)
         self._hyde_retriever = HyDERetriever(
             retriever=retriever,
             llm_client=self._llm_client,
@@ -174,22 +173,10 @@ class SociologistAgent(BaseAgent):
         """
         logger.info("[SociologistAgent] Starting analysis | %d input chunks", len(chunks))
 
-        # ── Step 3a — Enrich with RAG if retriever available ─────────────────
-        all_chunks = list(chunks)
-        if self._tools_available["rag_retrieval"] and self.retriever is not None:
-            logger.info("[SociologistAgent] RAG retrieval enabled — fetching additional evidence...")
-            bundle = self._retrieve_evidence()
-            # Merge: add RAG chunks not already in input
-            existing_ids = {
-                getattr(c, "chunk_id", "") or getattr(c, "document_id", "")
-                for c in all_chunks
-            }
-            for rag_chunk in bundle.chunks:
-                cid = getattr(rag_chunk, "chunk_id", "") or getattr(rag_chunk, "document_id", "")
-                if cid not in existing_ids:
-                    all_chunks.append(rag_chunk)
-                    existing_ids.add(cid)
-            logger.info("[SociologistAgent] Total chunks after RAG enrichment: %d", len(all_chunks))
+        # ── Step 3a — Input chunks + HyDE retrieval (BaseAgent.gather_evidence) ─
+        all_chunks = self.gather_evidence(chunks)
+        if not all_chunks:
+            return self.abstain("no evidence")
 
         # ── Step 3b — Score and filter evidence ──────────────────────────────
         all_chunks = self._prepare_evidence(all_chunks)
@@ -210,6 +197,13 @@ class SociologistAgent(BaseAgent):
         return self._build_insight(payload, all_chunks)
 
     # ── Step 3 — Evidence retrieval & preparation ────────────────────────────
+
+    def search_own_evidence(self) -> list[Any]:
+        """The sociologist's own search is HyDE over its core themes."""
+        if self._hyde_retriever is None or self._hyde_retriever.retriever is not self.retriever:
+            self._hyde_retriever = HyDERetriever(retriever=self.retriever, llm_client=self.openai_client, top_k=10)
+        logger.info("[SociologistAgent] RAG retrieval enabled — fetching additional evidence...")
+        return self._retrieve_evidence().chunks
 
     def _retrieve_evidence(self) -> EvidenceBundle:
         """
@@ -308,6 +302,8 @@ STEP 5 — FORMULATE FINDINGS: Write 4-6 specific, evidence-grounded findings.
 ## OUTPUT RULES
 - Respond with valid JSON ONLY — no markdown, no explanation outside JSON
 - Minimum {MIN_FINDINGS} key_findings required
+- Every finding ends with the exact [ID] of the evidence it rests on, e.g. "... [abc-123]".
+  Findings without a valid [ID] are discarded.
 - confidence_score: float 0.0-1.0 reflecting how well evidence supports your analysis
 - If evidence is thin, say so in evidence_gaps
 """
@@ -349,34 +345,17 @@ Produce a structured sociological analysis in the JSON format specified in your 
     # ── Step 5c — LLM call with retry ────────────────────────────────────────
 
     def _call_llm_with_retry(self, system_prompt: str, user_prompt: str) -> dict:
-        """Call LLM with retry on failure — uses Groq via llm_config."""
-        import json
-        from agents.llm_config import build_llm_client, get_model
+        """Call the LLM through BaseAgent._call_llm, retrying on failure.
 
+        Raises ValueError once all attempts fail, so the pipeline records the
+        perspective as missing instead of passing placeholder findings to the curator.
+        """
         last_error = None
 
         for attempt in range(1, MAX_RETRIES + 1):
             try:
                 logger.info("[SociologistAgent] LLM call attempt %d/%d", attempt, MAX_RETRIES)
-
-                # Use llm_config client (Groq) instead of self.openai_client (OpenAI)
-                llm_client = build_llm_client()
-                model = get_model()
-
-                response = llm_client.chat.completions.create(
-                    model=model,
-                    response_format={"type": "json_object"},
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user",   "content": user_prompt},
-                    ],
-                )
-
-                content = response.choices[0].message.content
-                if not content:
-                    raise ValueError("LLM returned empty content")
-
-                payload = json.loads(content)
+                payload = self._call_llm(system_prompt, user_prompt)
                 logger.info("[SociologistAgent] LLM call succeeded on attempt %d", attempt)
                 return payload
 
@@ -389,7 +368,7 @@ Produce a structured sociological analysis in the JSON format specified in your 
                     time.sleep(wait)
 
         logger.error("[SociologistAgent] All %d LLM attempts failed. Last error: %s", MAX_RETRIES, last_error)
-        return self._fallback_payload()
+        raise ValueError(f"Sociologist LLM call failed after {MAX_RETRIES} attempts: {last_error}") from last_error
 
     # ── Step 6 — Self-validation ──────────────────────────────────────────────
 
@@ -422,16 +401,14 @@ Produce a structured sociological analysis in the JSON format specified in your 
             if "confidence_score" not in payload:
                 payload["confidence_score"] = 0.5
 
-        # Validate findings count
+        # Validate findings count. Short output is kept as is: placeholder
+        # findings would reach the curator as if they were real analysis.
         findings = payload.get("key_findings", [])
         if len(findings) < MIN_FINDINGS:
             logger.warning(
-                "[SociologistAgent] Only %d findings (min %d) — padding with defaults",
+                "[SociologistAgent] Only %d findings (expected at least %d) — evidence may be thin",
                 len(findings), MIN_FINDINGS
             )
-            while len(findings) < MIN_FINDINGS:
-                findings.append(f"Additional social pattern {len(findings)+1} — requires more evidence.")
-            payload["key_findings"] = findings
 
         # Validate confidence score
         try:
@@ -443,7 +420,7 @@ Produce a structured sociological analysis in the JSON format specified in your 
         # Add metadata
         payload["analyst"]    = "Dr. Amira — Sociologist, AI Museum of the Future"
         payload["era"]        = "Tunisia 2020-2026"
-        payload["model_used"] = LLM_MODEL
+        payload["model_used"] = self.model
         payload["evidence_count"] = len(chunks)
 
         logger.info(
@@ -459,40 +436,29 @@ Produce a structured sociological analysis in the JSON format specified in your 
         """Convert validated payload to InsightObject for the pipeline."""
 
         findings  = [str(f) for f in payload.get("key_findings", []) if f]
-        artifacts = [str(a) for a in payload.get("selected_artifacts", []) if a]
+        input_ids = [
+            cid for c in chunks
+            if (cid := getattr(c, "chunk_id", "") or getattr(c, "document_id", ""))
+        ]
+        # Keep only artifacts that exist in the evidence (no hallucinated IDs)
+        artifacts = [str(a) for a in payload.get("selected_artifacts", []) if str(a) in input_ids]
 
         # Fallback artifacts from input chunks
         if not artifacts:
-            artifacts = [
-                getattr(c, "chunk_id", "") or getattr(c, "document_id", "")
-                for c in chunks[:2]
-                if getattr(c, "chunk_id", "") or getattr(c, "document_id", "")
-            ]
+            artifacts = input_ids[:2]
 
-        perspective = str(payload.get("perspective", "Social patterns in Tunisian society 2020-2026."))
-
-        # Enrich perspective with metadata
+        # Analysis metadata goes to the log, not into the exhibition text
         themes   = payload.get("themes_detected", [])
         conf     = payload.get("confidence_score", 0.5)
         evidence = payload.get("evidence_count", len(chunks))
 
-        enriched_perspective = (
-            f"{perspective} "
-            f"[Themes: {', '.join(themes[:3]) if themes else 'general'}] "
-            f"[Evidence: {evidence} chunks | Confidence: {conf:.0%}]"
-        )
-
         logger.info(
-            "[SociologistAgent] Insight built | %d findings | %d artifacts",
-            len(findings), len(artifacts)
+            "[SociologistAgent] Insight built | %d findings | %d artifacts | themes=%s | evidence=%d chunks | confidence=%.0f%%",
+            len(findings), len(artifacts), ", ".join(themes[:3]) if themes else "general", evidence, conf * 100
         )
 
-        return InsightObject(
-            agent="sociologist",
-            perspective=enriched_perspective,
-            key_findings=findings,
-            selected_artifacts=artifacts,
-        )
+        # Shared rule: every finding must cite the evidence (BaseAgent.finalize)
+        return self.finalize(payload, chunks)
 
     # ── Fallback ──────────────────────────────────────────────────────────────
 
@@ -507,11 +473,11 @@ Produce a structured sociological analysis in the JSON format specified in your 
             "key_findings":      [
                 "LLM analysis failed — raw evidence available in the knowledge base.",
                 "Manual review of collected data recommended.",
-                "Re-run with valid OpenAI API key to generate full analysis.",
+                "Re-run with a valid LLM_API_KEY to generate full analysis.",
             ],
             "selected_artifacts":  [],
             "artifact_justification": "N/A",
             "confidence_score":   0.0,
             "evidence_gaps":     ["LLM call failed — analysis incomplete"],
-            "model_used":        LLM_MODEL,
+            "model_used":        self.model,
         }

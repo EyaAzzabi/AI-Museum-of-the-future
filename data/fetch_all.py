@@ -42,8 +42,8 @@ def _run_ingestion() -> None:
 
     # ── Chunker guard ─────────────────────────────────────────────────────────
     try:
-        from rag.chunking.chunker import ChunkConfig, Chunker  # type: ignore[import]
-        chunker = Chunker(ChunkConfig())
+        from rag.chunking.chunker import PRODUCTION_CHUNK_CONFIG, Chunker  # type: ignore[import]
+        chunker = Chunker(PRODUCTION_CHUNK_CONFIG)
     except ImportError:
         print(
             "  [ingest] Chunker not yet implemented — skipping ingestion."

@@ -4,6 +4,11 @@
 
 ---
 
+## v3 — 2026-10-14
+Every key finding must end with the [ID] of the evidence it rests on; uncited
+findings are dropped by BaseAgent.finalize. Evidence items now start with their
+[ID] instead of an item number.
+
 ## v2 — 2026-10-11
 Complete rewrite. Tunisia-specific, structured output, multi-theme analysis.
 
@@ -97,10 +102,10 @@ Produce 4-6 concise, specific findings. Each finding must:
   "perspective": "2-3 sentence overall sociological framing of the era",
   "themes_detected": ["theme1", "theme2"],
   "key_findings": [
-    "Finding 1 — specific social dynamic observed",
-    "Finding 2 — specific social dynamic observed",
-    "Finding 3 — specific social dynamic observed",
-    "Finding 4 — specific social dynamic observed"
+    "Finding 1 — specific social dynamic observed [artifact-id-1]",
+    "Finding 2 — specific social dynamic observed [artifact-id-2]",
+    "Finding 3 — specific social dynamic observed [artifact-id-1, artifact-id-3]",
+    "Finding 4 — specific social dynamic observed [artifact-id-3]"
   ],
   "selected_artifacts": ["artifact-id-1", "artifact-id-2"],
   "artifact_justification": "Why these artifacts best represent the social reality of the era",

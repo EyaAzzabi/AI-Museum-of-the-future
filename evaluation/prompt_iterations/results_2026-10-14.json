@@ -1,0 +1,481 @@
+{
+  "date": "2026-10-14",
+  "fixture_model": "qwen/qwen3.8-27b (Groq)",
+  "fact_checker": {
+    "model": "qwen/qwen3.8-27b",
+    "observed_v1_in_live_run": {
+      "correct": 5,
+      "of": 10,
+      "missed_errors": [
+        "A",
+        "B",
+        "F",
+        "H"
+      ],
+      "false_alarms": [
+        "E"
+      ],
+      "total_flags": 11,
+      "rows": [
+        {
+          "id": "A",
+          "should_flag": true,
+          "flagged": false,
+          "correct": false
+        },
+        {
+          "id": "B",
+          "should_flag": true,
+          "flagged": false,
+          "correct": false
+        },
+        {
+          "id": "C",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "D",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "E",
+          "should_flag": false,
+          "flagged": true,
+          "correct": false
+        },
+        {
+          "id": "F",
+          "should_flag": true,
+          "flagged": false,
+          "correct": false
+        },
+        {
+          "id": "G",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "H",
+          "should_flag": true,
+          "flagged": false,
+          "correct": false
+        },
+        {
+          "id": "I",
+          "should_flag": false,
+          "flagged": false,
+          "correct": true
+        },
+        {
+          "id": "J",
+          "should_flag": false,
+          "flagged": false,
+          "correct": true
+        }
+      ]
+    },
+    "v1": {
+      "correct": 6,
+      "of": 10,
+      "missed_errors": [
+        "A",
+        "B",
+        "F",
+        "H"
+      ],
+      "false_alarms": [],
+      "total_flags": 6,
+      "rows": [
+        {
+          "id": "A",
+          "should_flag": true,
+          "flagged": false,
+          "correct": false
+        },
+        {
+          "id": "B",
+          "should_flag": true,
+          "flagged": false,
+          "correct": false
+        },
+        {
+          "id": "C",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "D",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "E",
+          "should_flag": false,
+          "flagged": false,
+          "correct": true
+        },
+        {
+          "id": "F",
+          "should_flag": true,
+          "flagged": false,
+          "correct": false
+        },
+        {
+          "id": "G",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "H",
+          "should_flag": true,
+          "flagged": false,
+          "correct": false
+        },
+        {
+          "id": "I",
+          "should_flag": false,
+          "flagged": false,
+          "correct": true
+        },
+        {
+          "id": "J",
+          "should_flag": false,
+          "flagged": false,
+          "correct": true
+        }
+      ]
+    },
+    "v2": {
+      "correct": 9,
+      "of": 10,
+      "missed_errors": [
+        "F"
+      ],
+      "false_alarms": [],
+      "total_flags": 19,
+      "rows": [
+        {
+          "id": "A",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "B",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "C",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "D",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "E",
+          "should_flag": false,
+          "flagged": false,
+          "correct": true
+        },
+        {
+          "id": "F",
+          "should_flag": true,
+          "flagged": false,
+          "correct": false
+        },
+        {
+          "id": "G",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "H",
+          "should_flag": true,
+          "flagged": true,
+          "correct": true
+        },
+        {
+          "id": "I",
+          "should_flag": false,
+          "flagged": false,
+          "correct": true
+        },
+        {
+          "id": "J",
+          "should_flag": false,
+          "flagged": false,
+          "correct": true
+        }
+      ]
+    },
+    "v1_verdicts": [
+      {
+        "section": 0,
+        "title": "The Heat as Catalyst",
+        "supported": false,
+        "unsupported_claims": [
+          "In 2026, the physical reality of climate change ceased to be a distant future and became an immediate driver of social unrest.",
+          "Scientific experts, such as Friederike Otto, emphasized that heatwaves are the most severely affected by climate change."
+        ]
+      },
+      {
+        "section": 1,
+        "title": "Cinq ans après : La Crise Électrique et l'Échec des institutions",
+        "supported": false,
+        "unsupported_claims": [
+          "Onze ans après la révolution, la Tunisie fait face à une « anatomie de l’échec » où la consolidation d’un modèle anti-démocratique coïncide avec un effondrement des services publics",
+          "la décentralisation administrative n’a pas suffi à prévenir l’effondrement de l’Infrastructure"
+        ]
+      },
+      {
+        "section": 2,
+        "title": "Debt, Stagnation, and Civic Alert",
+        "supported": false,
+        "unsupported_claims": [
+          "a figure driven by debt servicing that effectively crowded out private sector investment",
+          "This fiscal burden stifled grassroots entrepreneurship and cemented structural inequality, leading to a 'civilizational fatigue' among the populace"
+        ]
+      },
+      {
+        "section": 3,
+        "title": "Connected but Excluded: The Digital Marker",
+        "supported": true,
+        "unsupported_claims": []
+      },
+      {
+        "section": 4,
+        "title": "Visual Witness: Art in the Twilight",
+        "supported": true,
+        "unsupported_claims": []
+      }
+    ],
+    "v2_verdicts": [
+      {
+        "section": 0,
+        "title": "The Heat as Catalyst",
+        "supported": false,
+        "unsupported_claims": [
+          "the physical reality of climate change ceased to be a distant future and became an immediate driver of social unrest",
+          "extreme heat waves triggered visible protests in both Libya and Tunisia",
+          "transforming meteorological events into political flashpoints",
+          "rising temperatures directly precipitated public grievance",
+          "Friederike Otto, emphasized that heatwaves are the most severely affected by climate change"
+        ]
+      },
+      {
+        "section": 1,
+        "title": "Cinq ans après : La Crise Électrique et l'Échec des institutions",
+        "supported": false,
+        "unsupported_claims": [
+          "Onze ans après la révolution",
+          "la consolidation d’un modèle anti-démocratique coïncide avec un effondrement des services publics",
+          "cinq ans après les mesures exceptionnelles de Kais Saïd, la décentralisation administrative n’a pas suffi à prévenir l’effondrement de l’Infrastructure",
+          "Cette période illustre la tension entre la centralisation du pouvoir exécutif et l’incapacité à maintenir le contrat social, révélant la vulnérabilité des États face aux contraintes sécuritaires et climatiques"
+        ]
+      },
+      {
+        "section": 2,
+        "title": "Debt, Stagnation, and Civic Alert",
+        "supported": false,
+        "unsupported_claims": [
+          "a figure driven by debt servicing that effectively crowded out private sector investment",
+          "This fiscal burden stifled grassroots entrepreneurship and cemented structural inequality, leading to a 'civilizational fatigue' among the populace",
+          "signaling a shift from industrial bargaining to a defense of national stability as a core sociological function"
+        ]
+      },
+      {
+        "section": 3,
+        "title": "Connected but Excluded: The Digital Marker",
+        "supported": false,
+        "unsupported_claims": [
+          "creating a new form of social stratification in the early 2020s",
+          "connecting a significant demographic to global discourse via social media",
+          "This connectivity existed in stark contrast to domestic labor market realities, where structural deficits and long-term unemployment persisted",
+          "highlighting a gap between global visibility and local economic participation that complicated the narrative of simple modernization or isolation"
+        ]
+      },
+      {
+        "section": 4,
+        "title": "Visual Witness: Art in the Twilight",
+        "supported": false,
+        "unsupported_claims": [
+          "serving as a visual record of the thermal challenges discussed in the previous sections",
+          "a photograph from Mexico City captured the gritty reality of urban life during unrest",
+          "Together, these works illustrate how communities visually processed the 'dangerous twilight' of their time"
+        ]
+      }
+    ]
+  },
+  "reviewer": {
+    "model": "qwen/qwen3.8-27b",
+    "observed_v1_in_live_run": {
+      "agreements_shared_evidence": [
+        "Identify the occurrence of a severe electricity crisis in Tunisia in 2026 as a key manifestation of systemic or public service failure."
+      ],
+      "agreements_theme_only": [
+        "Integrate climate change themes into public cultural and artistic discourse (manifested as street art in Sydney for visual, and linked to social unrest/thermal anger for historian)."
+      ],
+      "tensions": 1,
+      "weak_findings": 2
+    },
+    "v1": {
+      "agreements_shared_evidence": [
+        "Both specialists identify a severe electricity crisis in Tunisia in 2026 as a key event, linking it to the political context of the 'exceptional measures' implemented five years prior."
+      ],
+      "agreements_theme_only": [
+        "Both acknowledge climate change as a prominent public and cultural theme in the mid-2020s, with the historian citing scientist recognition of heat risks and the visual specialist noting climate-themed street art in Sydney in 2026."
+      ],
+      "tensions": 1,
+      "weak_findings": 3
+    },
+    "v2": {
+      "agreements_shared_evidence": [
+        "Both identify a severe electricity crisis in Tunisia in 2026, occurring five years after the exceptional measures of 2021, as a symbol of institutional or public service failure."
+      ],
+      "agreements_theme_only": [],
+      "tensions": 1,
+      "weak_findings": 4
+    },
+    "v1_review": {
+      "agreements": [
+        {
+          "agents": [
+            "historian",
+            "sociologist"
+          ],
+          "point": "Both specialists identify a severe electricity crisis in Tunisia in 2026 as a key event, linking it to the political context of the 'exceptional measures' implemented five years prior.",
+          "artifacts": [
+            "e6c6913f-4ba5-4e84-81ea-7d5357e2d689"
+          ]
+        },
+        {
+          "agents": [
+            "historian",
+            "visual"
+          ],
+          "point": "Both acknowledge climate change as a prominent public and cultural theme in the mid-2020s, with the historian citing scientist recognition of heat risks and the visual specialist noting climate-themed street art in Sydney in 2026.",
+          "artifacts": [
+            "732dd921-0ba2-4bb5-a783-9c8da1e55e0e",
+            "0c3f28cf-986f-49d8-a572-555b01adaf29"
+          ]
+        }
+      ],
+      "tensions": [
+        {
+          "agents": [
+            "culture_art",
+            "historian",
+            "sociologist"
+          ],
+          "issue": "The culture_art specialist asserts the evidence does not support a cohesive analysis of a specific cultural trend and highlights fragmentation, whereas the historian and sociologist construct detailed, cohesive narratives about systemic failures, climatic unrest, and societal fatigue based on overlapping but differently framed sources regarding Tunisia and global impacts.",
+          "artifacts": [
+            "7b245b60-5047-4d90-885e-5d8120d3af1b",
+            "9b21c179-6d79-4ebd-89cb-3b6d1ef78658",
+            "53fd95a7-bad8-41c0-875a-9c1b06546781"
+          ]
+        }
+      ],
+      "weak_findings": [
+        {
+          "agent": "technology",
+          "finding": 4,
+          "text": "In 2020, the public discourse focused on the efficacy of mRNA vaccines, with reports noting Moderna’s vaccines were nearly 95 percent effective, yet significant barriers remained in regulatory approval, supply distribution, and cost accessibility [657913fd-39f4-4252-aa04-aeab4c24eb9f].",
+          "reason": "The cited evidence discusses the efficacy of Moderna's vaccine against SARS-CoV-2 (the virus causing the pandemic), not 'mRNA vaccines' in general, and the finding generalizes the specific trial results to the broader technology class without direct support in the snippet."
+        },
+        {
+          "agent": "historian",
+          "finding": 2,
+          "text": "Impact à l'Échelle d'un Siècle : Les soulèvements populaires contemporains en Libye et en Tunisie, déclenchés par des vagues de chaleur extrêmes liées au changement climatique, préfigurent l'émergence d'un nouveau type de mécontentement civil : la « colère thermique », où le climat sert de catalyseur direct aux ruptures sociales [9b21c179-6d79-4ebd-89cb-3b6d1ef78658].",
+          "reason": "The finding claims that protests in Libya and Tunisia were 'déclenchés par des vagues de chaleur extrêmes' (triggered by extreme heat waves). The cited evidence only states 'Protests in Libya, Tunisia Amid Extreme Heat Wave,' which indicates temporal coincidence or context, not necessarily causality."
+        },
+        {
+          "agent": "sociologist",
+          "finding": 3,
+          "text": "The national syndical movement (FTDES) began to explicitly frame economic austerity and debt accumulation as existential threats to 'social security and peace,' signaling a shift from industrial bargaining to the defense of national stability as a core sociological function of civil society [53f9a9a6-bc12-4da7-9c60-9a3bbdaa7ead].",
+          "reason": "The finding claims the FTDES framed 'debt accumulation' as an existential threat. The cited evidence only mentions an alert regarding a risk to 'social security and peace' (sécurité et la paix sociales), without explicitly mentioning debt accumulation in the snippet provided."
+        }
+      ]
+    },
+    "v2_review": {
+      "agreements": [
+        {
+          "agents": [
+            "historian",
+            "sociologist"
+          ],
+          "point": "Both identify a severe electricity crisis in Tunisia in 2026, occurring five years after the exceptional measures of 2021, as a symbol of institutional or public service failure.",
+          "artifacts": [
+            "e6c6913f-4ba5-4e84-81ea-7d5357e2d689"
+          ]
+        }
+      ],
+      "tensions": [
+        {
+          "agents": [
+            "historian",
+            "sociologist",
+            "technology"
+          ],
+          "issue": "The Technology specialist characterizes the period 2020-2026 (specifically 2026) as a phase of technological maturation and specialized application (drone defense, AI biotech, design automation), whereas the Historian and Sociologist frame 2026 as a period of systemic collapse, security threats, and socio-economic paralysis due to climate change and political centralization. The former sees innovation capability, the latter see institutional failure.",
+          "artifacts": [
+            "410922e5-5f7a-40eb-ae4d-d6937af5d500",
+            "5ac124dc-0f49-40b3-a725-f9e9fde1f9a0",
+            "7b245b60-5047-4d90-885e-5d8120d3af1b",
+            "53f9a9a6-bc12-4da7-9c60-9a3bbdaa7ead"
+          ]
+        }
+      ],
+      "weak_findings": [
+        {
+          "agent": "technology",
+          "finding": 2,
+          "text": "By 2026, cybersecurity expertise extended to biological domains, with experts reporting that AI capabilities allowed for the design of new genetic sequences, blending computational security with biotechnology [410922e5-5f7a-40eb-ae4d-d6937af5d500].",
+          "reason": "The cited evidence is a headline 'خبير في الأمن السيبراني : يمكن للذكاء الاصطناعي تصميم تسلسلات جينية جديدة' (Cybersecurity expert: AI can design new genetic sequences) which appears to be a mistranlation or mislabeling of a standard biotech headline, and certainly does not support the finding's claim that this represents a blending of 'cybersecurity expertise' with biotechnology in a specialized application context; the link to 'cybersecurity' is tenuous at best based on the provided text fragment."
+        },
+        {
+          "agent": "technology",
+          "finding": 0,
+          "text": "A 2026 scientific paper formalized a model connecting Defense-in-Depth Theory, AI Pattern Recognition, and human-AI collaboration to address concerns regarding over-automation and analyst-skill erosion in cybersecurity operations [5ac124dc-0f49-40b3-a725-f9e9fde1f9a0].",
+          "reason": "The cited evidence states 'What remains largely absent is ', which is an incomplete sentence that does not explicitly confirm the finding's claim that a '2026 scientific paper formalized a model'. The evidence describes a gap in literature ('largely absent') rather than the existence of the specific paper claimed in the finding."
+        },
+        {
+          "agent": "sociologist",
+          "finding": 2,
+          "text": "The digital divide emerged as a defining social marker of the 2020s; with internet penetration reaching 76.5% in 2024, a significant demographic was connected to global discourse via social media while remaining disconnected from the domestic labor market, creating a specific form of 'digital exclusion' distinct from traditional poverty [e84ceff7-6a5f-4a12-be20-265667ed201a].",
+          "reason": "The cited evidence is a raw statistic 'Individuals using the Internet (% of population) for Tunisia in 2024: 76.5.' The finding draws a complex sociological interpretation of 'digital exclusion' and 'digital divide' distinct from labor market issues, which is not supported by the single statistical data point provided."
+        },
+        {
+          "agent": "visual",
+          "finding": 0,
+          "text": "A photograph documenting a protest in Mexico City reveals a street-level urban scene featuring a multi-story brick building, Spanish billboards, and a group of shirtless men wearing swim trunks, caps, or hats walking along a curb next to a black Honda vehicle [e782d1ec-4939-4a78-8eb8-23e3632cbe29]",
+          "reason": "The finding claims the photograph 'documents a protest', but the cited evidence only lists generic urban objects (shirtless men, Honda vehicle, billboards) and the label 'Protest in Mexico City'. The specific description of 'shirtless men wearing swim trunks' walking past a car does not inherently evidence a protest activity, making the 'documenting a protest' claim an interpretation not directly substantiated by the object list alone."
+        }
+      ]
+    }
+  },
+  "curator": {
+    "model": "openai/gpt-oss-120b",
+    "v5": {
+      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01jzt9v2hwf6n91kjhjh5me37n` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199999, Requested 5252. Please try again in 37m48.432s. Need more tokens?"
+    },
+    "v6": {
+      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01jzt9v2hwf6n91kjhjh5me37n` service tier `on_demand` on tokens per day (TPD): Limit 200000, Used 199848, Requested 8392. Please try again in 59m19.68s. Need more tokens? "
+    }
+  }
+}

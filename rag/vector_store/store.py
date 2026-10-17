@@ -109,3 +109,19 @@ def upsert_chunks(
         .execute()
     )
     return len(response.data) if response.data else 0
+
+
+def delete_stale_chunks(supabase_client, document_uuid: str, keep: int) -> None:
+    """Delete a document's chunks with chunk_index >= keep.
+
+    Upserting on (document_id, chunk_index) overwrites the first ``keep``
+    chunks of a re-ingested document but leaves any older, higher-numbered
+    chunks behind (e.g. after re-chunking with a different strategy).
+    """
+    (
+        supabase_client.table("chunks")
+        .delete()
+        .eq("document_id", document_uuid)
+        .gte("chunk_index", keep)
+        .execute()
+    )

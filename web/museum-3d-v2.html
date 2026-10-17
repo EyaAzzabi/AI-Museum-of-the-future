@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Museum of the Future — An immersive 3D experience through dynamic corpus and AI perspectives.">
+    <title>AI Museum of the Future — 3D Experience</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0a0e27;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #three-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* UI Overlay */
+        .museum-ui {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .ui-element {
+            pointer-events: auto;
+        }
+
+        /* Top HUD */
+        .hud-top {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 14, 39, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: #e2e8f0;
+            font-size: 14px;
+            backdrop-filter: blur(8px);
+            text-align: center;
+        }
+
+        .hud-top .title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #f0f9ff;
+            margin-bottom: 4px;
+        }
+
+        .hud-top .subtitle {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* Left sidebar — Gallery list */
+        .sidebar-left {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(10, 14, 39, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 200px;
+            max-height: 60vh;
+            overflow-y: auto;
+            backdrop-filter: blur(8px);
+            z-index: 20;
+        }
+
+        .sidebar-left .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .gallery-item {
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            background: rgba(100, 116, 139, 0.2);
+            border-left: 3px solid rgba(148, 163, 184, 0.5);
+            border-radius: 4px;
+            color: #cbd5e1;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .gallery-item:hover {
+            background: rgba(100, 116, 139, 0.35);
+            color: #e2e8f0;
+        }
+
+        .gallery-item.active {
+            background: rgba(59, 130, 246, 0.3);
+            border-left-color: #3b82f6;
+            color: #f0f9ff;
+        }
+
+        /* Right sidebar — Controls & Info */
+        .sidebar-right {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: rgba(10, 14, 39, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            max-width: 220px;
+            backdrop-filter: blur(8px);
+            z-index: 20;
+        }
+
+        .control-group {
+            margin-bottom: 16px;
+        }
+
+        .control-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .control-button {
+            display: inline-block;
+            padding: 6px 12px;
+            margin-right: 4px;
+            margin-bottom: 4px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            border-radius: 4px;
+            color: #3b82f6;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-button:hover {
+            background: rgba(59, 130, 246, 0.35);
+            color: #60a5fa;
+        }
+
+        /* Search */
+        .search-container {
+            margin-top: 16px;
+            margin-bottom: 12px;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 8px 10px;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+            color: #e2e8f0;
+            font-size: 12px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #search-input:focus {
+            border-color: rgba(59, 130, 246, 0.6);
+            background: rgba(30, 41, 59, 1);
+        }
+
+        #search-input::placeholder {
+            color: #64748b;
+        }
+
+        /* Bottom center — Help text */
+        .hud-bottom {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 14, 39, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 8px;
+            padding: 12px 20px;
+            color: #94a3b8;
+            font-size: 12px;
+            backdrop-filter: blur(8px);
+            text-align: center;
+            max-width: 400px;
+        }
+
+        /* Modal overlay */
+        #modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        #modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(10, 14, 39, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            backdrop-filter: blur(12px);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #e2e8f0;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #f0f9ff;
+            margin-bottom: 12px;
+        }
+
+        .modal-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 12px;
+        }
+
+        .modal-meta-item {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(100, 116, 139, 0.2);
+            border-radius: 4px;
+            color: #cbd5e1;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .modal-text {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .modal-link {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 12px;
+            margin-top: 16px;
+            display: inline-block;
+        }
+
+        .modal-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading indicator */
+        .loading {
+            color: #94a3b8;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar-left,
+            .sidebar-right,
+            .hud-top,
+            .hud-bottom {
+                display: none;
+            }
+
+            .modal-content {
+                max-width: 90vw;
+                max-height: 90vh;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="three-canvas"></canvas>
+    </div>
+
+    <div class="museum-ui">
+        <!-- Top HUD -->
+        <div class="hud-top ui-element">
+            <div class="title">🏛️ AI Museum of the Future</div>
+            <div class="subtitle">Navigate 6 galleries • Click artifacts to explore</div>
+        </div>
+
+        <!-- Left Sidebar -->
+        <div class="sidebar-left ui-element">
+            <div class="section-title">Galleries</div>
+            <div id="gallery-list"></div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="sidebar-right ui-element">
+            <div class="control-group">
+                <label class="control-label">Navigation</label>
+                <div>
+                    <button class="control-button" id="btn-reset-view">Reset View</button>
+                    <button class="control-button" id="btn-fullscreen">Fullscreen</button>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="Search exhibits..."
+                    maxlength="100"
+                />
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">Current Gallery</label>
+                <div id="current-gallery" style="color: #cbd5e1; font-size: 12px;">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Bottom HUD -->
+        <div class="hud-bottom ui-element">
+            <strong>WASD</strong> to move • <strong>Mouse</strong> to look • <strong>Click</strong> artifacts to view details
+        </div>
+    </div>
+
+    <!-- Modal for artifact details -->
+    <div id="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close">&times;</button>
+            <h2 class="modal-title" id="modal-title">Artifact</h2>
+            <div class="modal-meta" id="modal-meta"></div>
+            <img id="modal-image" class="modal-image" src="" alt="" style="display: none;">
+            <div class="modal-text" id="modal-text"></div>
+            <a id="modal-link" class="modal-link" href="" target="_blank" rel="noopener">View Source</a>
+        </div>
+    </div>
+
+    <!-- Load Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Load our museum client and engine -->
+    <script src="/static/museum-api.js"></script>
+    <script src="/static/museum-3d-v2.js"></script>
+
+    <script>
+        // Initialize the museum on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            const museum = new MuseumScene('three-canvas');
+            await museum.init();
+        });
+    </script>
+</body>
+</html>

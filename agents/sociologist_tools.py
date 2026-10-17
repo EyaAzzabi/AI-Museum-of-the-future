@@ -292,12 +292,17 @@ def format_chunks_for_prompt(
         if len(content) > max_chars_per_chunk:
             content = content[:max_chars_per_chunk] + "..."
 
-        sim_str = f" [similarity: {similarity:.2f}]" if similarity is not None else ""
-        header = f"[{i}] Source: {source} | Category: {category}{sim_str}"
+        chunk_id = getattr(chunk, "chunk_id", "") or getattr(chunk, "document_id", "")
+
+        # Only the chunk ID is in brackets, so the model cites IDs, not item numbers or scores
+        sim_str = f" | similarity: {similarity:.2f}" if similarity is not None else ""
+        year = meta.get("year")
+        year_str = f" | Year: {year}" if year else ""
+        header = f"[{chunk_id}] Source: {source} | Category: {category}{year_str}{sim_str}"
         block = f"{header}\n{content}\n"
 
         if total_chars + len(block) > max_total_chars:
-            lines.append(f"[{i}] ... (truncated — {len(chunks) - i + 1} more chunks not shown)")
+            lines.append(f"... (truncated — {len(chunks) - i + 1} more chunks not shown)")
             break
 
         lines.append(block)

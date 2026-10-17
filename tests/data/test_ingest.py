@@ -58,8 +58,8 @@ def _patched_store():
 # Fixtures
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _make_records(n: int) -> list[dict]:
-    """Return n minimal processed-record dicts."""
+def _make_records(n: int, start: int = 0) -> list[dict]:
+    """Return n minimal processed-record dicts (ids record-<start>...)."""
     return [
         {
             "id": f"record-{i}",
@@ -75,7 +75,7 @@ def _make_records(n: int) -> list[dict]:
             "raw_source": "arxiv_test.json",
             "processed_on": "2026-10-04",
         }
-        for i in range(n)
+        for i in range(start, start + n)
     ]
 
 
@@ -185,7 +185,7 @@ class TestIngestProcessed:
             json.dumps(_make_records(3)), encoding="utf-8"
         )
         (tmp_path / "file_b.json").write_text(
-            json.dumps(_make_records(2)), encoding="utf-8"
+            json.dumps(_make_records(2, start=3)), encoding="utf-8"
         )
 
         with _patched_store():
@@ -275,3 +275,43 @@ class TestSkipIngestFlag:
                 main()
 
         mock_run_ingestion.assert_not_called()
+
+
+class TestDeduplicationAndFileSelection:
+    """The same document in several files is ingested once, with its longest text."""
+
+    def test_longest_text_wins_whatever_the_file_order(self, tmp_path: Path) -> None:
+        from data.ingest import load_records
+
+        headline = {**_make_records(1)[0], "text": "Short headline"}
+        full = {**_make_records(1)[0], "text": "Full article text. " * 50}
+        (tmp_path / "a_fulltext.json").write_text(json.dumps([full]), encoding="utf-8")
+        (tmp_path / "b_headlines.json").write_text(json.dumps([headline]), encoding="utf-8")
+
+        records = load_records(sorted(tmp_path.glob("*.json")))
+        assert len(records) == 1
+        assert records[0]["text"] == full["text"]
+
+    def test_same_id_from_another_source_is_a_different_document(self, tmp_path: Path) -> None:
+        from data.ingest import load_records
+
+        a = _make_records(1)[0]
+        b = {**a, "source": "gdelt"}
+        (tmp_path / "x.json").write_text(json.dumps([a, b]), encoding="utf-8")
+        assert len(load_records([tmp_path / "x.json"])) == 2
+
+    def test_only_selected_files_are_ingested(self, tmp_path: Path) -> None:
+        (tmp_path / "keep.json").write_text(json.dumps(_make_records(2)), encoding="utf-8")
+        (tmp_path / "skip.json").write_text(json.dumps(_make_records(3, start=10)), encoding="utf-8")
+        with _patched_store():
+            report = ingest_processed(tmp_path, _FakeChunker(), supabase_client=None,
+                                      files=[tmp_path / "keep.json"])
+        assert report.documents_processed == 2
+
+    def test_stale_chunks_are_deleted_after_reingestion(self, tmp_path: Path) -> None:
+        (tmp_path / "a.json").write_text(json.dumps(_make_records(1)), encoding="utf-8")
+        client = MagicMock()
+        with _patched_store(), patch("data.ingest.delete_stale_chunks") as delete:
+            ingest_processed(tmp_path, _FakeChunker(), supabase_client=client)
+        delete.assert_called_once()
+        assert delete.call_args.args[2] == 2  # _FakeChunker makes 2 chunks: indexes >= 2 are stale

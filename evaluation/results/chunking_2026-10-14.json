@@ -1,0 +1,1468 @@
+{
+  "date": "2026-10-14",
+  "k": 5,
+  "corpus_documents": 557,
+  "corpus_characters": 3284380,
+  "setups": {
+    "fixed-512": {
+      "note": "current production: 512 tiktoken tokens, 20% overlap",
+      "chunks": 3586,
+      "chunks_per_doc": 6.4,
+      "mean_tokens": 294.5,
+      "share_over_window": 0.948,
+      "text_unseen_by_embedder": 0.571,
+      "hit@1": 0.304,
+      "hit@5": 0.522,
+      "mrr@10": 0.4,
+      "answerable": 1.0,
+      "context_tokens_top_k": 1472,
+      "embed_seconds": 0.0,
+      "cases": [
+        {
+          "id": "saied-art80",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            " من الطعون الواردة عليها.\n\nحل البرلمان\n\nبعد مرور 8 أشهر على تعليق اختصاصاته، أعلن رئيس الجمهورية قيس سعيد في 30 مارس 2022 حل مجلس نواب الشعب استنادا للفصل 72 من",
+            " July. On the same day, Kais Saied dissolved Parliament, which the Constitution prohibits during the period when the state of emergency is applied, and threaten",
+            " and relieved prime minister Hichem Mechichi of his duties. Saied's actions, which included assuming the executive authority, suspending the Parliament, waiving"
+          ]
+        },
+        {
+          "id": "bouden",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "تقد قراره معظم الأحزاب الممثلة في البرلمان.\nفي 29 سبتمبر 2021، أصدر الرئيس تعليماته لنجلاء بودن بتشكيل حكومة جديدة، مما جعلها أول امرأة تتولى منصب رئاسة الحكومة",
+            " من جميع المقاعد. تونس مدرجة في سياسة الجوار الأوروبي التابعة للاتحاد الأوروبي، والتي تهدف إلى تقريب الاتحاد الأوروبي وجيرانه. في 23 نوفمبر 2014، أجرت تونس أول ",
+            "زوجات والطلاق وحق الزوج في تطليق زوجته من جانب واحد. تضمنت الإصلاحات الإضافية في 1993 حكماً يسمح للمرأة التونسية بنقل الجنسية حتى لو كانت متزوجة من أجنبي وتعيش "
+          ]
+        },
+        {
+          "id": "bouden-date",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            " to assess the legality of Saied's interpretation of the constitution.\nOn 29 September, President Saied instructed Prime Minister Najla Bouden to form a new gov",
+            "ورية، وهناك خلاف حول ما إذا كان ينبغي تعيين رئيس الحكومة المقبل من قبل حزب الأغلبية أو من قبل رئيس الجمهورية. ومع ذلك، تعلن رئاسة الجمهورية أن رئيس الجمهورية سي",
+            "re-conseiller auprès du président de la République, Rachida Ennaifer chargée de la communication, tandis que Nadia Akacha est responsable des affaires juridique"
+          ]
+        },
+        {
+          "id": "ref-turnout",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.25,
+          "answerable": true,
+          "top": [
+            "A constitutional referendum was held in Tunisia on 25 July 2022 by the Independent High Authority for Elections. The referendum was supported by the Tunisian pr",
+            "الاستفتاء الدستوري التونسي 2022 وهو استفتاء عام أجري في تونس يوم 25 يوليو 2022 بتنظيم الهيئة العليا المستقلة للانتخابات للسماح للتونسيين باتخاذ قرار بشأن دستور ",
+            "Le référendum constitutionnel tunisien de 2022 a lieu le 25 juillet 2022 afin de permettre à la population de se prononcer sur une nouvelle Constitution. Le pro"
+          ]
+        },
+        {
+          "id": "parl-turnout",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            " مشاركة في تاريخ الإنتخابات في تونس.\nالدور الثاني: بلغت نسبة المشاركة حسب ما أعلنته الهيئة يوم 30 يناير 2023، 11.4% أي بعدد ناخبين يقدر بـ895 ألف و2 ناخب من إجم",
+            " instance de supervision des élections est également créée, sur pression des manifestants, afin d'éviter toute manipulation des résultats par le ministère de l'",
+            "الانتخابات التشريعية التونسية 2022 أو الانتخابات التشريعية التونسية المبكرة 2022 هي الانتخابات التشريعية الخامسة عشر في تونس والرابعة بعد الثورة التونسية، والتي"
+          ]
+        },
+        {
+          "id": "pres-2024",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "لانتخابات، تم الإعلان عن النتائج في مساء يوم 26 يوليو 2022، كان عدد الناخبين الإجمالي 2,830,094، حيث حصل الناخبون بنعم على الأغلبية الساحقة بعدد قدره 2,607,884 ",
+            "لاً من نظام شبه رئاسي. أعلن عن النتائج في مساء يوم 26 يوليو 2022، كان عدد الناخبين الإجمالي 2،830،094 صوت، حيث حصل الناخبون الموافقون على الأغلبية الساحقة بعدد ",
+            " بنسبة 99.91% من الأصوات. في العام التالي، تم توقيع اتفاقية التجارة الحرة مع الاتحاد الأوروبي. كانت الانتخابات الرئاسية التي أقيمت في 24 نوفمبر 1999، على الرغم "
+          ]
+        },
+        {
+          "id": "saied-born",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.2,
+          "answerable": true,
+          "top": [
+            " being semi-presidential, Kais Saied had a week after his inauguration to instruct the party which took the lead in the legislative elections to form a governme",
+            "Kaïs Saïed (arabe : قيس سعيد), né le 22 février 1958 à Tunis, est un homme d'État tunisien, président de la République depuis le 23 octobre 2019. Universitaire ",
+            "raf Chebil, a judge he met when she was a law student in Sousse. He has three children. Saied's interests include classical Arab music and Arabic calligraphy.\nA"
+          ]
+        },
+        {
+          "id": "jcc-1966",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "Carthage Film Festival (Journées cinématographiques de Carthage, or JCC) is an annual film festival that takes place in Tunis, founded in 1966. It is also known",
+            "أيام قرطاج السينمائية (الفرنسية: Les Journées Cinématographiques de Carthage) مهرجان سينمائي كان ينتظم بتونس كل سنتين خلال شهر أكتوبر (تشرين الأول) وأصبح بعد ذل",
+            " Noire de... in 1966, afterwards worked with the politician Alimata Salembéré to create another major festival on the African continent, FESPACO (Festival Panaf"
+          ]
+        },
+        {
+          "id": "oscar",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            " at the 2017 Cannes Film Festival. It was also selected as the Tunisian entry for the Best Foreign Language Film at the 91st Academy Awards, but was not nominat",
+            "Le cinéma tunisien compte environ 600 films d'auteurs abrités à la Cinémathèque tunisienne. Ils traitent de tous les sujets de la société tunisienne.\nCertains d",
+            "Kaouther Ben Hania, also written Kaouther Ben Henia or Kaouther Benhenia (Arabic: كوثر بن هنية, romanized: Kawthar ibn Hanīyah), is a Tunisian filmmaker.\nShe is"
+          ]
+        },
+        {
+          "id": "covid-first",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "The COVID-19 pandemic in Tunisia was a part of the ongoing pandemic of coronavirus disease 2019 (COVID-19) caused by severe acute respiratory syndrome coronavir",
+            "La pandémie de Covid-19 en Tunisie démarre officiellement le 2 mars 2020. À la date du 11 décembre 2022, le bilan est de 29 272 morts. L'ensemble des 24 gouvern",
+            "تهتم هاته المقالة بمدى انتشار جائحة فيروس كورونا في تونس وكيفية التعامل معه في البلاد. سجلت أول حالة في تونس في 2 مارس 2020.\n\nخلفية\n\nفي 12 يناير 2020، أكدت منظم"
+          ]
+        },
+        {
+          "id": "nobel",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            " يصبح أول رئيس ناتج عن انتخابات ديمقراطية وشفافة. فازت لجنة الرباعي الراعي للحوار الوطني وهي جمعية من أربع منظمات حددت لنفسها هدف تنظيم مفاوضات بين الأحزاب السي",
+            "د مكونات رباعي الحوار الوطني الذي تحصل على جائزة نوبل للسلام في 2015 لنجاحه في الخروج بتونس من أزمتها السياسية عبر الحوار الوطني والتوصل للمصادقة على دستور تونس",
+            " sa joie et félicite le quartet tout en affirmant que ce prix est dédié à tous les Tunisiens qui ont commencé le Printemps arabe. François Hollande, président d"
+          ]
+        },
+        {
+          "id": "csp-1956",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.14285714285714285,
+          "answerable": true,
+          "top": [
+            "حقوق المرأة التونسية هي حصيلة كل ما يؤمنه القانون التونسي من حقوق للمرأة التونسية، تعد مجلة الأحوال الشخصية أبرز نص قانوني ينظم الحياة الإجتماعة والشخصية للمرأة",
+            "زوجات والطلاق وحق الزوج في تطليق زوجته من جانب واحد. تضمنت الإصلاحات الإضافية في 1993 حكماً يسمح للمرأة التونسية بنقل الجنسية حتى لو كانت متزوجة من أجنبي وتعيش ",
+            " المرأة. كما ينص على التناصف بين الرجال والنساء في المجالس المنتخبة وفق ما يحدده القانون.\nوبذلك تطور الإطار القانوني لحقوق المرأة في تونس عبر عدة مراحل رئيسية، "
+          ]
+        },
+        {
+          "id": "bce-2019",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            " his wares and the humiliation inflicted on him by a municipal official named Faida Hamdy. Anger and violence intensified following Bouazizi's death on 4 Januar",
+            "isia was hit by two terror attacks on foreign tourists in 2015, first killing 22 people at the Bardo National Museum, and later killing 38 people at the Sousse ",
+            ", was celebrated as a national holiday. He was consistently re-elected with enormous majorities every five years (well over 80 percent of the vote), the last be"
+          ]
+        },
+        {
+          "id": "bouazizi",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "The Tunisian revolution (Arabic: الثورة التونسية), also called the Jasmine Revolution and Tunisian Revolution of Dignity, was an intensive 28-day campaign of ci",
+            "س. وفي 20 مارس 1956، حصلت تونس على استقلالها بقيادة الحبيب بورقيبة بمساعدة نشطاء مثل الشاذلي قلالة، فرحات حشاد وصالح بن يوسف. وفي 25 يوليو 1957، تم إلغاء النظام",
+            " la vie politique de son pays était de militer en ligne.\nCet aspect de la révolution tunisienne est valorisé et hautement exploitable. Certains vont jusqu’à par"
+          ]
+        },
+        {
+          "id": "derja",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            " فيعتقد البعض أن اسم تونس يعود إلى الحقبة القرطاجية حيث سميت المدينة تونس على اسم الآلهة القرطاجية المحلية تانيت، ويرجع جذر هذه التسمية ٳلى اللغة الأمازيغية ويش",
+            ". It is established on a berber and punic substratum, influenced by the languages of the people that lived or administered the region, during the course of hist",
+            "Tunisian Arabic, or simply Tunisian (Arabic: تونسي, romanized: Tūnsi), is a variety of Arabic spoken in Tunisia. It is known among its 12.5 million speakers as "
+          ]
+        },
+        {
+          "id": "ugtt-1946",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "The Tunisian General Labour Union (French: Union Générale Tunisienne du Travail, UGTT. Arabic: الاتحاد العام التونسي للشغل) is a national trade union center in ",
+            "الاتحاد العام التونسي للشغل هو أكبر منظمة نقابية تونسية وتضم 000 500 عضو في 2017. \nتأسس الاتحاد في 20 يناير 1946 خلال المؤتمر الذي انعقد بالمدرسة الخلدونية من ق",
+            " أخرى يقوم بكراء فندق أميلكار في قرطاج.\nجاء تأسيس الاتحاد بعد فشل محاولتين سابقتين لتأسيس منظمة نقابية وطنية هما جامعة عموم العملة التونسية الأولى في العشرينات "
+          ]
+        },
+        {
+          "id": "agri-gdp",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "سوسة والمنستير والمهدية وصفاقس.\n\nالتأثيرات على الناس\n\nالزراعة\n\nتعتمد تونس اعتمادًا كبيرًا على المحاصيل البعلية لدعم قطاعها الزراعي ومجتمعاتها الريفية. تُعدّ الز",
+            " الأرقام الرسمية تتوزع الأنشطة الاقتصادية بين مختلف القطاعات كما يلي\n\nالصيد البحري والفلاحة\n\nشهد قطاع الصيد البحري والفلاحة التونسية منذ الاستقلال نموا مطردا مك",
+            " الصناعة الأكثر بروزاً بتركيز 85% المنشآت الصناعية في البلاد وحتى 87.5% من العمالة في هذا القطاع الاقتصادي.\nالقطاع الزراعي الوسيط: تعتبر الزراعة النشاط الاقتصاد"
+          ]
+        },
+        {
+          "id": "fr-referendum",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            "A constitutional referendum was held in Tunisia on 25 July 2022 by the Independent High Authority for Elections. The referendum was supported by the Tunisian pr",
+            "الاستفتاء الدستوري التونسي 2022 وهو استفتاء عام أجري في تونس يوم 25 يوليو 2022 بتنظيم الهيئة العليا المستقلة للانتخابات للسماح للتونسيين باتخاذ قرار بشأن دستور ",
+            "Le référendum constitutionnel tunisien de 2022 a lieu le 25 juillet 2022 afin de permettre à la population de se prononcer sur une nouvelle Constitution. Le pro"
+          ]
+        },
+        {
+          "id": "fr-bouden",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            " de terrain en faveur de l'alphabétisation et de l'autonomie financière des femmes et dirige la revue La Femme ; son rôle lui vaut d'être surnommée par Bourguib",
+            "re-conseiller auprès du président de la République, Rachida Ennaifer chargée de la communication, tandis que Nadia Akacha est responsable des affaires juridique",
+            "د يشير إلى شخص الرئيس الحبيب بورقيبة في البيت «نخوض اللهيب بروح الحبيب زعيم الوطن» لذلك بعد الإطاحة ببورقيبة في 7 نوفمبر 1987، عوض ألا خلّدي بحماة الحمى في 12 ن"
+          ]
+        },
+        {
+          "id": "fr-ben-ali",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.14285714285714285,
+          "answerable": true,
+          "top": [
+            "س. وفي 20 مارس 1956، حصلت تونس على استقلالها بقيادة الحبيب بورقيبة بمساعدة نشطاء مثل الشاذلي قلالة، فرحات حشاد وصالح بن يوسف. وفي 25 يوليو 1957، تم إلغاء النظام",
+            " تونس واقتصر نشاطها المعروف على أوروبا وأمريكا الشمالية في أوساط التونسيين في الخارج حتى سقط حكم بن علي. ترأس الحركة منذ 1991 الشيخ راشد الغنوشي الذي رجع من الم",
+            " regime came to an end 23 years later on 14 January 2011, in the events of the Tunisian Revolution, following nationwide demonstrations precipitated by high une"
+          ]
+        },
+        {
+          "id": "ar-july",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.125,
+          "answerable": true,
+          "top": [
+            " من الطعون الواردة عليها.\n\nحل البرلمان\n\nبعد مرور 8 أشهر على تعليق اختصاصاته، أعلن رئيس الجمهورية قيس سعيد في 30 مارس 2022 حل مجلس نواب الشعب استنادا للفصل 72 من",
+            "ا في تونس. في نفس المساء، واستناداً إلى الفصل 80 من الدستور، يقيل قيس سعيد حكومة هشام المشيشي بأمر فوري، ولا سيما هشام المشيشي من مهامه كرئيس للحكومة ووزير الدا",
+            "ك حزب التيار الديمقراطي وحركة النهضة، لكنه يحتفظ بدعم حركة الشعب. في 26 سبتمبر تظاهر 2000 شخص، معظمهم من أنصار النهضة وائتلاف الكرامة، ضد قراراته. في 29 سبتمبر،"
+          ]
+        },
+        {
+          "id": "ar-bouden",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.16666666666666666,
+          "answerable": true,
+          "top": [
+            "تقد قراره معظم الأحزاب الممثلة في البرلمان.\nفي 29 سبتمبر 2021، أصدر الرئيس تعليماته لنجلاء بودن بتشكيل حكومة جديدة، مما جعلها أول امرأة تتولى منصب رئاسة الحكومة",
+            " حكومتها رئيس الوزراء ، ولها برلمان من مجلسين، ونظام قضائي مدني . يضمن دستور تونس ، الذي اعتُمد في 26 يناير 2014، حقوق المرأة، وينص على أن يكون دين الرئيس \"الإس",
+            " من جميع المقاعد. تونس مدرجة في سياسة الجوار الأوروبي التابعة للاتحاد الأوروبي، والتي تهدف إلى تقريب الاتحاد الأوروبي وجيرانه. في 23 نوفمبر 2014، أجرت تونس أول "
+          ]
+        },
+        {
+          "id": "news-messi",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "News\nFollow Us on Google\nAugust 31, 2026 by Adedamola Ogunbewon\nFULL LIST: Lionel Messi’s achievements, trophies with Argentina\nArgentina legend Lionel Messi ha",
+            "2\nMessi helped Argentina defeat Italy at Wembley Stadium to lift the revived Finalissima trophy.\nOlympic Games\nGold medal: Beijing 2008\nMessi was part of the Ar",
+            "Published September 02, 2026\nMidfielder Leandro Paredes said it will be difficult to carry on playing for Argentina after receiving a 10-match suspension for hi"
+          ]
+        }
+      ]
+    },
+    "fixed-100": {
+      "note": "100 tiktoken tokens, 20% overlap: sized to the model window",
+      "chunks": 17734,
+      "chunks_per_doc": 31.8,
+      "mean_tokens": 63.3,
+      "share_over_window": 0.015,
+      "text_unseen_by_embedder": 0.001,
+      "hit@1": 0.217,
+      "hit@5": 0.478,
+      "mrr@10": 0.338,
+      "answerable": 1.0,
+      "context_tokens_top_k": 316,
+      "embed_seconds": 573.9,
+      "cases": [
+        {
+          "id": "saied-art80",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            " in force since 25 July. That same day, President Saied dissolved the Assembly, against constitutional procedure, and threatened the deputies with legal proceed",
+            ", met in a virtual session to vote on the end of the exceptional measures in force since 25 July. On the same day, Kais Saied dissolved Parliament, which the Co",
+            "ée à la pandémie de Covid-19. Le soir même, invoquant l'article 80 de la Constitution, Kaïs Saïed limoge le gouvernement Mechichi avec effet immédiat, en partic"
+          ]
+        },
+        {
+          "id": "bouden",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "اء بودن في منصب رئيسة حكومة تونس، وهي المرة الأولى في التاريخ التي يتم فيها تعيين امرأة في هذا المنصب في تونس والوطن العربي وقامت بتأدية اليمين الدستورية في",
+            "يين نجلاء بودن في منصب رئيسة الحكومة، لتصبح أول امرأة في تونس والوطن العربي تكون على رأس الحكومة. لاحقا، خرجت مظاهرات مؤيدة ومعارضة له",
+            " appointed to head a new government, making her the first female prime minister both in Tunisia and the Arab world. In July 2022, a new constitution expanding t"
+          ]
+        },
+        {
+          "id": "bouden-date",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "cret, récupérant de facto le pouvoir législatif. Sa décision est critiquée par la plupart des partis représentés au Parlement.\nLe 29 septembre, le président cha",
+            ", de facto restoring legislative power. His decision was criticized by most of the parties represented in Parliament.\nOn 29 September, the President instructed ",
+            "roie le droit de gouverner par décret, récupérant de facto le pouvoir législatif. Sa décision est critiquée par la plupart des partis représentés au Parlement.\n"
+          ]
+        },
+        {
+          "id": "ref-turnout",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.1,
+          "answerable": true,
+          "top": [
+            "الاستفتاء الدستوري التونسي 2022 وهو استفتاء عام أجري في تونس يوم 25 يوليو 2022 بتنظيم الهيئة العليا المستقلة للانتخابات للسماح للتونسيين باتخاذ قر",
+            "A constitutional referendum was held in Tunisia on 25 July 2022 by the Independent High Authority for Elections. The referendum was supported by the Tunisian pr",
+            "otted by many of Tunisia's largest political parties.\nThe question on the ballot was: \"Do you support the new draft constitution for the Tunisian republic?\" Pre"
+          ]
+        },
+        {
+          "id": "parl-turnout",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "هي أدنى نسبة مشاركة في تاريخ الإنتخابات في تونس.\nالدور الثاني: بلغت نسبة المشاركة حسب ما أعلنته الهيئة يوم 30 يناير 2023، 11.4% أي بعدد ناخبي",
+            " التشريعية وتسجيل أدنى نسبة مشاركة في تاريخ الانتخابات في تونس.\nتعمق الانقسام السياسي ودعوات لمقاطعة الانتخابات البرلمانية.\n\nردود الفعل\n\nمواقف الأحزاب الس",
+            " laissant envisager une défiance à une telle action de la part du président par l'ISIE.\n\nSondages\n\nRésultats\n\nAnalyse\n\nLes élections connaissent un taux de part"
+          ]
+        },
+        {
+          "id": "pres-2024",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            " 7 octobre, l'Instance supérieure indépendante pour les élections annonce les résultats : Saïed est réélu président avec 90,69 % des suffrages exprimés.\nEn avri",
+            " résultats définitifs sont rendus publics le 12 octobre par l'Instance supérieure indépendante pour les élections (Isie). Kaïs Saïed l'emporte dès le premier to",
+            " يوم 6 اكتوبر 2024 بنسبة 90.69% من أصوات الناخبين متقدما على كل من المرشحين العياشي زمال وزهير المغزاوي\n\nرئاسة الجمهورية\n\nأدى سعيّد اليمين الد"
+          ]
+        },
+        {
+          "id": "saied-born",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "\n\nKais Saied is the son of Moncef Saied and Zakia Bellagha from Béni Khiar (Cap Bon).  His paternal uncle, Hicham Saïed, was the first pediatric surgeon in Tuni",
+            " life\n\nKais Saied is married to Ichraf Chebil, a judge he met when she was a law student in Sousse. He has three children. Saied's interests include classical A",
+            ": प्रचारक से मुख्यमंत्री और अब राष्ट्रीय उपाध्यक्ष\nतीरथ सिंह रावत का जन्म 9 अप्रैल 1964 को पौड़ी गढ़व"
+          ]
+        },
+        {
+          "id": "jcc-1966",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "Carthage Film Festival (Journées cinématographiques de Carthage, or JCC) is an annual film festival that takes place in Tunis, founded in 1966. It is also known",
+            " the Carthage Theatre Festival, the festival became an annual event in 2014. \nA directing committee chaired by the Tunisian Ministry of Culture, joined with pro",
+            "goers.It was named Journées cinématographiques de Carthage (JCC) and is also known by its Arabic title, أيام قرطاج السينمائية (\"Cinema Days of Carthage\"), and i"
+          ]
+        },
+        {
+          "id": "oscar",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            " que L'Homme qui a vendu sa peau (2020) de Ben Hania est le premier film tunisien nommé à l'Oscar du meilleur film international. La dynamique se poursuit avec ",
+            " to a feature-length motion picture produced outside the United States that contains primarily non-English dialogue. As of 2023, ten Tunisian films have been su",
+            " its world premiere in the Orizzonti section of the 77th Venice International Film Festival. It was also selected as the Tunisian entry for the Best Foreign Lan"
+          ]
+        },
+        {
+          "id": "covid-first",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "The COVID-19 pandemic in Tunisia was a part of the ongoing pandemic of coronavirus disease 2019 (COVID-19) caused by severe acute respiratory syndrome coronavir",
+            " 2 March, the first cases of lineage B.1.1.7 (the 'UK variant') were reported in Tunisia. Tunisia's first case of the Omicron variant was reported on 3 December",
+            "La pandémie de Covid-19 en Tunisie démarre officiellement le 2 mars 2020. À la date du 11 décembre 2022, le bilan est de 29 272 morts. L'ensemble des 24 gouvern"
+          ]
+        },
+        {
+          "id": "nobel",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "H, the Tunisian Confederation of Industry, Trade and Handicrafts-UTICA and the Tunisian Order of Lawyers), collectively labelled the National Dialogue Quartet, ",
+            " qui complètent l'achèvement de la transition vers un état démocratique. Le Quartet du dialogue national a reçu le prix nobel de la paix 2015 pour « sa contribu",
+            "لجنة الرباعية للحوار الوطني التونسي جائزة نوبل للسلام عام 2015 «لمساهمتها الحاسمة في بناء ديمقراطية تعددية في تونس في أعقاب الثورة التونسية عام 2011"
+          ]
+        },
+        {
+          "id": "csp-1956",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            " the Tunis bar.\nIn 1956, The Code of Personal Status (Tunisia) was enacted—a document that has undergone heavy reform since its inception. This document has abo",
+            " وتقييم في التقارير والدراسات الدولية.\n\nالإطار الدستوري والقانوني\n\nيستند الإطار القانوني لحقوق المرأة في تونس إلى الدستور ومجلة الأحوال الشخصية والقوانين المتعل",
+            "La condition des femmes en Tunisie est déterminée à la fois par le système juridique, notamment le Code du statut personnel (CSP) qui est l'un des plus modernes"
+          ]
+        },
+        {
+          "id": "bce-2019",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            " de 20 % de son budget à rembourser ses créanciers, ce qui neutralise ses capacités d'investissement.\nLe président Béji Caïd Essebsi meurt le 25 juillet 2019, à",
+            " first democratically elected president Beji Caid Essebsi died in July 2019. Following him, Kais Saied became Tunisia's president after a landslide victory in t",
+            "ستثمارية. توفي الباجي قائد السبسي في 25 يوليو 2019 يوم ذكرى إعلان الجمهورية، عن عمر يناهز 92 عامًا، قبل 3 أشهر من نهاية عهدته، وتولى رئيس"
+          ]
+        },
+        {
+          "id": "bouazizi",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "-revolution (since 2011)\n\nThe Tunisian Revolution was an intensive campaign of civil resistance that was precipitated by high unemployment, food inflation, corr",
+            "The Tunisian revolution (Arabic: الثورة التونسية), also called the Jasmine Revolution and Tunisian Revolution of Dignity, was an intensive 28-day campaign of ci",
+            "ها.\n\nالشرارة التونسية\n\nميلاد الثورات العربية بدأ من تونس، وتحديدا من مدينة سيدي بوزيد عندما أقدم الشاب محمد البوعزيزي على إحراق نفسه في 17 ديسمبر/كان"
+          ]
+        },
+        {
+          "id": "derja",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.16666666666666666,
+          "answerable": true,
+          "top": [
+            "عربية كثيرا، مثال على ذلك التسمية الروسية لتونس (Тунис)، التسمية الإسبانية (Túnez) والتسمية الأمازيغية (ⵜⵓⵏⴻⵙ).\n\nالجغرافيا\n\nالجغرافيا الفي",
+            "ة; meaning \"common or everyday dialect\") to distinguish it from Modern Standard Arabic, the official language of Tunisia. Tunisian Arabic is mostly similar to e",
+            "ن اسم تونس يعود إلى الحقبة القرطاجية حيث سميت المدينة تونس على اسم الآلهة القرطاجية المحلية تانيت، ويرجع جذر هذه التسمية ٳلى اللغة الأمازيغية ويش"
+          ]
+        },
+        {
+          "id": "ugtt-1946",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "The Tunisian General Labour Union (French: Union Générale Tunisienne du Travail, UGTT. Arabic: الاتحاد العام التونسي للشغل) is a national trade union center in ",
+            "الاتحاد العام التونسي للشغل هو أكبر منظمة نقابية تونسية وتضم 000 500 عضو في 2017. \nتأسس الاتحاد في 20 يناير 1946 خلال المؤتمر الذي انعقد بالمدرسة الخلدون",
+            "حيدة على الساحة التونسية بعد الاستقلال رغم محاولات للخروج عليها وتأسيس منظمات أخرى هي: الاتحاد التونسي للشغل في الخمسينات والاتحاد الوطني التونسي للش"
+          ]
+        },
+        {
+          "id": "agri-gdp",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            " % par an depuis une dizaine d'années.\nL'économie de la Tunisie est historiquement liée à l'agriculture (blé, olives, dattes, agrumes et produits de la mer), au",
+            "اعي ومجتمعاتها الريفية. تُعدّ الزراعة قطاعًا رئيسيًا في تونس، حيث ستمثل 10% من الناتج المحلي الإجمالي في عام 2022، وتُوظّف 14% من القوى ال",
+            "épendance de la Tunisie, l'agriculture a enregistré des taux de croissance importants et a permis au pays d'atteindre un niveau de sécurité alimentaire suffisan"
+          ]
+        },
+        {
+          "id": "fr-referendum",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.25,
+          "answerable": true,
+          "top": [
+            "A constitutional referendum was held in Tunisia on 25 July 2022 by the Independent High Authority for Elections. The referendum was supported by the Tunisian pr",
+            "ح الاستفتاء دستورا يوسع الصلاحيات الممنوحة لرئيس الجمهورية وجعل تونس ذات نظام رئاسي بدلاً من نظام شبه رئاسي. أعلن عن النتائج في مساء يوم 26 يولي",
+            "الاستفتاء الدستوري التونسي 2022 وهو استفتاء عام أجري في تونس يوم 25 يوليو 2022 بتنظيم الهيئة العليا المستقلة للانتخابات للسماح للتونسيين باتخاذ قر"
+          ]
+        },
+        {
+          "id": "fr-bouden",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.25,
+          "answerable": true,
+          "top": [
+            ", de facto restoring legislative power. His decision was criticized by most of the parties represented in Parliament.\nOn 29 September, the President instructed ",
+            "ied appointed Najla Bouden to the premiership. Although this made her the first female prime minister in Tunisia and in the Arab World, she has been criticised ",
+            " was appointed Minister-Advisor to the President of the Republic, Rachida Ennaifer was put in charge of communication, while Nadia Akacha became responsible for"
+          ]
+        },
+        {
+          "id": "fr-ben-ali",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.16666666666666666,
+          "answerable": true,
+          "top": [
+            "-year-old President Bourguiba was overthrown and replaced by Ben Ali his Prime Minister on 7 November 1987. However, the Ben Ali regime came to an end 23 years ",
+            " 2011، أطاحت الثورة التونسية، التي اندلعت بسبب الافتقار إلى الحرية والديمقراطية في ظل حكم الرئيس زين العابدين بن علي الذي دام 24 عاما، بنظامه وحفزت ح",
+            " décembre 2010 et janvier 2011, a abouti au départ du président de la République de Tunisie, Zine el-Abidine Ben Ali, en poste depuis 1987. L'appellation « révo"
+          ]
+        },
+        {
+          "id": "ar-july",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "برلمانية التي ٱقيمت عن بعد في نفس اليوم، والتي ٱلغي بموجبها العمل بالإجراءات الاستثنائية، الأمر الذي اعتبره رئيس الجمهورية محاولة انقلابية ف",
+            "دستور. وذلك كرد فعل على الجلسة البرلمانية التي ٱقيمت «عن بعد» في نفس اليوم، والتي ٱلغي بموجبها العمل بـ«الاجراءات الاستثنائية». الأمر الذي ا",
+            "إجراءات الاستثنائية التي أقرها سابقا:\n\nبقاء المجلس النيابي مجمدا (معلقة اختصاصاته) إلى تاريخ تنظيم انتخابات تشريعية جديدة.\nتنظيم استشارة شعبية \"إ"
+          ]
+        },
+        {
+          "id": "ar-bouden",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "اء بودن في منصب رئيسة حكومة تونس، وهي المرة الأولى في التاريخ التي يتم فيها تعيين امرأة في هذا المنصب في تونس والوطن العربي وقامت بتأدية اليمين الدستورية في",
+            "يين نجلاء بودن في منصب رئيسة الحكومة، لتصبح أول امرأة في تونس والوطن العربي تكون على رأس الحكومة. لاحقا، خرجت مظاهرات مؤيدة ومعارضة له",
+            " appointed to head a new government, making her the first female prime minister both in Tunisia and the Arab world. In July 2022, a new constitution expanding t"
+          ]
+        },
+        {
+          "id": "news-messi",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            " U-20 World Cup Golden Shoe: 2005\n8. Record appearances for Argentina\n9. Argentina’s all-time leading goalscorer\n10. Most appearances by a South American player",
+            " most decorated player in Argentina’s history, after ending the country’s 28-year wait for a major international trophy by leading them to the 2021 Copa América",
+            "News\nFollow Us on Google\nAugust 31, 2026 by Adedamola Ogunbewon\nFULL LIST: Lionel Messi’s achievements, trophies with Argentina\nArgentina legend Lionel Messi ha"
+          ]
+        }
+      ]
+    },
+    "recursive-600": {
+      "note": "paragraphs up to 600 characters (existing recursive strategy)",
+      "chunks": 16836,
+      "chunks_per_doc": 30.2,
+      "mean_tokens": 63.3,
+      "share_over_window": 0.158,
+      "text_unseen_by_embedder": 0.064,
+      "hit@1": 0.304,
+      "hit@5": 0.696,
+      "mrr@10": 0.435,
+      "answerable": 1.0,
+      "context_tokens_top_k": 316,
+      "embed_seconds": 727.8,
+      "cases": [
+        {
+          "id": "saied-art80",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "حل البرلمان بعد مرور 8 أشهر على تعليق اختصاصاته، أعلن رئيس الجمهورية قيس سعيد في 30 مارس 2022 حل مجلس نواب الشعب استنادا للفصل 72 من الدستور. وذلك كرد فعل على ا",
+            "evailed. On 30 March 120 deputies, chaired by the second vice-president of the assembly Tarek Fetiti, met in a virtual session to vote on the end of the excepti",
+            "nt l'article 80 de la Constitution, Kaïs Saïed limoge le gouvernement Mechichi avec effet immédiat, en particulier Hichem Mechichi de ses attributions de chef d"
+          ]
+        },
+        {
+          "id": "bouden",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "الحكومة والسياسة تونس دولة ذات نظام رئاسي ، يرأسها رئيس الدولة ، ويرأس حكومتها رئيس الوزراء ، ولها برلمان من مجلسين، ونظام قضائي مدني . يضمن دستور تونس ، الذي ا",
+            "Sous Bourguiba La figure emblématique de cette période est Radhia Haddad (1922-2003). Formée avant l'indépendance au sein de l'Union des femmes musulmanes de Tu",
+            "السياسة تونس دولة ديمقراطية نيابية نظامها الجمهورية الرئاسية مع رئيس يعمل كرأس للدولة، رئيس وزراء، برلمان من مجلسين ونظام قضائي مدني. يكفل الدستور التونسي، المع"
+          ]
+        },
+        {
+          "id": "bouden-date",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "ing legislative power. His decision was criticized by most of the parties represented in Parliament. On 29 September the President tasked Najla Bouden with form",
+            "On 29 September, President Saied instructed Prime Minister Najla Bouden to form a new government. From 15 January to 20 March 2022, an electronic consultation w",
+            "Le 29 septembre, le président charge Najla Bouden de former un nouveau gouvernement. Elle devient de ce fait pionnière dans le pays ainsi que dans le monde arab"
+          ]
+        },
+        {
+          "id": "ref-turnout",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.25,
+          "answerable": true,
+          "top": [
+            "جرى الاستفتاء الدستوري يوم 25 يوليو 2022، للسماح للتونسيين باتخاذ قرار بشأن دستور جديد للجمهورية التونسية، اقترح الاستفتاء دستورا يوسع الصلاحيات الممنوحة لرئيس ",
+            "الاستفتاء الدستوري التونسي 2022 وهو استفتاء عام أجري في تونس يوم 25 يوليو 2022 بتنظيم الهيئة العليا المستقلة للانتخابات للسماح للتونسيين باتخاذ قرار بشأن دستور ",
+            "A constitutional referendum was held in Tunisia on 25 July 2022 by the Independent High Authority for Elections. The referendum was supported by the Tunisian pr"
+          ]
+        },
+        {
+          "id": "parl-turnout",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "Analyse Les élections connaissent un taux de participation historiquement faible qui s'établit à 11,22 %, contre 41,70 % en 2019. La Tunisie battrait ainsi le r",
+            "إجراء الانتخابات التشريعية وتسجيل أدنى نسبة مشاركة في تاريخ الانتخابات في تونس.",
+            "Analysis Turnout for the election in the first round was 8.8% at 18h, a record low not just for Tunisia, but for the entirety of north Africa."
+          ]
+        },
+        {
+          "id": "pres-2024",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "Analyses Les résultats définitifs sont rendus publics le 12 octobre par l'Instance supérieure indépendante pour les élections (Isie). Kaïs Saïed l'emporte dès l",
+            "Élection présidentielle de 2024 et second mandat Kaïs Saïed annonce qu'il brigue un nouveau mandat présidentiel lors de l'élection présidentielle prévue le 6 oc",
+            "On 6 October 2024, President Kais Saied won a second term with more than 90% of the vote in a presidential election with a 28.8% turnout. Five political parties"
+          ]
+        },
+        {
+          "id": "saied-born",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "Early life Kais Saied is the son of Moncef Saied and Zakia Bellagha from Béni Khiar (Cap Bon).  His paternal uncle, Hicham Saïed, was the first pediatric surgeo",
+            "Personal life Kais Saied is married to Ichraf Chebil, a judge he met when she was a law student in Sousse. He has three children. Saied's interests include clas",
+            "After assuming the presidency, Kais Saied garnered significant media attention for his handwritten official letters in fine Maghrebi script. Honours"
+          ]
+        },
+        {
+          "id": "jcc-1966",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "The Carthage Film Festival is held in October and November of every other year, alternating with the Carthage Theatre Festival. It was created in 1966 by the Tu",
+            "The Carthage Film Festival in regions",
+            "The Carthage Film Festival is held in October and November of every other year, alternating with the Carthage Theatre Festival. It was created in 1966 by the Tu"
+          ]
+        },
+        {
+          "id": "oscar",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "d His Skin was nominated for the Academy Award for Best International Feature Film at 93rd Academy Awards. It became the first Tunisian film to be nominated for",
+            "Academy Award nominations Tunisia has submitted films for the Academy Award for Best Foreign Language Film on an irregular basis since 1995. The award is handed",
+            "mes sociales contemporaines. Après la révolution de 2011, le cinéma tunisien se distingue par une diversité formelle accrue, avec Le Challat de Tunis (2013) de "
+          ]
+        },
+        {
+          "id": "covid-first",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            "The COVID-19 pandemic in Tunisia was a part of the ongoing pandemic of coronavirus disease 2019 (COVID-19) caused by severe acute respiratory syndrome coronavir",
+            "الجدول الزمني أعلنت تونس أولي حالات الإصابة بالمرض في 2 مارس 2020 ، حيث كانت الضحية رجل تونسي من مدينة قفصة، يبلغ من العمر 40 عامًا كان عائدا من إيطاليا.\nبالإضا",
+            "March 2020 Tunisia confirmed its first case on 2 March 2020, a 40-year-old Tunisian man from Gafsa returning from Italy.\nIn addition, 74 suspected cases in Gafs"
+          ]
+        },
+        {
+          "id": "nobel",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "ional Dialogue Quartet, the Constituent Assembly completed its work, the interim government resigned, and new elections were held in 2014, completing the transi",
+            "The Tunisian National Dialogue Quartet won the 2015 Nobel Peace Prize for its work in building a peaceful, pluralistic political order in Tunisia. Presidency of",
+            "In recent years, the UGTT worked together with three other organizations (the Tunisian Human Rights League-LTDH, the Tunisian Confederation of Industry, Trade a"
+          ]
+        },
+        {
+          "id": "csp-1956",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "In 1956, The Code of Personal Status (Tunisia) was enacted—a document that has undergone heavy reform since its inception. This document has abolished polygamy ",
+            "A Code of Personal Status was adopted shortly after independence in 1956, which, among other things, gave women full legal status (allowing them to run and own ",
+            "تم اعتماد مجلة الأحوال الشخصية بعد فترة وجيزة من الاستقلال في عام 1956، والذي من بين أمور أخرى، منح المرأة الوضع القانوني الكامل (السماح لها بإدارة الأعمال التج"
+          ]
+        },
+        {
+          "id": "bce-2019",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "Le président Béji Caïd Essebsi meurt le 25 juillet 2019, à 92 ans. Fin 2019, un double scrutin, législatif le 6 octobre, et présidentiel, avec un premier tour e",
+            "Presidency of Kais Saied (2019–present) Tunisia's first democratically elected president Beji Caid Essebsi died in July 2019. Following him, Kais Saied became T",
+            "توفي الباجي قائد السبسي في 25 يوليو 2019 يوم ذكرى إعلان الجمهورية، عن عمر يناهز 92 عامًا، قبل 3 أشهر من نهاية عهدته، وتولى رئيس مجلس نواب الشعب محمد الناصر منصب"
+          ]
+        },
+        {
+          "id": "bouazizi",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "Post-revolution (since 2011) The Tunisian Revolution was an intensive campaign of civil resistance that was precipitated by high unemployment, food inflation, c",
+            "The Tunisian revolution (Arabic: الثورة التونسية), also called the Jasmine Revolution and Tunisian Revolution of Dignity, was an intensive 28-day campaign of ci",
+            " العرب يشكلون الأغلبية الديموغرافية للسكان. ثم، في عام 1546، فرضت الدولة العثمانية سيطرتها هناك، واستمرت في السيطرة لأكثر من 300 عام، حتى عام 1881، عندما غزا ال"
+          ]
+        },
+        {
+          "id": "derja",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            "أصل التسمية تأتي تسمية البلاد من تسمية عاصمتها التي تمتلك نفس الاسم، وتختلف الآراء في تسمية هذه المدينة. فيعتقد البعض أن اسم تونس يعود إلى الحقبة القرطاجية حيث ",
+            "اللهجة التونسية أو الدارجة التونسية أو العربية التونسية أو التونسية، هي إحدى لهجات الدارجة المغاربيّة المحكيّة في تونس. يُطلق عليها متحدثوها الـ11 مليونا تسمية ",
+            "Tunisian Arabic, or simply Tunisian (Arabic: تونسي, romanized: Tūnsi), is a variety of Arabic spoken in Tunisia. It is known among its 12.5 million speakers as "
+          ]
+        },
+        {
+          "id": "ugtt-1946",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "The Tunisian General Labour Union (French: Union Générale Tunisienne du Travail, UGTT. Arabic: الاتحاد العام التونسي للشغل) is a national trade union center in ",
+            "جاء تأسيس الاتحاد بعد فشل محاولتين سابقتين لتأسيس منظمة نقابية وطنية هما جامعة عموم العملة التونسية الأولى في العشرينات ثم الثانية في الثلاثينات. وقد بقي الاتحا",
+            "As part of postwar Tunisia, a new all-Tunisian labor organization was formed, the Union Générale des Travailleurs (UGTT). This was one of the stronger component"
+          ]
+        },
+        {
+          "id": "agri-gdp",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.25,
+          "answerable": true,
+          "top": [
+            "الزراعة تعتمد تونس اعتمادًا كبيرًا على المحاصيل البعلية لدعم قطاعها الزراعي ومجتمعاتها الريفية. تُعدّ الزراعة قطاعًا رئيسيًا في تونس، حيث ستمثل 10% من الناتج ال",
+            "Agriculture Tunisia relies heavily on rain-fed crops to sustain their agricultural sector and rural communities. Agriculture is a key industry in Tunisia, accou",
+            "Agriculture Depuis l'indépendance de la Tunisie, l'agriculture a enregistré des taux de croissance importants et a permis au pays d'atteindre un niveau de sécur"
+          ]
+        },
+        {
+          "id": "fr-referendum",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.25,
+          "answerable": true,
+          "top": [
+            "A constitutional referendum was held in Tunisia on 25 July 2022 by the Independent High Authority for Elections. The referendum was supported by the Tunisian pr",
+            "الاستفتاء الدستوري التونسي 2022 وهو استفتاء عام أجري في تونس يوم 25 يوليو 2022 بتنظيم الهيئة العليا المستقلة للانتخابات للسماح للتونسيين باتخاذ قرار بشأن دستور ",
+            "جرى الاستفتاء الدستوري يوم 25 يوليو 2022، للسماح للتونسيين باتخاذ قرار بشأن دستور جديد للجمهورية التونسية، اقترح الاستفتاء دستورا يوسع الصلاحيات الممنوحة لرئيس "
+          ]
+        },
+        {
+          "id": "fr-bouden",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "Le 29 septembre 2021, Najla Bouden est nommée chef du gouvernement ; c'est la première fois de l'histoire du pays qu'une femme est nommée à ce poste.",
+            "evue La Femme ; son rôle lui vaut d'être surnommée par Bourguiba la « présidente des femmes ». Après la crise sociale de 1969-1970, son ralliement au courant de",
+            "ing legislative power. His decision was criticized by most of the parties represented in Parliament. On 29 September the President tasked Najla Bouden with form"
+          ]
+        },
+        {
+          "id": "fr-ben-ali",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.25,
+          "answerable": true,
+          "top": [
+            "The 84-year-old President Bourguiba was overthrown and replaced by Ben Ali his Prime Minister on 7 November 1987. However, the Ben Ali regime came to an end 23 ",
+            "أطيح بالرئيس بورقيبة البالغ من العمر 84 عاماً وحل محله بن علي رئيس وزرائه في 7 نوفمبر 1987. ومع ذلك، سقط نظام بن علي بعد 23 عاماً في 14 يناير 2011، في أحداث الث",
+            "Background President Zine El Abidine Ben Ali had ruled Tunisia since 1987, mostly as a one-party state with the Democratic Constitutional Rally (RCD), following"
+          ]
+        },
+        {
+          "id": "ar-july",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.2,
+          "answerable": true,
+          "top": [
+            "حل البرلمان بعد مرور 8 أشهر على تعليق اختصاصاته، أعلن رئيس الجمهورية قيس سعيد في 30 مارس 2022 حل مجلس نواب الشعب استنادا للفصل 72 من الدستور. وذلك كرد فعل على ا",
+            "n, il limoge le gouvernement Mechichi avec effet immédiat, annonce la suspension de l'assemblée, la formation d'un nouveau gouvernement et sa décision de gouver",
+            "يارات الدولارات لاقتصاد يعاني من الركود، الدين العام، التضخم والبطالة. بعد أكثر من 8 أشهر من تعليق اختصاصاته، أعلن رئيس الجمهورية قيس سعيّد في 30 مارس 2022 عن ح"
+          ]
+        },
+        {
+          "id": "ar-bouden",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.14285714285714285,
+          "answerable": true,
+          "top": [
+            "الحكومة والسياسة تونس دولة ذات نظام رئاسي ، يرأسها رئيس الدولة ، ويرأس حكومتها رئيس الوزراء ، ولها برلمان من مجلسين، ونظام قضائي مدني . يضمن دستور تونس ، الذي ا",
+            "Sous Bourguiba La figure emblématique de cette période est Radhia Haddad (1922-2003). Formée avant l'indépendance au sein de l'Union des femmes musulmanes de Tu",
+            "السياسة تونس دولة ديمقراطية نيابية نظامها الجمهورية الرئاسية مع رئيس يعمل كرأس للدولة، رئيس وزراء، برلمان من مجلسين ونظام قضائي مدني. يكفل الدستور التونسي، المع"
+          ]
+        },
+        {
+          "id": "news-messi",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "FULL LIST: Lionel Messi’s achievements, trophies with Argentina",
+            "Messi’s individual achievements with Argentina",
+            "Here is the full list of Messi’s major achievements and trophies with Argentina:"
+          ]
+        }
+      ]
+    },
+    "sentence-128": {
+      "note": "whole sentences packed up to 128 tokens of the embedding model",
+      "chunks": 9845,
+      "chunks_per_doc": 17.7,
+      "mean_tokens": 104.1,
+      "share_over_window": 0.003,
+      "text_unseen_by_embedder": 0.002,
+      "hit@1": 0.261,
+      "hit@5": 0.565,
+      "mrr@10": 0.391,
+      "answerable": 1.0,
+      "context_tokens_top_k": 520,
+      "embed_seconds": 29773.6,
+      "cases": [
+        {
+          "id": "saied-art80",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "Le jour même, Kaïs Saïed dissout le Parlement, ce qu'interdit pourtant la Constitution durant la période où l'état d'exception est appliqué, et menace les déput",
+            "Le soir même, invoquant l'article 80 de la Constitution, Kaïs Saïed limoge le gouvernement Mechichi avec effet immédiat, en particulier Hichem Mechichi de ses a",
+            "Le soir même, invoquant l'article 80 de la Constitution, Kaïs Saïed limoge le gouvernement Mechichi avec effet immédiat, en particulier Hichem Mechichi de ses a"
+          ]
+        },
+        {
+          "id": "bouden",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "When Tunisia regained its independence in 1956, the republic's founder—Habib Bourguiba—discussed repeatedly the need to include all persons in Tunisian society.",
+            "الحكومة والسياسة تونس دولة ذات نظام رئاسي ، يرأسها رئيس الدولة ، ويرأس حكومتها رئيس الوزراء ، ولها برلمان من مجلسين، ونظام قضائي مدني . يضمن دستور تونس ، الذي ا",
+            "السياسة تونس دولة ديمقراطية نيابية نظامها الجمهورية الرئاسية مع رئيس يعمل كرأس للدولة، رئيس وزراء، برلمان من مجلسين ونظام قضائي مدني. يكفل الدستور التونسي، المع"
+          ]
+        },
+        {
+          "id": "bouden-date",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "His decision was criticized by most of the parties represented in Parliament. On 29 September the President tasked Najla Bouden with forming a new government. F",
+            "His decision was criticized by most of the parties represented in Parliament. On 29 September, the President instructed Najla Bouden to form a new government. T",
+            "Sa décision est critiquée par la plupart des partis représentés au Parlement. Le 29 septembre, le président charge Najla Bouden de former un nouveau gouvernemen"
+          ]
+        },
+        {
+          "id": "ref-turnout",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "الاستفتاء الدستوري التونسي 2022 وهو استفتاء عام أجري في تونس يوم 25 يوليو 2022 بتنظيم الهيئة العليا المستقلة للانتخابات للسماح للتونسيين باتخاذ قرار بشأن دستور ",
+            "A constitutional referendum was held in Tunisia on 25 July 2022 by the Independent High Authority for Elections. The referendum was supported by the Tunisian pr",
+            "Le référendum constitutionnel tunisien de 2022 a lieu le 25 juillet 2022 afin de permettre à la population de se prononcer sur une nouvelle Constitution. Le pro"
+          ]
+        },
+        {
+          "id": "parl-turnout",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "Analysis Turnout for the election in the first round was 8.8% at 18h, a record low not just for Tunisia, but for the entirety of north Africa. According to the ",
+            "الدور الثاني: بلغت نسبة المشاركة حسب ما أعلنته الهيئة يوم 30 يناير 2023، 11.4% أي بعدد ناخبين يقدر بـ895 ألف و2 ناخب من إجمالي عدد المسجلين البالغ عددهم حوالي 7",
+            "Results Turnout was low at only 31%, according to official figures released by Tunisia's elections committee. The new constitution was declared approved regardl"
+          ]
+        },
+        {
+          "id": "pres-2024",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "Élection présidentielle de 2024 et second mandat Kaïs Saïed annonce qu'il brigue un nouveau mandat présidentiel lors de l'élection présidentielle prévue le 6 oc",
+            "Kaïs Saïed l'emporte dès le premier tour avec plus de 90 % des voix, pour un taux de participation de 28 %. La participation connaît ainsi une hausse par rappor",
+            "سبق الاقتراع استشارة إلكترونية تتعلق بشكل خاص بطبيعة النظام السياسي وطريقة التصويت في الانتخابات التشريعية القادمة. تم الإعلان عن النتائج في مساء يوم 26 يوليو 2"
+          ]
+        },
+        {
+          "id": "saied-born",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "Early life Kais Saied is the son of Moncef Saied and Zakia Bellagha from Béni Khiar (Cap Bon). His paternal uncle, Hicham Saïed, was the first pediatric surgeon",
+            "Kais Saied, the outgoing President, having officially announced his candidacy for his own re-election on 20 July filed it on 5 August. Ayachi Zammel, leader of ",
+            "While the government of Kais Saied has tried taking some measures to address the problem, \"Tunisians were, globally, the population most dissatisfied with effor"
+          ]
+        },
+        {
+          "id": "jcc-1966",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "The Carthage Film Festival is held in October and November of every other year, alternating with the Carthage Theatre Festival. It was created in 1966 by the Tu",
+            "The Carthage Film Festival is held in October and November of every other year, alternating with the Carthage Theatre Festival. It was created in 1966 by the Tu",
+            "Carthage Film Festival (Journées cinématographiques de Carthage, or JCC) is an annual film festival that takes place in Tunis, founded in 1966. It is also known"
+          ]
+        },
+        {
+          "id": "oscar",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            "It became the first Tunisian film to be nominated for an Academy Award. The documentary film Four Daughters was nominated for Best Documentary Feature at 96th A",
+            "Après la révolution de 2011, le cinéma tunisien se distingue par une diversité formelle accrue, avec Le Challat de Tunis (2013) de Kaouther Ben Hania et Tlamess",
+            "Tunisia has submitted films for the Academy Award for Best Foreign Language Film on an irregular basis since 1995. The award is handed out annually by the Unite"
+          ]
+        },
+        {
+          "id": "covid-first",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.25,
+          "answerable": true,
+          "top": [
+            "The COVID-19 pandemic in Tunisia was a part of the ongoing pandemic of coronavirus disease 2019 (COVID-19) caused by severe acute respiratory syndrome coronavir",
+            "2021 cases On 2 March, the first cases of lineage B.1.1.7 (the 'UK variant') were reported in Tunisia. Tunisia's first case of the Omicron variant was reported ",
+            "La pandémie de Covid-19 en Tunisie démarre officiellement le 2 mars 2020. À la date du 11 décembre 2022, le bilan est de 29 272 morts. L'ensemble des 24 gouvern"
+          ]
+        },
+        {
+          "id": "nobel",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "The Tunisian National Dialogue Quartet was awarded the 2015 Nobel Peace Prize for \"its decisive contribution to the building of a pluralistic democracy in Tunis",
+            "فازت لجنة الرباعي الراعي للحوار الوطني وهي جمعية من أربع منظمات حددت لنفسها هدف تنظيم مفاوضات بين الأحزاب السياسية التونسية لضمان الانتقال إلى نظام ديمقراطي دائ",
+            "démocratique et transparente. Le quartet du dialogue national, association de quatre organisations s'étant donné pour but d'organiser des négociations entre les"
+          ]
+        },
+        {
+          "id": "csp-1956",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "In 1956, The Code of Personal Status (Tunisia) was enacted—a document that has undergone heavy reform since its inception. This document has abolished polygamy ",
+            "التاريخ ارتبط تطور حقوق المرأة في تونس منذ النصف الأول من القرن العشرين بحركة إصلاح اجتماعي وفكري وبنشوء جمعيات نسائية شاركت في النقاش حول التعليم والعمل ووضع ا",
+            "يستند الإطار القانوني لحقوق المرأة في تونس إلى الدستور ومجلة الأحوال الشخصية والقوانين المتعلقة بالعمل والعنف والانتخابات والجنسية، إضافة إلى الاتفاقيات الدولية"
+          ]
+        },
+        {
+          "id": "bce-2019",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "Le président Béji Caïd Essebsi meurt le 25 juillet 2019, à 92 ans. Fin 2019, un double scrutin, législatif le 6 octobre, et présidentiel, avec un premier tour e",
+            "Tunisian president Beji Caid Essebsi renewed the state of emergency in October for three more months. The Tunisian National Dialogue Quartet won the 2015 Nobel ",
+            "Caïd Essebsi government Béji Caïd Essebsi became prime minister, appointed by Mebazaa on the day Ghannouchi resigned. Although the cabinet was now free of RCD m"
+          ]
+        },
+        {
+          "id": "bouazizi",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "يبدا الكتاب بلمحة عن تونس ثم تاريخ الفترات التي مر بها هذا البلد من الحكم الروماني والدولة القرطاجية إلى الفتح الإسلامي ثم تاريخ تونس الحديث فعهد زين العابدين ب",
+            "The Tunisian revolution (Arabic: الثورة التونسية), also called the Jasmine Revolution and Tunisian Revolution of Dignity, was an intensive 28-day campaign of ci",
+            "Today, Tunisia's culture and identity are rooted in this centuries-long intersection of different cultures and ethnicities. In 2011, the Tunisian Revolution, wh"
+          ]
+        },
+        {
+          "id": "derja",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.1111111111111111,
+          "answerable": true,
+          "top": [
+            "كلمة (Tunisie) المشتقة من الفرنسية تبنتها بعض اللغات الأوروبية مع بعض التعديلات الطفيفة، مما أنتج عن اسم مميز للبلاد. أما بعض اللغات الأخرى فلم تغير التسمية الع",
+            "Tunisian Arabic is the mother tongue of the Arabic-speaking population in Tunisia. It is also the second language of the Berber minority living in the country, ",
+            "Tunisian Arabic is mostly similar to eastern Algerian Arabic and western Libyan Arabic. As part of the Maghrebi Arabic dialect continuum, Tunisian merges into A"
+          ]
+        },
+        {
+          "id": "ugtt-1946",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "The Tunisian General Labour Union (French: Union Générale Tunisienne du Travail, UGTT. Arabic: الاتحاد العام التونسي للشغل) is a national trade union center in ",
+            "من جهة أخرى يقوم بكراء فندق أميلكار في قرطاج. جاء تأسيس الاتحاد بعد فشل محاولتين سابقتين لتأسيس منظمة نقابية وطنية هما جامعة عموم العملة التونسية الأولى في العش",
+            "الاتحاد العام التونسي للشغل هو أكبر منظمة نقابية تونسية وتضم 000 500 عضو في 2017. تأسس الاتحاد في 20 يناير 1946 خلال المؤتمر الذي انعقد بالمدرسة الخلدونية من قب"
+          ]
+        },
+        {
+          "id": "agri-gdp",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "تعتمد تونس اعتمادًا كبيرًا على المحاصيل البعلية لدعم قطاعها الزراعي ومجتمعاتها الريفية. تُعدّ الزراعة قطاعًا رئيسيًا في تونس، حيث ستمثل 10% من الناتج المحلي الإ",
+            "In 2008 it had an economy of US$41 billion in nominal terms, and $82 billion in PPP. The agricultural sector accounts for 11.6% of the GDP, industry 25.7%, and ",
+            "منذ إعلان استقلال تونس، سجلت الزراعة معدلات نمو كبيرة ومكنت البلاد من تحقيق مستوى كافٍ من الأمن الغذائي. على الرغم من تطور القطاعات الأخرى للاقتصاد الوطني، تحتف"
+          ]
+        },
+        {
+          "id": "fr-referendum",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            "A constitutional referendum was held in Tunisia on 25 July 2022 by the Independent High Authority for Elections. The referendum was supported by the Tunisian pr",
+            "Le 13 décembre, il annonce la tenue d'un référendum constitutionnel qui se solde par la large approbation en juillet 2022 d'une nouvelle Constitution mettant no",
+            "Le référendum constitutionnel tunisien de 2022 a lieu le 25 juillet 2022 afin de permettre à la population de se prononcer sur une nouvelle Constitution. Le pro"
+          ]
+        },
+        {
+          "id": "fr-bouden",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.125,
+          "answerable": true,
+          "top": [
+            "His decision was criticized by most of the parties represented in Parliament. On 29 September, the President instructed Najla Bouden to form a new government. T",
+            "In October, Najla Bouden was appointed to head a new government, making her the first female prime minister both in Tunisia and the Arab world. In July 2022, a ",
+            "Abderraouf Bettaïeb was appointed Minister-Advisor to the President of the Republic, Rachida Ennaifer was put in charge of communication, while Nadia Akacha bec"
+          ]
+        },
+        {
+          "id": "fr-ben-ali",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            "أطيح بالرئيس بورقيبة البالغ من العمر 84 عاماً وحل محله بن علي رئيس وزرائه في 7 نوفمبر 1987. ومع ذلك، سقط نظام بن علي بعد 23 عاماً في 14 يناير 2011، في أحداث الث",
+            "It added that Ben Ali's resignation, following his statement that he had been \"duped by his entourage\", may not have been entirely sincere. Le Monde criticised ",
+            "Le 7 novembre 1987, le Président Bourguiba, alors âgé de 84 ans, est renversé et remplacé par Ben Ali, son Premier ministre. Toutefois, le régime de Ben Ali est"
+          ]
+        },
+        {
+          "id": "ar-july",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "بينما كشفت وسائل إعلام عن معاينة المكتب لاستقالة 8 نواب من كتلة حركة النهضة والاتجاه لعقد جلسة عامة «عن بعد» يوم الاربعاء 30 مارس لإلغاء العمل بالتدابير الاستثن",
+            "وفي 24 أغسطس، بعد انتهاء مدة الـ30 يوما أصدر سعيد قرارًا بتمديد فترة التدابير الاستثنائية التي أعلنها منذ شهر إلى غاية إشعار آخر. على الرغم من أن الدستور ينص عل",
+            "كل هذه القرارات جاءت في إطار «الإجراءات الإستثنائية» في ظل تدهور الوضع الصحي والإقتصادي بالبلاد. وعلى إثر هذه القرارات، اندلعت أزمة سياسية عاصفة بالبلاد وظل منذ"
+          ]
+        },
+        {
+          "id": "ar-bouden",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "في وقت سابق من ذلك اليوم، سُجن سيف الدين مخلوف وفيصل التبيني، وكلاهما من أعضاء البرلمان. وفي 29 سبتمبر 2021، عيَّن سعيد السيدة نجلاء بودن في منصب رئيسة حكومة تو",
+            "الحكومة والسياسة تونس دولة ذات نظام رئاسي ، يرأسها رئيس الدولة ، ويرأس حكومتها رئيس الوزراء ، ولها برلمان من مجلسين، ونظام قضائي مدني . يضمن دستور تونس ، الذي ا",
+            "السياسة تونس دولة ديمقراطية نيابية نظامها الجمهورية الرئاسية مع رئيس يعمل كرأس للدولة، رئيس وزراء، برلمان من مجلسين ونظام قضائي مدني. يكفل الدستور التونسي، المع"
+          ]
+        },
+        {
+          "id": "news-messi",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "Messi’s international career began in 2005 and spanned more than two decades, during which he experienced devastating defeats before leading Argentina through o",
+            "News Follow Us on Google August 31, 2026 by Adedamola Ogunbewon FULL LIST: Lionel Messi’s achievements, trophies with Argentina Argentina legend Lionel Messi ha",
+            "The Inter Miami forward leaves the international stage as the most decorated player in Argentina’s history, after ending the country’s 28-year wait for a major "
+          ]
+        }
+      ]
+    },
+    "sentence-128+title": {
+      "note": "same, each chunk prefixed with its document title",
+      "chunks": 11144,
+      "chunks_per_doc": 20.0,
+      "mean_tokens": 106.5,
+      "share_over_window": 0.006,
+      "text_unseen_by_embedder": 0.003,
+      "hit@1": 0.304,
+      "hit@5": 0.652,
+      "mrr@10": 0.47,
+      "answerable": 1.0,
+      "context_tokens_top_k": 532,
+      "embed_seconds": 513.9,
+      "cases": [
+        {
+          "id": "saied-art80",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.25,
+          "answerable": true,
+          "top": [
+            "Kais Saied — Saied's actions, which included assuming the executive authority, suspending the Parliament, waiving the immunity of the parliament members, orderi",
+            "Kaïs Saïed — Le soir même, invoquant l'article 80 de la Constitution, Kaïs Saïed limoge le gouvernement Mechichi avec effet immédiat, en particulier Hichem Mech",
+            "قيس سعيد — في اليوم التالي يقيل قيس سعيّد وزير الدفاع الوطني إبراهيم البرتاجي ووزيرة العدل المؤقتة حسناء بن سليمان. في 1 أغسطس اعتقل نائبان من ائتلاف الكرامة اح"
+          ]
+        },
+        {
+          "id": "bouden",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "تونس — في 29 سبتمبر قام قيس سعيّد بتعيين نجلاء بودن في منصب رئيسة الحكومة، لتصبح أول امرأة في تونس والوطن العربي تكون على رأس الحكومة. لاحقا، خرجت مظاهرات مؤيدة",
+            "2021 Tunisian self-coup — In October, Najla Bouden was appointed to head a new government, making her the first female prime minister both in Tunisia and the Ar",
+            "Condition des femmes en Tunisie — Sous Bourguiba La figure emblématique de cette période est Radhia Haddad (1922-2003). Formée avant l'indépendance au sein de l"
+          ]
+        },
+        {
+          "id": "bouden-date",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "Tunisie — Le 29 septembre 2021, Najla Bouden est nommée chef du gouvernement ; c'est la première fois de l'histoire du pays qu'une femme est nommée à ce poste. ",
+            "قيس سعيد — في 25 يوليو 2020، عين سعيّد هشام المشيشي رئيسا للحكومة، مكلفا بتشكيل الحكومة في شهر واحد والحصول على ثقة مجلس نواب الشعب. وفي وقت لاحق، تولى منصبه في",
+            "2024 Tunisian presidential election — His decision was criticized by most of the parties represented in Parliament. On 29 September the President tasked Najla B"
+          ]
+        },
+        {
+          "id": "ref-turnout",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "الاستفتاء الدستوري التونسي 2022 — النتائج بحسب الأرقام الرسمية الصادرة عن الهيئة العليا المستقلة للانتخابات، تم الإعلان عن النتائج في مساء يوم 26 يوليو 2022، كا",
+            "الاستفتاء الدستوري التونسي 2022 — سبق الاقتراع استشارة إلكترونية تتعلق بشكل خاص بطبيعة النظام السياسي وطريقة التصويت في الانتخابات التشريعية القادمة. تم الإعلان",
+            "2022 Tunisian constitutional referendum — The Social Democratic Path, the Democratic Forum for Labour and Liberties, and the Democratic Patriots' Unified Party "
+          ]
+        },
+        {
+          "id": "parl-turnout",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "2022–23 Tunisian parliamentary election — Analysis Turnout for the election in the first round was 8.8% at 18h, a record low not just for Tunisia, but for the e",
+            "Élections législatives tunisiennes de 2022-2023 — Les élections connaissent un taux de participation historiquement faible qui s'établit à 11,22 %, contre 41,70",
+            "2022 Tunisian constitutional referendum — Turnout was low, at only 31%. The newly drafted constitution turned Tunisia's semi-presidential system into a presiden"
+          ]
+        },
+        {
+          "id": "pres-2024",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "Kaïs Saïed — Élection présidentielle de 2024 et second mandat Kaïs Saïed annonce qu'il brigue un nouveau mandat présidentiel lors de l'élection présidentielle p",
+            "قيس سعيد — أعلن عن النتائج في مساء يوم 26 يوليو 2022، كان عدد الناخبين الإجمالي 2،830،094 صوت، حيث حصل الناخبون الموافقون على الأغلبية الساحقة بعدد قدره 2،607،8",
+            "Élection présidentielle tunisienne de 2024 — Les résultats définitifs sont rendus publics le 12 octobre par l'Instance supérieure indépendante pour les élection"
+          ]
+        },
+        {
+          "id": "saied-born",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "Kais Saied — He ruled by decree until he was successful in passing a new constitution which granted him more powers and called snap legislative elections. He wa",
+            "Kais Saied — He was also a member of the scientific council of several commissions academics. In 2013, while a visiting professor at several Arab universities, ",
+            "Kais Saied — His paternal uncle, Hicham Saïed, was the first pediatric surgeon in Tunisia, known for having separated two conjoined twins in the 1970s. Saïed co"
+          ]
+        },
+        {
+          "id": "jcc-1966",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "Tunisia — The Carthage Film Festival is held in October and November of every other year, alternating with the Carthage Theatre Festival. It was created in 1966",
+            "Carthage Film Festival — Carthage Film Festival (Journées cinématographiques de Carthage, or JCC) is an annual film festival that takes place in Tunis, founded ",
+            "Carthage Film Festival — The Pan African Federation of Filmmakers (French: Fédération Panafricaine des Cinéastes; FEPACI) was officially established in 1970 at "
+          ]
+        },
+        {
+          "id": "oscar",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "Kaouther Ben Hania — Le film L'Homme qui a vendu sa peau l'est en 2021, ce qui en fait le premier film tunisien sélectionné aux Oscars. En 2023, son nouveau fil",
+            "Cinema of Tunisia — The Man Who Sold His Skin was nominated for the Academy Award for Best International Feature Film at 93rd Academy Awards. It became the firs",
+            "Cinema of Tunisia — Both films were directed by Kaouther Ben Hania and with the nomination of Four Daughters, Hania became the first Arab Woman to earn two Acad"
+          ]
+        },
+        {
+          "id": "covid-first",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "COVID-19 pandemic in Tunisia — Tunisia confirmed its first case on 2 March 2020, a 40-year-old Tunisian man from Gafsa returning from Italy. In addition, 74 sus",
+            "Pandémie de Covid-19 en Tunisie — Le 17 mars, le bilan s'élève à 29 cas enregistrés et le premier patient guéri. Le 18 mars, le nombre de cas monte à 39 et un p",
+            "COVID-19 pandemic in Tunisia — The number of recovered patients increased to 105,364, leaving 29,100 active cases at the end of the month. Subsequent cases 2021"
+          ]
+        },
+        {
+          "id": "nobel",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "Tunisian revolution — The Tunisian National Dialogue Quartet was awarded the 2015 Nobel Peace Prize for \"its decisive contribution to the building of a pluralis",
+            "Tunisie — élection démocratique et transparente. Le quartet du dialogue national, association de quatre organisations s'étant donné pour but d'organiser des nég",
+            "Tunisians — The Tunisian National Dialogue Quartet was awarded the 2015 Nobel Peace Prize for \"its decisive contribution to the building of a pluralistic democr"
+          ]
+        },
+        {
+          "id": "csp-1956",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.125,
+          "answerable": true,
+          "top": [
+            "حقوق المرأة في تونس — وفي يونيو 1959 أقر دستور الجمهورية التونسية مبدأ المساواة أمام القانون، ونص على تمتع المواطنين بالحقوق والواجبات على قدم المساواة. كما أرس",
+            "حقوق المرأة في تونس — كان إصدار مجلة الأحوال الشخصية جزءًا من مشروع أوسع لإعادة بناء الدولة والمجتمع بعد الاستقلال. وتحت قيادة الرئيس الحبيب بورقيبة اتجهت الدول",
+            "حقوق المرأة في تونس — كما ينص على التناصف بين الرجال والنساء في المجالس المنتخبة وفق ما يحدده القانون. وبذلك تطور الإطار القانوني لحقوق المرأة في تونس عبر عدة م"
+          ]
+        },
+        {
+          "id": "bce-2019",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "Tunisia — Tunisian president Beji Caid Essebsi renewed the state of emergency in October for three more months. The Tunisian National Dialogue Quartet won the 2",
+            "Tunisian revolution — On 24 December, Mohamed Ammari was fatally shot in the chest by police in Bouziane. Other protesters were also injured, including Chawki B",
+            "Kaïs Saïed — Virage autoritaire et crise politique de 2021-2024 Elyes Fakhfakh démissionne le 15 juillet 2020 à la demande du président de la République (ce qui"
+          ]
+        },
+        {
+          "id": "bouazizi",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.0,
+          "answerable": true,
+          "top": [
+            "الثورة التونسية — يبدا الكتاب بلمحة عن تونس ثم تاريخ الفترات التي مر بها هذا البلد من الحكم الروماني والدولة القرطاجية إلى الفتح الإسلامي ثم تاريخ تونس الحديث ف",
+            "الثورة التونسية — الشرارة التونسية ميلاد الثورات العربية بدأ من تونس، وتحديدا من مدينة سيدي بوزيد عندما أقدم الشاب محمد البوعزيزي على إحراق نفسه في 17 ديسمبر/كا",
+            "تونس — ثم، في عام 1546، فرضت الدولة العثمانية سيطرتها هناك، واستمرت في السيطرة لأكثر من 300 عام، حتى عام 1881، عندما غزا الفرنسيون تونس. وفي 20 مارس 1956، حصلت "
+          ]
+        },
+        {
+          "id": "derja",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.1111111111111111,
+          "answerable": true,
+          "top": [
+            "تونس — كلمة (Tunisie) المشتقة من الفرنسية تبنتها بعض اللغات الأوروبية مع بعض التعديلات الطفيفة، مما أنتج عن اسم مميز للبلاد. أما بعض اللغات الأخرى فلم تغير التس",
+            "Tunisian Arabic — Tunisian Arabic is mostly similar to eastern Algerian Arabic and western Libyan Arabic. As part of the Maghrebi Arabic dialect continuum, Tuni",
+            "لهجة تونسية — اللهجة التونسية والعربية ومن أبرز الكلمات التي تميز اللهجة التونسية وتعرف بها كلمة «بَرْشَا» بمعنى «كثير»، فالسنة البرشاء عند العرب هي السنة كثيرة"
+          ]
+        },
+        {
+          "id": "ugtt-1946",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "الاتحاد العام التونسي للشغل — الاتحاد العام التونسي للشغل هو أكبر منظمة نقابية تونسية وتضم 000 500 عضو في 2017. تأسس الاتحاد في 20 يناير 1946 خلال المؤتمر الذي ",
+            "Tunisian General Labour Union — The Tunisian General Labour Union (French: Union Générale Tunisienne du Travail, UGTT. Arabic: الاتحاد العام التونسي للشغل) is a",
+            "الاتحاد العام التونسي للشغل — من جهة أخرى يقوم بكراء فندق أميلكار في قرطاج. جاء تأسيس الاتحاد بعد فشل محاولتين سابقتين لتأسيس منظمة نقابية وطنية هما جامعة عموم "
+          ]
+        },
+        {
+          "id": "agri-gdp",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            "تونس — منذ إعلان استقلال تونس، سجلت الزراعة معدلات نمو كبيرة ومكنت البلاد من تحقيق مستوى كافٍ من الأمن الغذائي. على الرغم من تطور القطاعات الأخرى للاقتصاد الوطن",
+            "Économie de la Tunisie — En effet, les taux de couverture des besoins nationaux par la production intérieure sont de près de 48 % pour les céréales, de 100 % po",
+            "Tunisia — In 2008 it had an economy of US$41 billion in nominal terms, and $82 billion in PPP. The agricultural sector accounts for 11.6% of the GDP, industry 2"
+          ]
+        },
+        {
+          "id": "fr-referendum",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.3333333333333333,
+          "answerable": true,
+          "top": [
+            "2022 Tunisian constitutional referendum — A constitutional referendum was held in Tunisia on 25 July 2022 by the Independent High Authority for Elections. The r",
+            "Tunisie — Le 13 décembre, il annonce la tenue d'un référendum constitutionnel qui se solde par la large approbation en juillet 2022 d'une nouvelle Constitution ",
+            "Constitution de la Tunisie — La version en vigueur est adoptée par référendum le 25 juillet 2022 et entre en vigueur le 16 août de la même année. Il s'agit de l"
+          ]
+        },
+        {
+          "id": "fr-bouden",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "Tunisie — Le 29 septembre 2021, Najla Bouden est nommée chef du gouvernement ; c'est la première fois de l'histoire du pays qu'une femme est nommée à ce poste. ",
+            "2021 Tunisian self-coup — On 29 September 2021, two months after the coup, Saied appointed Najla Bouden to the premiership. Although this made her the first fem",
+            "Kais Saied — On 22 September, Saied announced that he will rule by decree and ignore parts of the constitution. Saied named Najla Bouden as Prime Minister on 29"
+          ]
+        },
+        {
+          "id": "fr-ben-ali",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "تونسيون — ومع ذلك، أدت المشاكل الزراعية والبطالة الحضرية إلى زيادة الهجرة إلى أوروبا. أطيح بالرئيس بورقيبة البالغ من العمر 84 عاماً وحل محله بن علي رئيس وزرائه ",
+            "Tunisiens — Le 7 novembre 1987, le Président Bourguiba, alors âgé de 84 ans, est renversé et remplacé par Ben Ali, son Premier ministre. Toutefois, le régime de",
+            "Tunisian revolution — It added that Ben Ali's resignation, following his statement that he had been \"duped by his entourage\", may not have been entirely sincere"
+          ]
+        },
+        {
+          "id": "ar-july",
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "rr@10": 0.16666666666666666,
+          "answerable": true,
+          "top": [
+            "مجلس نواب الشعب (تونس) — وفي 13 ديسمبر 2021، أعلن سعيد عن استمرار تعليق اختصاصات المجلس حتى تنظيم انتخابات تشريعية جديدة في 17 ديسمبر 2022. في 29 يوليو 2021، أص",
+            "قيس سعيد — في اليوم التالي يقيل قيس سعيّد وزير الدفاع الوطني إبراهيم البرتاجي ووزيرة العدل المؤقتة حسناء بن سليمان. في 1 أغسطس اعتقل نائبان من ائتلاف الكرامة اح",
+            "مجلس نواب الشعب (تونس) — وكان ذلك لأسباب عديدة تدور حول الأزمة السياسية التونسية. يوم 23 أغسطس 2021، أعلن الرئيس قيس سعيد تمديد التدابير الاستثنائية الخاصة بتعل"
+          ]
+        },
+        {
+          "id": "ar-bouden",
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "rr@10": 1.0,
+          "answerable": true,
+          "top": [
+            "تونس — في 29 سبتمبر قام قيس سعيّد بتعيين نجلاء بودن في منصب رئيسة الحكومة، لتصبح أول امرأة في تونس والوطن العربي تكون على رأس الحكومة. لاحقا، خرجت مظاهرات مؤيدة",
+            "2021 Tunisian self-coup — In October, Najla Bouden was appointed to head a new government, making her the first female prime minister both in Tunisia and the Ar",
+            "Condition des femmes en Tunisie — À l'issue de ce scrutin, Souad Abderrahim devient la première femme maire de Tunis, fonction qu'elle exerce jusqu'en 2023. Sou"
+          ]
+        },
+        {
+          "id": "news-messi",
+          "hit@1": 0.0,
+          "hit@5": 1.0,
+          "rr@10": 0.5,
+          "answerable": true,
+          "top": [
+            "FULL LIST : Lionel Messi achievements , trophies with Argentina — Most appearances by a South American player in men’s international football Messi’s internatio",
+            "FULL LIST : Lionel Messi achievements , trophies with Argentina — News Follow Us on Google August 31, 2026 by Adedamola Ogunbewon FULL LIST: Lionel Messi’s achi",
+            "FULL LIST : Lionel Messi achievements , trophies with Argentina — He also won two Copa América titles during his international career. Messi wrote in an emotion"
+          ]
+        }
+      ]
+    }
+  }
+}

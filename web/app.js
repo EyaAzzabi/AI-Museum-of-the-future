@@ -13,6 +13,7 @@ const sectionTitles = {
   corpus:   'Corpus',
   data:     'Données',
   agents:   'Agents',
+  historian:'Test Historian Agent',
   prompts:  'Prompts V1',
   tests:    'Tests',
 };
@@ -335,6 +336,217 @@ navItems.forEach(item => {
     }
   });
 });
+
+// Delegate click on "Tester l'agent" from Agent cards
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.btn-test-agent');
+  if (btn && btn.dataset.target) {
+    activateSection(btn.dataset.target);
+  }
+});
+
+// ── Historian Agent Playground Controller ──────────────────────────────────
+let historianPresets = [];
+let currentChunks = [];
+
+const historianPresetsContainer = document.getElementById('historianPresets');
+const chunksListContainer       = document.getElementById('chunksListContainer');
+const chunksCountLabel          = document.getElementById('chunksCountLabel');
+const btnAddCustomChunk         = document.getElementById('btnAddCustomChunk');
+const btnRunHistorian           = document.getElementById('btnRunHistorian');
+const historianLoadingStatus    = document.getElementById('historianLoadingStatus');
+const historianModeBadge        = document.getElementById('historianModeBadge');
+const historianPlaceholder      = document.getElementById('historianPlaceholder');
+const historianResultContainer  = document.getElementById('historianResultContainer');
+const historianSimNotice        = document.getElementById('historianSimulationNotice');
+const historianPerspectiveText  = document.getElementById('historianPerspectiveText');
+const historianFindingsList     = document.getElementById('historianFindingsList');
+const historianArtifactsPills   = document.getElementById('historianArtifactsPills');
+const btnToggleJson             = document.getElementById('btnToggleJson');
+const historianRawJson          = document.getElementById('historianRawJson');
+const accordionArrow            = document.getElementById('accordionArrow');
+
+async function loadHistorianPresets() {
+  try {
+    const res = await fetch('/api/historian/presets');
+    const data = await res.json();
+    historianPresets = data.presets || [];
+    renderPresetsList();
+    if (historianPresets.length > 0) {
+      selectPreset(0);
+    }
+  } catch (err) {
+    console.error('Erreur chargement presets:', err);
+  }
+}
+
+function renderPresetsList() {
+  if (!historianPresetsContainer) return;
+  historianPresetsContainer.innerHTML = '';
+  historianPresets.forEach((p, idx) => {
+    const btn = document.createElement('button');
+    btn.className = `btn-preset ${idx === 0 ? 'active' : ''}`;
+    btn.innerHTML = `
+      <span>${escHtml(p.title)}</span>
+      <span class="preset-badge">${escHtml(p.category)}</span>
+    `;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectPreset(idx);
+    });
+    historianPresetsContainer.appendChild(btn);
+  });
+}
+
+function selectPreset(idx) {
+  const preset = historianPresets[idx];
+  if (!preset) return;
+  currentChunks = JSON.parse(JSON.stringify(preset.chunks || []));
+  renderChunks();
+}
+
+function renderChunks() {
+  if (!chunksListContainer) return;
+  chunksListContainer.innerHTML = '';
+  chunksCountLabel.textContent = `${currentChunks.length} document(s) sélectionné(s)`;
+
+  currentChunks.forEach((chunk, i) => {
+    const item = document.createElement('div');
+    item.className = 'chunk-item';
+    item.innerHTML = `
+      <div class="chunk-meta-bar">
+        <span class="chunk-id-pill">${escHtml(chunk.chunk_id || `chunk-${i+1}`)}</span>
+        <button class="btn-remove-chunk" title="Supprimer cet extrait">✕</button>
+      </div>
+      <textarea class="chunk-textarea" placeholder="Contenu du document...">${escHtml(chunk.content || '')}</textarea>
+    `;
+
+    const textarea = item.querySelector('.chunk-textarea');
+    textarea.addEventListener('input', () => {
+      currentChunks[i].content = textarea.value;
+    });
+
+    const btnRemove = item.querySelector('.btn-remove-chunk');
+    btnRemove.addEventListener('click', () => {
+      currentChunks.splice(i, 1);
+      renderChunks();
+    });
+
+    chunksListContainer.appendChild(item);
+  });
+}
+
+if (btnAddCustomChunk) {
+  btnAddCustomChunk.addEventListener('click', () => {
+    const newId = `custom-doc-${Date.now().toString().slice(-4)}`;
+    currentChunks.push({
+      chunk_id: newId,
+      document_id: `doc-${newId}`,
+      content: '',
+      metadata: { source: 'custom', category: 'history' },
+      similarity: 0.9,
+    });
+    renderChunks();
+    // Scroll to bottom of chunks list
+    setTimeout(() => {
+      chunksListContainer.scrollTop = chunksListContainer.scrollHeight;
+      const lastTextarea = chunksListContainer.querySelector('.chunk-item:last-child .chunk-textarea');
+      if (lastTextarea) lastTextarea.focus();
+    }, 50);
+  });
+}
+
+if (btnRunHistorian) {
+  btnRunHistorian.addEventListener('click', async () => {
+    if (currentChunks.length === 0) {
+      alert('Veuillez ajouter au moins un document ou sélectionner un scénario.');
+      return;
+    }
+
+    btnRunHistorian.disabled = true;
+    historianLoadingStatus.classList.remove('hidden');
+
+    try {
+      const res = await fetch('/api/historian/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chunks: currentChunks }),
+      });
+      const data = await res.json();
+
+      if (!data.ok) {
+        alert(data.error || "Erreur lors de l'exécution de l'agent.");
+        return;
+      }
+
+      displayHistorianResult(data);
+    } catch (err) {
+      alert(`Erreur de connexion : ${err.message}`);
+    } finally {
+      btnRunHistorian.disabled = false;
+      historianLoadingStatus.classList.add('hidden');
+    }
+  });
+}
+
+function displayHistorianResult(data) {
+  historianPlaceholder.classList.add('hidden');
+  historianPlaceholder.style.display = 'none';
+  historianResultContainer.classList.remove('hidden');
+  historianResultContainer.style.display = 'block';
+
+  // Badge mode
+  if (data.mode === 'live') {
+    historianModeBadge.className = 'mode-badge live';
+    historianModeBadge.textContent = `🟢 En direct (${data.model})`;
+    historianSimNotice.classList.add('hidden');
+  } else {
+    historianModeBadge.className = 'mode-badge simulated';
+    historianModeBadge.textContent = '🟡 Simulation locale';
+    historianSimNotice.textContent = data.notice || 'Exécuté en mode simulation locale.';
+    historianSimNotice.classList.remove('hidden');
+  }
+
+  // Perspective
+  const insight = data.insight || {};
+  historianPerspectiveText.textContent = `« ${insight.perspective || ''} »`;
+
+  // Key findings (3 pillars)
+  historianFindingsList.innerHTML = '';
+  (insight.key_findings || []).forEach((f, idx) => {
+    const li = document.createElement('li');
+    li.className = 'finding-item';
+    li.innerHTML = `
+      <div class="finding-num">${idx + 1}</div>
+      <div class="finding-text">${escHtml(f)}</div>
+    `;
+    historianFindingsList.appendChild(li);
+  });
+
+  // Artifacts
+  historianArtifactsPills.innerHTML = '';
+  (insight.selected_artifacts || []).forEach(art => {
+    const pill = document.createElement('span');
+    pill.className = 'artifact-pill';
+    pill.textContent = art;
+    historianArtifactsPills.appendChild(pill);
+  });
+
+  // Raw JSON
+  historianRawJson.textContent = JSON.stringify(insight, null, 2);
+}
+
+if (btnToggleJson) {
+  btnToggleJson.addEventListener('click', () => {
+    const isHidden = historianRawJson.classList.contains('hidden');
+    historianRawJson.classList.toggle('hidden');
+    accordionArrow.textContent = isHidden ? '▲' : '▼';
+  });
+}
+
+// Charger les presets Historian
+loadHistorianPresets();
 
 // Auto-run on load
 runValidation();
