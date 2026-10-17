@@ -296,6 +296,10 @@ class BaseAgent(ABC):
             "category": meta.get("category"),
             "year": meta.get("year"),
             "url": meta.get("url"),
+            "image_url": meta.get("image_url"),
+            "image_alt": meta.get("image_alt"),
+            "image_credit": meta.get("image_credit"),
+            "image_source": meta.get("image_source"),
         }
 
     def abstain(self, reason: str) -> InsightObject:

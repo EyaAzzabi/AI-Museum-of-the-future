@@ -102,8 +102,12 @@ python test_agents_live.py        # Windows: set PYTHONIOENCODING=utf-8 first, o
 python app.py                     # http://localhost:5000
 ```
 
-Serves the data explorer, pipeline validation (`/api/validate`), and the **Exposition** page
-(`http://127.0.0.1:5000/#exhibition`) which starts, follows, stops and loads saved pipeline runs.
+Serves the visitor-facing museum, its immersive 3D visit, and the existing dashboard. Open
+`http://127.0.0.1:5000/` for the museum or `/visite-virtuelle` for the 3D visit; use
+`/tableau-de-bord` for the data explorer, pipeline validation (`/api/validate`) and the
+**Exposition** page, which starts, follows, stops and loads saved pipeline runs. The museum's
+agent controls launch the real exhibition pipeline. A selected story can run from its included
+archive fragments without Supabase; custom queries use the Supabase knowledge base.
 
 | Route | Role |
 |---|---|

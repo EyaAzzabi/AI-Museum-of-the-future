@@ -58,6 +58,29 @@ def test_evidence_line_shows_id_then_provenance():
     assert line.startswith("[own-1] (2023 · gdelt/news · Headline) Found by the agent.")
 
 
+def test_selected_artifact_keeps_image_credit_metadata():
+    chunk = RetrievalResult(
+        chunk_id="img-1",
+        document_id="doc-1",
+        content="A documented event.",
+        metadata={
+            "image_url": "https://images.example.org/archive.jpg",
+            "image_alt": "An archival photograph.",
+            "image_credit": "Archive photographer · CC BY 4.0",
+            "image_source": "https://commons.wikimedia.org/wiki/File:Archive.jpg",
+        },
+    )
+    agent = HistorianAgent(openai_client=None)
+    with patch.object(agent, "_call_llm", return_value={
+        "perspective": "A documented view.",
+        "key_findings": ["The archive records this event [img-1]."],
+    }):
+        result = agent.run([chunk])
+
+    assert result.evidence["img-1"]["image_url"] == "https://images.example.org/archive.jpg"
+    assert result.evidence["img-1"]["image_credit"] == "Archive photographer · CC BY 4.0"
+
+
 def test_citations_accept_lists():
     assert citations_in("A [x] and [y, z; w].") == ["x", "y", "z", "w"]
 

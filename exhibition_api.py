@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 
 RUN_ID = re.compile(r"^\d{8}-\d{6}-[0-9a-f]{6}$")
 CITED_LINE = re.compile(r"^\[([0-9a-f-]{36})\]")
+CHUNK_UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE)
 MAX_TIMEOUT = 900
 WAIT_LIMIT = 900
 LIST_LIMIT = 30
@@ -67,7 +68,6 @@ def _default_runner(params: dict, recorder: Any) -> None:
     from agents.llm_config import build_llm_client
     from agents.pipeline import context_from_run, curate, run_pipeline
     from agents.run_log import load_run
-    from rag.vector_store.hybrid_retriever import SearchFilters, build_hybrid_retriever
 
     llm = _CancellableLLM(build_llm_client(), getattr(recorder, "cancelled", threading.Event()))
     if params["from_run"]:
@@ -80,16 +80,39 @@ def _default_runner(params: dict, recorder: Any) -> None:
         finally:
             recorder.save()
         return
-    filters = SearchFilters(country=params["country"], year_from=params["year_from"], year_to=params["year_to"])
+    from rag.vector_store.retriever import RetrievalResult
+
+    chunks = [
+        RetrievalResult(
+            chunk_id=chunk["chunk_id"],
+            document_id=chunk.get("document_id", ""),
+            content=chunk["content"],
+            metadata=chunk.get("metadata", {}),
+        )
+        for chunk in params["chunks"]
+    ]
+    retriever = None
+    if params["use_rag"]:
+        from rag.vector_store.hybrid_retriever import SearchFilters, build_hybrid_retriever
+
+        filters = SearchFilters(country=params["country"], year_from=params["year_from"], year_to=params["year_to"])
+        retriever = build_hybrid_retriever(llm_client=llm, filters=filters)
+        if params["query"]:
+            for result in retriever.search(
+                params["query"], k=8, filters=retriever.default_filters, rerank=False,
+            ):
+                if result.chunk_id not in {chunk.chunk_id for chunk in chunks}:
+                    chunks.append(result)
     run_pipeline(
-        [], llm, timeout_secs=params["timeout"],
-        retriever=build_hybrid_retriever(llm_client=llm, filters=filters),
+        chunks, llm, timeout_secs=params["timeout"],
+        retriever=retriever,
         recorder=recorder, review=params["review"], fact_check=params["fact_check"],
     )
 
 
 def _default_image_lookup(chunk_ids: list[str]) -> dict[str, str]:
-    if not chunk_ids:
+    valid_chunk_ids = [chunk_id for chunk_id in chunk_ids if CHUNK_UUID.fullmatch(chunk_id)]
+    if not valid_chunk_ids:
         return {}
     try:
         from supabase import create_client
@@ -97,7 +120,7 @@ def _default_image_lookup(chunk_ids: list[str]) -> dict[str, str]:
         from scripts.config import SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL
 
         client = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-        chunks = client.table("chunks").select("id,document_id").in_("id", chunk_ids).execute().data or []
+        chunks = client.table("chunks").select("id,document_id").in_("id", valid_chunk_ids).execute().data or []
         doc_ids = sorted({c["document_id"] for c in chunks})
         docs = (
             client.table("documents").select("id,metadata").in_("id", doc_ids).execute().data or []
@@ -168,11 +191,41 @@ def exhibition_view(
     review = next((e.get("review") for e in reversed(events) if e.get("kind") == "review"), None) \
         or (result or {}).get("review") or {}
     vision = vision if vision is not None else vision_descriptions(events)
+    failure_reason = next(
+        (
+            event.get("reason") or "provider rate limit"
+            for event in events
+            if event.get("kind") == "run_error"
+            and event.get("reason") == "provider rate limit"
+        ),
+        None,
+    )
+    if not failure_reason and not result:
+        has_rate_limit = any(
+            event.get("kind") == "agent_error"
+            and any(token in str(event.get("error") or "").lower() for token in ("429", "rate limit", "tokens per day"))
+            for event in events
+        )
+        if has_rate_limit:
+            failure_reason = "provider rate limit"
+
+    section_artifact_ids = {
+        cid for section in (result or {}).get("sections") or []
+        for cid in section.get("artifacts") or []
+    }
+    artifact_ids = sorted(set(evidence) | section_artifact_ids)
+    images = (image_lookup(artifact_ids) or {}) if image_lookup else {}
+    artifact_catalog = [
+        {
+            "id": cid,
+            **(evidence.get(cid) or {}),
+            "image_url": images.get(cid) or (evidence.get(cid) or {}).get("image_url"),
+        }
+        for cid in artifact_ids
+    ]
 
     exhibition = None
     if result:
-        artifact_ids = sorted({cid for s in result.get("sections") or [] for cid in s.get("artifacts") or []})
-        images = image_lookup(artifact_ids) if image_lookup else {}
         verdicts = {v.get("section"): v for v in result.get("fact_check") or [] if isinstance(v, dict)}
         exhibition = {
             "title": result.get("exhibition_title", ""),
@@ -200,10 +253,12 @@ def exhibition_view(
         "run_id": run.get("run_id"),
         "started_at": run.get("started_at"),
         "status": "done" if exhibition else "failed",
+        "error": f"The run stopped ({failure_reason}). Partial results, if any, are saved." if failure_reason else None,
         "cancelled": any(e.get("kind") == "cancelled" for e in events),
         "config": run.get("config") or {},
         "timings": run.get("timings") or {},
         "exhibition": exhibition,
+        "artifacts": artifact_catalog,
         "review": {key: review.get(key) or [] for key in ("agreements", "tensions", "weak_findings")},
         "insights": insights,
     }
@@ -234,10 +289,37 @@ def _parse_params(data: dict) -> dict:
     from_run = data.get("from_run")
     if from_run is not None and (not isinstance(from_run, str) or not RUN_ID.match(from_run)):
         raise ValueError("from_run must be a run id such as 20261014-205736-68ae22.")
+    query = data.get("query", "")
+    if not isinstance(query, str) or len(query) > 300:
+        raise ValueError("query must be a string of at most 300 characters.")
+    raw_chunks = data.get("chunks", [])
+    if not isinstance(raw_chunks, list) or len(raw_chunks) > 50:
+        raise ValueError("chunks must be a list of at most 50 objects.")
+    chunks = []
+    for chunk in raw_chunks:
+        if (
+            not isinstance(chunk, dict)
+            or not isinstance(chunk.get("chunk_id"), str)
+            or not chunk["chunk_id"].strip()
+            or not isinstance(chunk.get("content"), str)
+            or len(chunk["content"]) > 20_000
+            or ("metadata" in chunk and not isinstance(chunk["metadata"], dict))
+        ):
+            raise ValueError("each chunk needs a chunk_id, content string (up to 20000 characters), and optional metadata object.")
+        chunks.append({
+            "chunk_id": chunk["chunk_id"],
+            "document_id": str(chunk.get("document_id") or ""),
+            "content": chunk["content"],
+            "metadata": chunk.get("metadata") or {},
+        })
+    use_rag = flag("use_rag", True)
+    if not use_rag and not chunks and not from_run:
+        raise ValueError("Send chunks or set use_rag to true.")
     return {
         "country": country or None, "year_from": year("year_from", 2020), "year_to": year("year_to", 2026),
         "review": flag("review", True), "fact_check": flag("fact_check", True), "timeout": timeout,
-        "wait": flag("wait", False), "from_run": from_run,
+        "wait": flag("wait", False), "from_run": from_run, "chunks": chunks, "use_rag": use_rag,
+        "query": query.strip(),
     }
 
 
@@ -334,6 +416,8 @@ def create_exhibition_blueprint(
                 text = str(exc)
                 reason = "provider rate limit" if "429" in text or "rate limit" in text.lower() else "pipeline error"
                 error = f"The run stopped ({reason}). Partial results, if any, are saved; see the server log."
+                recorder.record("run_error", reason=reason)
+                recorder.save()
         with lock:
             jobs[run_id].update(status="failed" if error else "done", error=error)
 
@@ -368,6 +452,7 @@ def create_exhibition_blueprint(
                 "review": params["review"], "fact_check": params["fact_check"],
                 "timeout": params["timeout"], "rerank": False,
                 "from_run": params["from_run"], "trigger": "api",
+                "query": params["query"], "use_rag": params["use_rag"],
             })
             run_id = recorder.run_id
             thread = threading.Thread(target=work, args=(run_id, params, recorder), daemon=True)

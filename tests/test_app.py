@@ -1,12 +1,21 @@
 from app import create_app
 
 
-def test_dashboard_serves_assets_and_favicon():
+def test_museum_frontend_routes_and_assets():
     client = create_app().test_client()
     response = client.get('/')
     assert response.status_code == 200
-    assert b'/web/styles.css' in response.data
-    assert b'/web/app.js' in response.data
+    assert b'/web/visitor.css' in response.data
+    assert b'/web/visitor.js' in response.data
+    assert b'/web/pipeline-client.js' in response.data
+    assert client.get('/web/visitor.css').status_code == 200
+    assert client.get('/web/pipeline-client.js').status_code == 200
+    assert client.get('/visite-virtuelle').status_code == 200
+    assert b'/web/virtual.js' in client.get('/visite-virtuelle').data
+    dashboard = client.get('/tableau-de-bord')
+    assert dashboard.status_code == 200
+    assert b'/web/styles.css' in dashboard.data
+    assert b'/web/app.js' in dashboard.data
     assert client.get('/web/styles.css').status_code == 200
     assert client.get('/web/app.js').status_code == 200
     assert client.get('/favicon.ico').status_code == 204
@@ -31,8 +40,11 @@ def test_historian_presets_api():
     assert response.status_code == 200
     payload = response.get_json()
     assert 'presets' in payload
-    assert len(payload['presets']) >= 3
+    assert len(payload['presets']) >= 6
     assert payload['presets'][0]['chunks'][0]['chunk_id']
+    image_metadata = [preset['chunks'][0]['metadata'] for preset in payload['presets'][:3]]
+    assert all(metadata['image_url'].startswith('https://') for metadata in image_metadata)
+    assert all(metadata['image_credit'] and metadata['image_source'] for metadata in image_metadata)
 
 
 def test_historian_analyze_endpoint_without_key_reports_error(monkeypatch):

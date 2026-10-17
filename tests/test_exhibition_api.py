@@ -30,6 +30,10 @@ EXHIBITION = {
 }
 
 
+def test_default_image_lookup_skips_demo_chunk_ids():
+    assert exhibition_api._default_image_lookup(["tn-politique-01", "tn-migration-02"]) == {}
+
+
 def record_pipeline(recorder: RunRecorder, complete: bool = True) -> None:
     recorder.record("insight", agent="technology", insight={
         "agent": "technology", "perspective": "Energy grows.", "key_findings": ["Solar plant [c1]"],
@@ -99,6 +103,17 @@ class TestExhibitionView:
         assert view["insights"]["visual"]["status"] == "error"
         assert view["review"]["agreements"][0]["point"] == "change"
 
+    def test_partial_run_exposes_agent_selected_articles_and_images(self, tmp_path):
+        run = save_run(tmp_path, "20261014-100000-aaaaaa", complete=False).to_dict()
+        view = exhibition_view(run, image_lookup=lambda ids: {"c1": "https://img/solar.jpg"})
+        assert view["status"] == "failed"
+        assert view["exhibition"] is None
+        assert "provider rate limit" in view["error"]
+        assert "org_secret" not in view["error"]
+        assert view["insights"]["technology"]["selected_artifacts"] == ["c1"]
+        assert view["artifacts"][0]["id"] == "c1"
+        assert view["artifacts"][0]["image_url"] == "https://img/solar.jpg"
+
 
 class TestStartRun:
     def test_wait_returns_the_exhibition(self, make_client):
@@ -119,6 +134,60 @@ class TestStartRun:
 
     def test_rejects_bad_parameters(self, make_client):
         assert make_client().post("/api/exhibition", json={"timeout": 5}).status_code == 400
+        assert make_client().post("/api/exhibition", json={"chunks": ["invalid"]}).status_code == 400
+        assert make_client().post("/api/exhibition", json={"use_rag": False}).status_code == 400
+        assert make_client().post("/api/exhibition", json={"query": "q" * 301}).status_code == 400
+
+    def test_shared_chunks_and_rag_setting_are_passed_to_runner(self, make_client):
+        client = make_client()
+        chunk = {"chunk_id": "preset-1", "content": "A documented event.", "metadata": {"country": "Tunisia"}}
+        response = client.post("/api/exhibition", json={
+            "query": "An exhibition", "chunks": [chunk], "use_rag": False, "wait": True,
+        })
+        assert response.status_code == 200
+        assert client.calls[0]["chunks"] == [{
+            **chunk, "document_id": "",
+        }]
+        assert client.calls[0]["use_rag"] is False
+        assert client.calls[0]["query"] == "An exhibition"
+
+    def test_default_runner_passes_shared_chunks_without_initializing_rag(self, monkeypatch):
+        from types import SimpleNamespace
+
+        from rag.vector_store.retriever import RetrievalResult
+
+        import agents.pipeline
+
+        client = SimpleNamespace(chat=SimpleNamespace(completions=object()))
+        captured = {}
+        monkeypatch.setattr("agents.llm_config.build_llm_client", lambda: client)
+        monkeypatch.setattr(
+            agents.pipeline,
+            "run_pipeline",
+            lambda chunks, _client, **kwargs: captured.update(chunks=chunks, retriever=kwargs["retriever"]),
+        )
+        exhibition_api._default_runner({
+            "from_run": None,
+            "chunks": [{
+                "chunk_id": "preset-1",
+                "document_id": "doc-1",
+                "content": "A documented event.",
+                "metadata": {"country": "Tunisia"},
+            }],
+            "use_rag": False,
+            "query": "An exhibition",
+            "country": "Tunisia",
+            "year_from": 2020,
+            "year_to": 2026,
+            "timeout": 400,
+            "review": True,
+            "fact_check": True,
+        }, SimpleNamespace(cancelled=threading.Event()))
+        assert captured["chunks"] == [RetrievalResult(
+            chunk_id="preset-1", document_id="doc-1", content="A documented event.",
+            metadata={"country": "Tunisia"},
+        )]
+        assert captured["retriever"] is None
 
     def test_token_required_when_set(self, make_client, monkeypatch):
         monkeypatch.setenv("EXHIBITION_API_TOKEN", "secret")
@@ -221,7 +290,7 @@ def test_dashboard_serves_the_exhibition_page():
     from app import create_app
 
     client = create_app().test_client()
-    html = client.get("/").get_data(as_text=True)
+    html = client.get("/tableau-de-bord").get_data(as_text=True)
     assert 'id="section-exhibition"' in html and 'data-section="exhibition"' in html
     assert "exhibition.js" in html
     assert client.get("/web/exhibition.js").status_code == 200
