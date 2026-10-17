@@ -47,26 +47,77 @@ class VisualAgent(BaseAgent):
         return self.finalize(payload, evidence)
 
     def describe_images(self, evidence: list) -> list:
-        """Run the vision model on the first ``max_images`` evidence items that have an image."""
-        with_image = [i for i, e in enumerate(evidence) if (e.metadata or {}).get("image_url")][: self.max_images]
-        if not with_image or self.openai_client is None:
-            return evidence
-        from multimodal.analyze_image import analyze_image
+        """Run the vision model on the first ``max_images`` evidence items that have an image.
 
-        def describe(index: int) -> tuple[int, str]:
+        Prefers an existing ``vision_description`` on metadata or a disk cache hit before
+        calling the model. Saves descriptions on the ``images`` run event and, when a
+        Supabase client is available on the retriever, into document/chunk rows (C3).
+        """
+        from multimodal.analyze_image import analyze_image, load_cache, summarize_for_evidence
+        from multimodal.store_vision import store_vision_for_chunk
+
+        with_image = [i for i, e in enumerate(evidence) if (e.metadata or {}).get("image_url")][: self.max_images]
+        if not with_image:
+            return evidence
+
+        supabase = getattr(getattr(self, "retriever", None), "supabase_client", None)
+
+        def describe(index: int) -> tuple[int, str, Any]:
+            item = evidence[index]
+            meta = item.metadata or {}
+            existing = (meta.get("vision_description") or "").strip()
+            if existing and existing != "Image unavailable.":
+                return index, existing[:500], None
+
+            url = meta["image_url"]
+            cached = load_cache(url)
+            if cached is not None:
+                text = summarize_for_evidence(cached)
+                return index, text, cached if text else None
+
+            if self.openai_client is None:
+                return index, "", None
             try:
-                result = analyze_image(evidence[index].metadata["image_url"], openai_client=self.openai_client)
-                text = (result.description or "").strip()
-                return index, "" if text == "Image unavailable." else text
+                caption = meta.get("title") or (item.content or "").split("\n")[0][:200]
+                result = analyze_image(url, openai_client=self.openai_client, caption=caption)
+                text = summarize_for_evidence(result)
+                return index, text, result if text else None
             except Exception as exc:  # noqa: BLE001 - a missing image never blocks the agent
                 logger.warning("[visual] image analysis failed: %s", exc)
-                return index, ""
+                return index, "", None
 
         enriched = list(evidence)
-        with ThreadPoolExecutor(max_workers=len(with_image)) as pool:
-            for index, description in pool.map(describe, with_image):
-                if description:
-                    item = enriched[index]
-                    enriched[index] = replace(item, content=f"{item.content}\nvision: {description[:500]}")
-        self._record("images", described=[evidence[i].chunk_id for i in with_image])
+        descriptions: dict[str, str] = {}
+        with ThreadPoolExecutor(max_workers=max(1, len(with_image))) as pool:
+            for index, text, result in pool.map(describe, with_image):
+                if not text:
+                    continue
+                item = enriched[index]
+                descriptions[item.chunk_id] = text
+                meta = dict(item.metadata or {})
+                meta["vision_description"] = text
+                if result is not None:
+                    meta.setdefault("vision_objects", list(getattr(result, "objects", None) or []))
+                    meta.setdefault("vision_tags", list(getattr(result, "tags", None) or []))
+                    meta.setdefault("vision_scene", getattr(result, "scene", None) or "")
+                    if getattr(result, "caption_mismatch", False):
+                        meta["vision_caption_mismatch"] = True
+                        meta["vision_caption_mismatch_note"] = getattr(result, "caption_mismatch_note", "") or ""
+                enriched[index] = replace(item, content=f"{item.content}\nvision: {text}", metadata=meta)
+                if supabase is not None and result is not None and item.document_id:
+                    try:
+                        store_vision_for_chunk(
+                            supabase,
+                            chunk_id=item.chunk_id,
+                            document_id=item.document_id,
+                            result=result,
+                        )
+                    except Exception as exc:  # noqa: BLE001
+                        logger.warning("[visual] store_vision skipped: %s", exc)
+
+        self._record(
+            "images",
+            described=[evidence[i].chunk_id for i in with_image],
+            descriptions=descriptions,
+        )
         return enriched

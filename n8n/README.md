@@ -43,6 +43,27 @@ Runs the workflow's own `chunk` and `format embedding` JavaScript with Node.js, 
 Supabase inside a transaction that is rolled back. Last run: 8 chunks of 71-127 tokens (English,
 French and Arabic text), 384-dimension vectors stored and read back, database unchanged.
 
+## Exhibition pipeline (end to end)
+
+[`workflows/Exhibition_pipeline_end_to_end.json`](workflows/Exhibition_pipeline_end_to_end.json)
+calls the Flask exhibition API on the same machine:
+
+1. Webhook `POST /webhook/exhibition` (or Monday 09:00 schedule).
+2. Optional ingest sub-workflow (disabled by default).
+3. `POST /api/exhibition` → returns `run_id` (202).
+4. Poll `GET /api/exhibition/<run_id>` every 60 s until the exhibition is written.
+5. Summary node (title + section count) or failure branch.
+
+Body example: `{ "country": "Tunisia", "year_from": 2020, "year_to": 2026, "review": true, "fact_check": true }`.
+Replay curator only: `{ "from_run": "20261015-113815-09c5e1" }`.
+
+**Run it**
+
+1. `python app.py` on port 5000 (needs LLM + Supabase keys for a full run).
+2. Import the JSON into n8n; keep one active workflow (delete duplicate imports).
+3. Use `127.0.0.1`, not `localhost` (n8n on Windows often resolves `localhost` to IPv6 `::1` while Flask listens on IPv4).
+4. Optional env: `EXHIBITION_API_URL`, `EXHIBITION_API_TOKEN`. Set `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` if `$env` is blocked.
+
 ## Known issue: document identity differs from the Python pipeline
 
 n8n identifies documents by `metadata.external_id` (e.g. `arxiv:2610.02207`) and leaves

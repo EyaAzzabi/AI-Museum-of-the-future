@@ -279,6 +279,13 @@ class HybridRetriever:
                 "image_url": doc_meta.get("image_url"),
                 "channels": sorted(c.channels),
             })
+            # Vision fields written by multimodal/store_vision.py (what the image shows)
+            for key in (
+                "vision_description", "vision_objects", "vision_tags", "vision_scene",
+                "vision_caption_mismatch", "vision_caption_mismatch_note", "vision_at",
+            ):
+                if key in doc_meta and doc_meta[key] not in (None, "", []):
+                    meta[key] = doc_meta[key]
             c.result = replace(c.result, metadata=meta)
 
     @staticmethod

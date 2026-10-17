@@ -102,7 +102,19 @@ python test_agents_live.py        # Windows: set PYTHONIOENCODING=utf-8 first, o
 python app.py                     # http://localhost:5000
 ```
 
-Serves the data explorer and the pipeline validation page (`/api/validate`). It does not call the LLM, so it runs with no keys. The explorer shows records from `data/processed/`, which is empty on a fresh clone (data is not committed); fill it with step 4.
+Serves the data explorer, pipeline validation (`/api/validate`), and the **Exposition** page
+(`http://127.0.0.1:5000/#exhibition`) which starts, follows, stops and loads saved pipeline runs.
+
+| Route | Role |
+|---|---|
+| `POST /api/exhibition` | start a run (or `from_run` to replay curator + fact-check) |
+| `POST /api/exhibition/<run_id>/cancel` | stop at the next step |
+| `POST /api/exhibition/<run_id>/vision` | describe the exhibition's images with the vision model |
+| `GET /api/exhibition/<run_id>` | status, then the exhibition |
+| `GET /api/exhibition/latest` | last complete exhibition |
+| `GET /api/exhibitions` | list of saved runs |
+
+Optional `EXHIBITION_API_TOKEN` (Bearer) on POST. See [`exhibition_api.py`](exhibition_api.py) and the n8n workflow in [`n8n/workflows/Exhibition_pipeline_end_to_end.json`](n8n/workflows/Exhibition_pipeline_end_to_end.json).
 
 ### 3. Tests
 
@@ -127,7 +139,8 @@ All tests use mocked clients, so no keys or network are needed. (`hypothesis` is
 | Historian (writes in French) | Eya | [`agents/historian.py`](agents/historian.py) | Demo UI tab and `/api/historian/*` in `app.py` |
 | Sociologist | Eya Rachdi | [`agents/sociologist.py`](agents/sociologist.py) | [`agents/SOCIOLOGIST_README.md`](agents/SOCIOLOGIST_README.md) |
 | Culture & Art | Sarah | [`agents/culture_art.py`](agents/culture_art.py) | [`docs/culture_art/`](docs/culture_art/) (start with `START_HERE_SARAH.md`) |
-| Technology, Visual | team | [`agents/technology.py`](agents/technology.py), [`agents/visual.py`](agents/visual.py) | |
+| Technology | Tasnim | [`agents/technology.py`](agents/technology.py) | [`agents/TECHNOLOGY_README.md`](agents/TECHNOLOGY_README.md); HTTP `serve_technology.py` (port 5002) |
+| Visual | team | [`agents/visual.py`](agents/visual.py) | Multimodal: [`multimodal/README.md`](multimodal/README.md) |
 
 All specialists share one design ([`agents/base_agent.py`](agents/base_agent.py)); each only declares its focus, its own search queries and its prompt:
 

@@ -13,8 +13,9 @@ const sectionTitles = {
   corpus:   'Corpus',
   data:     'Données',
   agents:   'Agents',
+  exhibition: 'Exposition',
   historian:'Test Historian Agent',
-  prompts:  'Prompts V1',
+  prompts:  'Prompts',
   tests:    'Tests',
 };
 
@@ -22,6 +23,7 @@ function activateSection(id) {
   navItems.forEach(n => n.classList.toggle('active', n.dataset.section === id));
   sections.forEach(s => s.classList.toggle('active', s.id === `section-${id}`));
   pageTitle.textContent = sectionTitles[id] || id;
+  if (location.hash.slice(1) !== id) history.replaceState(null, '', `#${id}`);
 }
 
 navItems.forEach(item => {
@@ -30,6 +32,9 @@ navItems.forEach(item => {
     activateSection(item.dataset.section);
   });
 });
+
+const initialSection = location.hash.slice(1);
+if (sectionTitles[initialSection]) activateSection(initialSection);
 
 // ── Validation ──────────────────────────────────────────────────────────────
 const btnValidate   = document.getElementById('btnValidate');

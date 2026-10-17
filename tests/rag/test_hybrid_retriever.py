@@ -185,3 +185,31 @@ def test_transient_database_errors_are_retried(monkeypatch):
 
     sb.rpc = flaky
     assert [x.chunk_id for x in HybridRetriever(sb, EMBED).search("x", k=1, rerank=False)] == ["art-1"]
+
+
+def test_document_vision_fields_are_surfaced_on_results():
+    """Vision metadata stored by multimodal/store_vision.py must reach every agent."""
+    class VisionDocs(_Query):
+        def execute(self):
+            if self.table == "documents":
+                return SimpleNamespace(data=[
+                    {"id": d, "source": DOCS[d][0], "category": None, "title": "", "url": "",
+                     "published_at": DOCS[d][1],
+                     "metadata": {
+                         "image_url": "https://img/mural.jpg",
+                         "vision_description": "A mural of a woman holding an apple.",
+                         "vision_tags": ["street-art"],
+                         "vision_caption_mismatch": False,
+                     }}
+                    for d in self.ids
+                ])
+            return super().execute()
+
+    class VisionSupabase(FakeSupabase):
+        def table(self, name):
+            return VisionDocs(name, self.keyword_calls)
+
+    results = HybridRetriever(VisionSupabase(["art-1"]), EMBED).search("film", k=1, rerank=False)
+    assert results[0].metadata["vision_description"] == "A mural of a woman holding an apple."
+    assert results[0].metadata["vision_tags"] == ["street-art"]
+    assert results[0].metadata["image_url"] == "https://img/mural.jpg"

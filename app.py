@@ -13,13 +13,31 @@ from agents.base_agent import InsightObject
 from agents.historian import HistorianAgent
 from agents.llm_config import build_llm_client, get_model
 from agents.shared_context import compute_cross_references
+from exhibition_api import create_exhibition_blueprint
 from multimodal.analyze_image import analyze_image
 from rag.chunking.chunker import ChunkConfig, Chunker, ChunkingStrategy
 from rag.vector_store.retriever import RetrievalResult, Retriever
 
 
+def _supabase_counts() -> dict[str, int] | None:
+    """Read-only exact counts of documents and chunks; None if keys are missing or the call fails."""
+    url, key = os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    if not url or not key:
+        return None
+    try:
+        from supabase import create_client
+
+        client = create_client(url, key)
+        docs = client.table("documents").select("id", count="exact").limit(1).execute()
+        chunks = client.table("chunks").select("id", count="exact").limit(1).execute()
+        return {"documents": int(docs.count or 0), "chunks": int(chunks.count or 0)}
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def create_app() -> Flask:
     app = Flask(__name__, static_folder="web", template_folder="web")
+    app.register_blueprint(create_exhibition_blueprint())
 
     def _result(name: str, ok: bool, detail: str) -> dict[str, Any]:
         return {"name": name, "ok": ok, "detail": detail}
@@ -41,8 +59,7 @@ def create_app() -> Flask:
         version = None
         for line in text.splitlines():
             if line.startswith("## v"):
-                version = line.replace("## ", "").strip()
-                break
+                version = line.replace("## ", "").split()[0]
         return {"name": name, "found": True, "version": version}
 
     @app.get("/api/data")
@@ -218,15 +235,18 @@ def create_app() -> Flask:
     def validate_pipeline() -> Any:
         steps: list[dict[str, Any]] = []
 
-        # 1 — Corpus
+        # 1 — Corpus (local files, or read-only counts from Supabase when processed is empty)
         processed_dir = Path("data/processed")
         json_files = sorted(processed_dir.glob("*.json")) if processed_dir.exists() else []
         corpus_files = [_corpus_file_info(f) for f in json_files]
-        steps.append(_result(
-            "Corpus collected",
-            bool(json_files),
-            f"{len(json_files)} fichier(s) JSON in data/processed",
-        ))
+        corpus_detail = f"{len(json_files)} fichier(s) JSON in data/processed"
+        corpus_ok = bool(json_files)
+        if not json_files:
+            counts = _supabase_counts()
+            if counts:
+                corpus_ok = True
+                corpus_detail = f"{counts['documents']} documents, {counts['chunks']} chunks dans Supabase"
+        steps.append(_result("Corpus collected", corpus_ok, corpus_detail))
 
         # 2 — Chunking
         sample_record = {
@@ -264,14 +284,20 @@ def create_app() -> Flask:
 
         # 5 — Prompts
         prompt_names = [
-            "system.md", "historian.md", "sociologist.md",
-            "technology.md", "culture_art.md", "visual.md", "curator.md",
+            "system.md", "historian.md", "sociologist.md", "technology.md", "culture_art.md",
+            "visual.md", "reviewer.md", "curator.md", "fact_checker.md",
         ]
         prompt_infos = [_prompt_file_info(n) for n in prompt_names]
         prompt_ok = all(p["found"] for p in prompt_infos)
         found_count = sum(1 for p in prompt_infos if p["found"])
-        steps.append(_result("Prompts V1 defined and tested", prompt_ok,
-                              f"{found_count} prompt(s) détecté(s)"))
+        detail = ", ".join(
+            f"{p['name'].removesuffix('.md')} {p['version'] or '?'}" for p in prompt_infos if p["found"]
+        )
+        steps.append(_result(
+            "Prompts versioned and measured",
+            prompt_ok,
+            f"{found_count}/{len(prompt_names)} prompt(s) : {detail}",
+        ))
 
         # 6 — Multimodal
         vision = analyze_image("https://example.com/does-not-exist.jpg")
