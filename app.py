@@ -15,6 +15,7 @@ from rag.vector_store.retriever import Retriever
 
 def create_app() -> Flask:
     app = Flask(__name__, static_folder="web", template_folder="web")
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     def _result(name: str, ok: bool, detail: str) -> dict[str, Any]:
         return {"name": name, "ok": ok, "detail": detail}
@@ -150,6 +151,178 @@ def create_app() -> Flask:
             "prompt_files":    prompt_infos,
             "cross_references": refs,
         })
+
+    @app.get("/api/curator/exhibition")
+    def get_curator_exhibition() -> Any:
+        """Returns synthesized exhibition data from Curator agent or curated highlights."""
+        corpus = get_corpus()
+        
+        # Build thematic rooms and featured items
+        rooms = []
+        for g in GALLERIES:
+            recs = [r for r in corpus if _categorize_record(r) == g["id"]]
+            items = []
+            for r in recs[:5]:
+                items.append({
+                    "id": r.get("id", ""),
+                    "title": r.get("title", "Sans titre"),
+                    "text": (r.get("text") or "")[:280],
+                    "source": r.get("source", ""),
+                    "date": r.get("date", "2026"),
+                    "image_url": r.get("image_url"),
+                    "category": r.get("category", ""),
+                })
+            rooms.append({
+                "id": g["id"],
+                "name": g["name"],
+                "agent": g["agent"],
+                "theme_color": g["theme_color"],
+                "accent_color": g["accent_color"],
+                "description": g["description"],
+                "total_items": len(recs),
+                "featured": items,
+            })
+
+        return jsonify({
+            "title": "AI Museum of the Future : 2026 → 2126",
+            "subtitle": "Comment le futur se souviendra de notre époque.",
+            "curator_concept": "Une exposition permanente synthétisée à partir d'un corpus contemporain multi-sources (arXiv, Wikimedia, Wikipedia, Banque Mondiale), analysée sous l'angle critique de 5 agents spécialisés et arbitrée par le Conservateur IA.",
+            "total_artifacts": len(corpus),
+            "rooms": rooms,
+            "pipeline": ["Sources publiques", "n8n", "RAG", "5 agents", "Curateur"]
+        })
+
+    @app.post("/api/guide/chat")
+    def guide_chat() -> Any:
+        """AI Curator conversational guide connected to LLM and corpus context."""
+        data = request.get_json(silent=True) or {}
+        user_message = data.get("message", "").strip()
+        history = data.get("history", [])
+
+        if not user_message:
+            return jsonify({"reply": "Bonjour ! Je suis le Conservateur IA. Comment puis-je vous guider à travers l'exposition 2026 ?"}), 200
+
+        # Try LLM generation if configured
+        api_key = os.getenv("LLM_API_KEY") or os.getenv("GROQ_API_KEY") or os.getenv("OPENAI_API_KEY")
+        if api_key:
+            try:
+                client = build_llm_client()
+                model_name = get_model()
+
+                # Get brief RAG context from corpus matching user query keywords
+                corpus = get_corpus()
+                matched_snippets = []
+                q_words = [w.lower() for w in user_message.split() if len(w) > 3]
+                for rec in corpus:
+                    t = (rec.get("title") or "").lower()
+                    b = (rec.get("text") or "")[:300].lower()
+                    if any(w in t or w in b for w in q_words):
+                        matched_snippets.append(f"[{rec.get('title')} ({rec.get('source')})]: {rec.get('text', '')[:200]}")
+                        if len(matched_snippets) >= 3:
+                            break
+
+                context_str = "\n".join(matched_snippets) if matched_snippets else "Corpus couvrant la Tunisie et le monde en 2026 (société, démocratie, IA, transition numérique, culture)."
+
+                messages = [
+                    {
+                        "role": "system",
+                        "content": (
+                            "Tu es le Conservateur IA du 'AI Museum of the Future' (2026 → 2126). "
+                            "Tu parles en français avec élégance, clarté et concision (3 à 5 phrases max). "
+                            "Tu t'appuies sur le corpus et les 5 agents du musée (Historien, Sociologue, Technologue, Culture & Art, Visuel). "
+                            "Cite tes sources entre crochets quand c'est pertinent (ex: [Wikipedia], [arXiv]).\n\n"
+                            f"Contexte du corpus :\n{context_str}"
+                        )
+                    }
+                ]
+                for h in history[-4:]:
+                    messages.append({"role": h.get("role", "user"), "content": h.get("content", "")})
+                messages.append({"role": "user", "content": user_message})
+
+                resp = client.chat.completions.create(
+                    model=model_name,
+                    messages=messages,
+                    max_tokens=350,
+                    temperature=0.6,
+                )
+                reply = resp.choices[0].message.content or "Analyse indisponible."
+                return jsonify({
+                    "reply": reply,
+                    "model": model_name,
+                    "sources": [s.split("]:")[0].replace("[", "") for s in matched_snippets]
+                })
+            except Exception as e:
+                # Fallback on controlled graceful message
+                pass
+
+        # Intelligent fallback when LLM offline
+        return jsonify({
+            "reply": f"En tant que Conservateur IA observant 2026 depuis 2126 : votre interrogation sur « {user_message[:50]} » reflète les bouleversements démocratiques, technologiques et culturels de cette décennie charnière. Nos agents Historien et Sociologue relèvent particulièrement ces tensions.",
+            "sources": ["Wikipedia", "arXiv", "WorldBank"],
+            "model": "rule-based curator"
+        })
+
+    @app.get("/api/timeline/events")
+    def get_timeline_events() -> Any:
+        """Returns curated 2026 timeline events projected from 2126."""
+        events = [
+            {
+                "id": "event-1",
+                "room": "technology",
+                "room_name": "Technologie",
+                "date": "Mars 2026",
+                "title": "Déploiement des modèles de raisonnement autonomes",
+                "summary": "L'émergence des agents RAG auto-correcteurs et multimodaux transforme la production de code et la conservation archivistique.",
+                "verdict_agent": "Historien",
+                "verdict_text": "Le basculement vers l'externalisation de la mémoire cognitive aux systèmes d'IA a marqué le point de non-retour de la décennie 2020.",
+                "color": "#7c3aed"
+            },
+            {
+                "id": "event-2",
+                "room": "sociologist",
+                "room_name": "Société",
+                "date": "Avril 2026",
+                "title": "Mobilisations citoyennes et souveraineté numérique",
+                "summary": "Les populations redéfinissent leur rapport aux plateformes centralisées et exigent la transparence des données publiques.",
+                "verdict_agent": "Sociologue",
+                "verdict_text": "Une réappropriation du lien civique née du refus de la captation algorithmique de l'espace public.",
+                "color": "#16a34a"
+            },
+            {
+                "id": "event-3",
+                "room": "historian",
+                "room_name": "Histoire",
+                "date": "Mai 2026",
+                "title": "Crises climatiques et accords transméditerranéens",
+                "summary": "Négociations autour des ressources hydriques et des corridors énergétiques durables.",
+                "verdict_agent": "Historien",
+                "verdict_text": "Le traité fondateur qui a réarticulé les relations Nord-Sud autour de la survie écologique commune.",
+                "color": "#1e40af"
+            },
+            {
+                "id": "event-4",
+                "room": "culture_art",
+                "room_name": "Culture & Art",
+                "date": "Juin 2026",
+                "title": "Le cinéma hybride et les récits diasporiques",
+                "summary": "La consécration mondiale des nouvelles cinématographies maghrébines et arabes.",
+                "verdict_agent": "Culture & Art",
+                "verdict_text": "L'affirmation d'une identité visuelle libérée de l'exotisme, récompensée dans les plus hauts festivals.",
+                "color": "#ea580c"
+            },
+            {
+                "id": "event-5",
+                "room": "visual",
+                "room_name": "Visuel",
+                "date": "Juillet 2026",
+                "title": "Archives photographiques et modèles génératifs",
+                "summary": "Digitalisation massive du patrimoine architectural et restitution 3D temps-réel.",
+                "verdict_agent": "Visuel",
+                "verdict_text": "La bascule historique entre l'image capturée et l'image synthétique réparatrice de mémoire.",
+                "color": "#be185d"
+            }
+        ]
+        return jsonify({"events": events})
 
     return app
 
