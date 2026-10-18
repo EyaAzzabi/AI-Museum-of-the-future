@@ -35,6 +35,165 @@ def _supabase_counts() -> dict[str, int] | None:
         return None
 
 
+def _historian_presets() -> list[dict[str, Any]]:
+    # Short summaries of documented events (see the Wikipedia articles on each),
+    # used as sample evidence for the historian demo and as grounding for the chat assistant.
+    image_metadata = {
+        "governance": {
+            "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Couloir_de_l%27assembl%C3%A9e_des_repr%C3%A9sentants_du_peuple_%D8%B1%D9%88%D8%A7%D9%82_%D9%85%D8%AC%D9%84%D8%B3_%D9%86%D9%88%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8.jpg/960px-Couloir_de_l%27assembl%C3%A9e_des_repr%C3%A9sentants_du_peuple_%D8%B1%D9%88%D8%A7%D9%82_%D9%85%D8%AC%D9%84%D8%B3_%D9%86%D9%88%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8.jpg",
+            "image_alt": "Couloir de l’Assemblée des représentants du peuple, au Bardo, Tunis",
+            "image_credit": "Sami Mlouhi · CC BY-SA 4.0",
+            "image_source": "https://commons.wikimedia.org/w/index.php?curid=58877833",
+        },
+        "governance_referendum": {
+            "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Secretary_Blinken_Meets_With_Tunisian_President_Saied_%2852564271954%29.jpg/960px-Secretary_Blinken_Meets_With_Tunisian_President_Saied_%2852564271954%29.jpg",
+            "image_alt": "Kaïs Saïed rencontre Antony Blinken à Washington, décembre 2022",
+            "image_credit": "U.S. Department of State · domaine public",
+            "image_source": "https://commons.wikimedia.org/w/index.php?curid=126642183",
+        },
+        "governance_election": {
+            "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Panorama_Assembly_of_the_Representatives_of_the_People_-_Photo_panoramique_de_l%27Assembl%C3%A9e_des_repr%C3%A9sentants_du_peuple_-_%D8%A8%D8%A7%D9%86%D9%88%D8%B1%D8%A7%D9%85%D8%A7_%D9%85%D8%AC%D9%84%D8%B3_%D9%86%D9%88%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8.jpg/960px-thumbnail.jpg",
+            "image_alt": "Panorama de l’Assemblée des représentants du peuple au Bardo, Tunis",
+            "image_credit": "Sami Mlouhi · CC BY-SA 4.0",
+            "image_source": "https://commons.wikimedia.org/w/index.php?curid=58877811",
+        },
+        "migration": {
+            "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Distressed_persons_wave_after_being_transferred_to_a_Maltese_patrol_vessel..jpg/960px-Distressed_persons_wave_after_being_transferred_to_a_Maltese_patrol_vessel..jpg",
+            "image_alt": "Personnes secourues en Méditerranée transférées vers un navire maltais, 2013",
+            "image_credit": "U.S. Navy · domaine public",
+            "image_source": "https://commons.wikimedia.org/w/index.php?curid=30911859",
+        },
+        "migration_memorandum": {
+            "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Lamta_sea%2C_Tunisia.JPG/960px-Lamta_sea%2C_Tunisia.JPG",
+            "image_alt": "Vue de Lamta, en Tunisie, depuis la plage avec des bateaux de pêche",
+            "image_credit": "Habib M’henni · CC BY-SA 3.0",
+            "image_source": "https://commons.wikimedia.org/w/index.php?curid=12241588",
+        },
+        "cinema": {
+            "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kaouther_Ben_Hania_%282018%29.jpg",
+            "image_alt": "Kaouther Ben Hania au Festival de Carthage, 2018",
+            "image_credit": "Houssem Abida · CC BY-SA 4.0",
+            "image_source": "https://commons.wikimedia.org/w/index.php?curid=95502631",
+        },
+        "cinema_olfa": {
+            "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Kaouther_Ben_Hania_-_IFFR_2024.jpg/960px-Kaouther_Ben_Hania_-_IFFR_2024.jpg",
+            "image_alt": "Kaouther Ben Hania au Festival international du film de Rotterdam, 2024",
+            "image_credit": "Vera de Kok · CC BY-SA 4.0",
+            "image_source": "https://commons.wikimedia.org/w/index.php?curid=144692321",
+        },
+    }
+    return [
+        {
+            "id": "tunisia_2021_constitution",
+            "title": "Le 25 juillet 2021 et la nouvelle Constitution",
+            "category": "Politique & Institutions",
+            "chunks": [
+                {
+                    "chunk_id": "tn-politique-01",
+                    "document_id": "wiki-crise-politique-2021",
+                    "content": "Le 25 juillet 2021, le président Kaïs Saïed limoge le chef du gouvernement Hichem Mechichi et gèle les activités de l'Assemblée des représentants du peuple, en invoquant l'article 80 de la Constitution de 2014.",
+                    "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Décret présidentiel du 25 juillet 2021", **image_metadata["governance"]},
+                },
+                {
+                    "chunk_id": "tn-politique-02",
+                    "document_id": "wiki-referendum-2022",
+                    "content": "Le 25 juillet 2022, une nouvelle Constitution qui renforce les pouvoirs du président est adoptée par référendum, avec une participation d'environ 30 %.",
+                    "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Référendum constitutionnel du 25 juillet 2022", **image_metadata["governance_referendum"]},
+                },
+                {
+                    "chunk_id": "tn-politique-03",
+                    "document_id": "wiki-legislatives-2022",
+                    "content": "Au premier tour des élections législatives de décembre 2022, la participation est d'environ 11 %.",
+                    "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Participation aux législatives de décembre 2022", **image_metadata["governance_election"]},
+                },
+            ],
+        },
+        {
+            "id": "tunisia_migration",
+            "title": "Migrations en Méditerranée centrale",
+            "category": "Société & Migration",
+            "chunks": [
+                {
+                    "chunk_id": "tn-migration-01",
+                    "document_id": "wiki-migration-mediterranee",
+                    "content": "En 2023, la Tunisie devient le principal point de départ des traversées irrégulières de la Méditerranée centrale vers l'Italie, devant la Libye.",
+                    "metadata": {"source": "wikipedia", "category": "migration", "country": "Tunisia", "title": "Départs migratoires de Tunisie en 2023", **image_metadata["migration"]},
+                },
+                {
+                    "chunk_id": "tn-migration-02",
+                    "document_id": "wiki-memorandum-ue-tunisie",
+                    "content": "Le 16 juillet 2023, l'Union européenne et la Tunisie signent un mémorandum d'entente portant notamment sur la migration et la coopération économique.",
+                    "metadata": {"source": "wikipedia", "category": "migration", "country": "Tunisia", "title": "Mémorandum UE–Tunisie sur la migration", **image_metadata["migration_memorandum"]},
+                },
+            ],
+        },
+        {
+            "id": "tunisia_cinema",
+            "title": "Le cinéma tunisien sur la scène mondiale",
+            "category": "Culture & Arts",
+            "chunks": [
+                {
+                    "chunk_id": "tn-cinema-01",
+                    "document_id": "wiki-homme-vendu-sa-peau",
+                    "content": "En 2021, « L'Homme qui a vendu sa peau » de Kaouther Ben Hania devient le premier film tunisien nommé à l'Oscar du meilleur film international.",
+                    "metadata": {"source": "wikipedia", "category": "culture", "country": "Tunisia", "title": "L’Homme qui a vendu sa peau", **image_metadata["cinema"]},
+                },
+                {
+                    "chunk_id": "tn-cinema-02",
+                    "document_id": "wiki-filles-olfa",
+                    "content": "« Les Filles d'Olfa » de Kaouther Ben Hania, en compétition au Festival de Cannes 2023, y reçoit L'Œil d'or puis est nommé à l'Oscar du meilleur film documentaire en 2024.",
+                    "metadata": {"source": "wikipedia", "category": "culture", "country": "Tunisia", "title": "Les Filles d’Olfa", **image_metadata["cinema_olfa"]},
+                },
+            ],
+        },
+        {
+            "id": "tunisia_revolution",
+            "title": "La révolution tunisienne de 2010-2011",
+            "category": "Histoire & Société",
+            "chunks": [
+                {
+                    "chunk_id": "tn-revolution-01",
+                    "document_id": "wiki-revolution-tunisienne",
+                    "content": "Les manifestations déclenchées en décembre 2010 à Sidi Bouzid s'étendent à la Tunisie. Le président Zine el-Abidine Ben Ali quitte le pays le 14 janvier 2011.",
+                    "metadata": {"source": "wikipedia", "category": "history", "country": "Tunisia", "title": "Révolution tunisienne"},
+                },
+                {
+                    "chunk_id": "tn-revolution-02",
+                    "document_id": "wiki-assemblee-constituante-tunisie-2011",
+                    "content": "L'élection du 23 octobre 2011 désigne une Assemblée constituante chargée de rédiger une nouvelle Constitution.",
+                    "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Élection de l'Assemblée constituante tunisienne de 2011"},
+                },
+            ],
+        },
+        {
+            "id": "tunisia_national_dialogue",
+            "title": "Le Dialogue national et le prix Nobel de la paix",
+            "category": "Société & Histoire",
+            "chunks": [
+                {
+                    "chunk_id": "tn-dialogue-01",
+                    "document_id": "nobel-quartet-tunisia-2015",
+                    "content": "Le Quartet du Dialogue national tunisien reçoit le prix Nobel de la paix 2015 pour sa contribution décisive à la construction d'une démocratie pluraliste après la révolution de 2011.",
+                    "metadata": {"source": "Nobel Prize", "category": "society", "country": "Tunisia", "title": "Le Quartet du Dialogue national tunisien, prix Nobel de la paix 2015"},
+                },
+            ],
+        },
+        {
+            "id": "tunisia_el_jem",
+            "title": "El Jem, mémoire romaine en Tunisie",
+            "category": "Patrimoine & Culture",
+            "chunks": [
+                {
+                    "chunk_id": "tn-el-jem-01",
+                    "document_id": "unesco-amphitheatre-el-jem",
+                    "content": "L'amphithéâtre d'El Jem, construit au IIIe siècle, est l'un des monuments romains les mieux conservés d'Afrique du Nord. Il est inscrit au patrimoine mondial de l'UNESCO depuis 1979.",
+                    "metadata": {"source": "UNESCO", "category": "culture", "country": "Tunisia", "title": "Amphithéâtre d'El Jem"},
+                },
+            ],
+        },
+    ]
+
+
 def create_app() -> Flask:
     app = Flask(__name__, static_folder="web", template_folder="web")
     app.register_blueprint(create_exhibition_blueprint())
@@ -108,163 +267,60 @@ def create_app() -> Flask:
 
     @app.get("/api/historian/presets")
     def get_historian_presets() -> Any:
-        # Short summaries of documented events (see the Wikipedia articles on each),
-        # used as sample evidence for the historian demo.
-        image_metadata = {
-            "governance": {
-                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Couloir_de_l%27assembl%C3%A9e_des_repr%C3%A9sentants_du_peuple_%D8%B1%D9%88%D8%A7%D9%82_%D9%85%D8%AC%D9%84%D8%B3_%D9%86%D9%88%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8.jpg/960px-Couloir_de_l%27assembl%C3%A9e_des_repr%C3%A9sentants_du_peuple_%D8%B1%D9%88%D8%A7%D9%82_%D9%85%D8%AC%D9%84%D8%B3_%D9%86%D9%88%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8.jpg",
-                "image_alt": "Couloir de l’Assemblée des représentants du peuple, au Bardo, Tunis",
-                "image_credit": "Sami Mlouhi · CC BY-SA 4.0",
-                "image_source": "https://commons.wikimedia.org/w/index.php?curid=58877833",
-            },
-            "governance_referendum": {
-                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Secretary_Blinken_Meets_With_Tunisian_President_Saied_%2852564271954%29.jpg/960px-Secretary_Blinken_Meets_With_Tunisian_President_Saied_%2852564271954%29.jpg",
-                "image_alt": "Kaïs Saïed rencontre Antony Blinken à Washington, décembre 2022",
-                "image_credit": "U.S. Department of State · domaine public",
-                "image_source": "https://commons.wikimedia.org/w/index.php?curid=126642183",
-            },
-            "governance_election": {
-                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e0/Panorama_Assembly_of_the_Representatives_of_the_People_-_Photo_panoramique_de_l%27Assembl%C3%A9e_des_repr%C3%A9sentants_du_peuple_-_%D8%A8%D8%A7%D9%86%D9%88%D8%B1%D8%A7%D9%85%D8%A7_%D9%85%D8%AC%D9%84%D8%B3_%D9%86%D9%88%D8%A7%D8%A8_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8.jpg/960px-thumbnail.jpg",
-                "image_alt": "Panorama de l’Assemblée des représentants du peuple au Bardo, Tunis",
-                "image_credit": "Sami Mlouhi · CC BY-SA 4.0",
-                "image_source": "https://commons.wikimedia.org/w/index.php?curid=58877811",
-            },
-            "migration": {
-                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Distressed_persons_wave_after_being_transferred_to_a_Maltese_patrol_vessel..jpg/960px-Distressed_persons_wave_after_being_transferred_to_a_Maltese_patrol_vessel..jpg",
-                "image_alt": "Personnes secourues en Méditerranée transférées vers un navire maltais, 2013",
-                "image_credit": "U.S. Navy · domaine public",
-                "image_source": "https://commons.wikimedia.org/w/index.php?curid=30911859",
-            },
-            "migration_memorandum": {
-                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/Lamta_sea%2C_Tunisia.JPG/960px-Lamta_sea%2C_Tunisia.JPG",
-                "image_alt": "Vue de Lamta, en Tunisie, depuis la plage avec des bateaux de pêche",
-                "image_credit": "Habib M’henni · CC BY-SA 3.0",
-                "image_source": "https://commons.wikimedia.org/w/index.php?curid=12241588",
-            },
-            "cinema": {
-                "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Kaouther_Ben_Hania_%282018%29.jpg",
-                "image_alt": "Kaouther Ben Hania au Festival de Carthage, 2018",
-                "image_credit": "Houssem Abida · CC BY-SA 4.0",
-                "image_source": "https://commons.wikimedia.org/w/index.php?curid=95502631",
-            },
-            "cinema_olfa": {
-                "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Kaouther_Ben_Hania_-_IFFR_2024.jpg/960px-Kaouther_Ben_Hania_-_IFFR_2024.jpg",
-                "image_alt": "Kaouther Ben Hania au Festival international du film de Rotterdam, 2024",
-                "image_credit": "Vera de Kok · CC BY-SA 4.0",
-                "image_source": "https://commons.wikimedia.org/w/index.php?curid=144692321",
-            },
-        }
-        presets = [
-            {
-                "id": "tunisia_2021_constitution",
-                "title": "Le 25 juillet 2021 et la nouvelle Constitution",
-                "category": "Politique & Institutions",
-                "chunks": [
-                    {
-                        "chunk_id": "tn-politique-01",
-                        "document_id": "wiki-crise-politique-2021",
-                        "content": "Le 25 juillet 2021, le président Kaïs Saïed limoge le chef du gouvernement Hichem Mechichi et gèle les activités de l'Assemblée des représentants du peuple, en invoquant l'article 80 de la Constitution de 2014.",
-                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Décret présidentiel du 25 juillet 2021", **image_metadata["governance"]},
-                    },
-                    {
-                        "chunk_id": "tn-politique-02",
-                        "document_id": "wiki-referendum-2022",
-                        "content": "Le 25 juillet 2022, une nouvelle Constitution qui renforce les pouvoirs du président est adoptée par référendum, avec une participation d'environ 30 %.",
-                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Référendum constitutionnel du 25 juillet 2022", **image_metadata["governance_referendum"]},
-                    },
-                    {
-                        "chunk_id": "tn-politique-03",
-                        "document_id": "wiki-legislatives-2022",
-                        "content": "Au premier tour des élections législatives de décembre 2022, la participation est d'environ 11 %.",
-                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Participation aux législatives de décembre 2022", **image_metadata["governance_election"]},
-                    },
-                ],
-            },
-            {
-                "id": "tunisia_migration",
-                "title": "Migrations en Méditerranée centrale",
-                "category": "Société & Migration",
-                "chunks": [
-                    {
-                        "chunk_id": "tn-migration-01",
-                        "document_id": "wiki-migration-mediterranee",
-                        "content": "En 2023, la Tunisie devient le principal point de départ des traversées irrégulières de la Méditerranée centrale vers l'Italie, devant la Libye.",
-                        "metadata": {"source": "wikipedia", "category": "migration", "country": "Tunisia", "title": "Départs migratoires de Tunisie en 2023", **image_metadata["migration"]},
-                    },
-                    {
-                        "chunk_id": "tn-migration-02",
-                        "document_id": "wiki-memorandum-ue-tunisie",
-                        "content": "Le 16 juillet 2023, l'Union européenne et la Tunisie signent un mémorandum d'entente portant notamment sur la migration et la coopération économique.",
-                        "metadata": {"source": "wikipedia", "category": "migration", "country": "Tunisia", "title": "Mémorandum UE–Tunisie sur la migration", **image_metadata["migration_memorandum"]},
-                    },
-                ],
-            },
-            {
-                "id": "tunisia_cinema",
-                "title": "Le cinéma tunisien sur la scène mondiale",
-                "category": "Culture & Arts",
-                "chunks": [
-                    {
-                        "chunk_id": "tn-cinema-01",
-                        "document_id": "wiki-homme-vendu-sa-peau",
-                        "content": "En 2021, « L'Homme qui a vendu sa peau » de Kaouther Ben Hania devient le premier film tunisien nommé à l'Oscar du meilleur film international.",
-                        "metadata": {"source": "wikipedia", "category": "culture", "country": "Tunisia", "title": "L’Homme qui a vendu sa peau", **image_metadata["cinema"]},
-                    },
-                    {
-                        "chunk_id": "tn-cinema-02",
-                        "document_id": "wiki-filles-olfa",
-                        "content": "« Les Filles d'Olfa » de Kaouther Ben Hania, en compétition au Festival de Cannes 2023, y reçoit L'Œil d'or puis est nommé à l'Oscar du meilleur film documentaire en 2024.",
-                        "metadata": {"source": "wikipedia", "category": "culture", "country": "Tunisia", "title": "Les Filles d’Olfa", **image_metadata["cinema_olfa"]},
-                    },
-                ],
-            },
-            {
-                "id": "tunisia_revolution",
-                "title": "La révolution tunisienne de 2010-2011",
-                "category": "Histoire & Société",
-                "chunks": [
-                    {
-                        "chunk_id": "tn-revolution-01",
-                        "document_id": "wiki-revolution-tunisienne",
-                        "content": "Les manifestations déclenchées en décembre 2010 à Sidi Bouzid s'étendent à la Tunisie. Le président Zine el-Abidine Ben Ali quitte le pays le 14 janvier 2011.",
-                        "metadata": {"source": "wikipedia", "category": "history", "country": "Tunisia", "title": "Révolution tunisienne"},
-                    },
-                    {
-                        "chunk_id": "tn-revolution-02",
-                        "document_id": "wiki-assemblee-constituante-tunisie-2011",
-                        "content": "L'élection du 23 octobre 2011 désigne une Assemblée constituante chargée de rédiger une nouvelle Constitution.",
-                        "metadata": {"source": "wikipedia", "category": "politics", "country": "Tunisia", "title": "Élection de l'Assemblée constituante tunisienne de 2011"},
-                    },
-                ],
-            },
-            {
-                "id": "tunisia_national_dialogue",
-                "title": "Le Dialogue national et le prix Nobel de la paix",
-                "category": "Société & Histoire",
-                "chunks": [
-                    {
-                        "chunk_id": "tn-dialogue-01",
-                        "document_id": "nobel-quartet-tunisia-2015",
-                        "content": "Le Quartet du Dialogue national tunisien reçoit le prix Nobel de la paix 2015 pour sa contribution décisive à la construction d'une démocratie pluraliste après la révolution de 2011.",
-                        "metadata": {"source": "Nobel Prize", "category": "society", "country": "Tunisia", "title": "Le Quartet du Dialogue national tunisien, prix Nobel de la paix 2015"},
-                    },
-                ],
-            },
-            {
-                "id": "tunisia_el_jem",
-                "title": "El Jem, mémoire romaine en Tunisie",
-                "category": "Patrimoine & Culture",
-                "chunks": [
-                    {
-                        "chunk_id": "tn-el-jem-01",
-                        "document_id": "unesco-amphitheatre-el-jem",
-                        "content": "L'amphithéâtre d'El Jem, construit au IIIe siècle, est l'un des monuments romains les mieux conservés d'Afrique du Nord. Il est inscrit au patrimoine mondial de l'UNESCO depuis 1979.",
-                        "metadata": {"source": "UNESCO", "category": "culture", "country": "Tunisia", "title": "Amphithéâtre d'El Jem"},
-                    },
-                ],
-            },
-        ]
-        return jsonify({"presets": presets})
+        return jsonify({"presets": _historian_presets()})
+
+    @app.post("/api/chat")
+    def chat_with_museum() -> Any:
+        data = request.get_json(silent=True) or {}
+        question = data.get("question")
+        if not isinstance(question, str) or not question.strip():
+            return jsonify({"ok": False, "error": "Provide a non-empty 'question' string."}), 400
+        question = question.strip()
+        if len(question) > 500:
+            return jsonify({"ok": False, "error": "La question est limitée à 500 caractères."}), 400
+
+        raw_history = data.get("history", [])
+        history: list[dict[str, str]] = []
+        if isinstance(raw_history, list):
+            for turn in raw_history[-6:]:
+                if (
+                    isinstance(turn, dict)
+                    and turn.get("role") in ("user", "assistant")
+                    and isinstance(turn.get("content"), str)
+                    and turn["content"].strip()
+                ):
+                    history.append({"role": turn["role"], "content": turn["content"].strip()[:1000]})
+
+        # No canned fallback: an answer is either produced by the model or reported as unavailable.
+        if not (os.getenv("LLM_API_KEY") or os.getenv("GROQ_API_KEY")):
+            return jsonify({
+                "ok": False,
+                "error": "Aucune clé LLM_API_KEY configurée : définissez-la dans le fichier .env pour activer l'assistant.",
+            }), 503
+
+        tours = "\n".join(f"- {p['title']} ({p['category']})" for p in _historian_presets())
+        system_prompt = (
+            "Tu es l'assistant du musée virtuel de notre époque, un musée imaginé comme s'il était visité "
+            "dans 100 ans. Réponds brièvement (2 à 4 phrases). Si le visiteur demande explicitement une "
+            "langue de réponse (ex. « en anglais », « in French », « answer in Arabic »), réponds dans "
+            "cette langue ; sinon, réponds dans la langue de la question. Appuie-toi sur les parcours "
+            "documentaires proposés par le musée ci-dessous. N'invente pas de faits qui ne sont pas dans "
+            "ces parcours ou dans des connaissances générales évidentes. Si une question sort du sujet du "
+            "musée, dis-le poliment et recentre vers les parcours.\n\n"
+            f"Parcours disponibles :\n{tours}"
+        )
+        messages = [{"role": "system", "content": system_prompt}, *history, {"role": "user", "content": question}]
+
+        try:
+            response = build_llm_client().chat.completions.create(model=get_model(), messages=messages)
+            answer = (response.choices[0].message.content or "").strip()
+        except Exception as exc:
+            return jsonify({"ok": False, "error": f"Le fournisseur d'IA a rejeté la requête : {exc}"}), 502
+
+        if not answer:
+            return jsonify({"ok": False, "error": "L'assistant n'a pas pu générer de réponse."}), 502
+
+        return jsonify({"ok": True, "answer": answer, "model": get_model()})
 
     @app.post("/api/historian/analyze")
     def analyze_historian() -> Any:

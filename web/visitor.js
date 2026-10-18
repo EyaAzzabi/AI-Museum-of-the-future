@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedPreset = null;
   let currentRoom = 0;
   let showAllRecords = false;
+  let chatHistory = [];
 
   class ApiError extends Error {
     constructor(message, status) {
@@ -232,38 +233,36 @@ document.addEventListener('DOMContentLoaded', () => {
     chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
-  function buildMuseumAnswer(question) {
-    const text = question.toLowerCase();
-    const visiblePresets = presets;
+  async function askMuseumAssistant(question) {
+    chatInput.disabled = true;
+    const submitButton = chatForm.querySelector('button[type="submit"]');
+    if (submitButton) submitButton.disabled = true;
 
-    if (!visiblePresets.length) {
-      return 'Le musée est en train de préparer ses parcours. Vous pouvez revenir un peu plus tard pour poser des questions sur les expositions.';
+    const thinking = document.createElement('div');
+    thinking.className = 'chat-message assistant';
+    thinking.textContent = 'L’assistant du musée réfléchit…';
+    chatMessages.appendChild(thinking);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      const result = await requestJson('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, history: chatHistory.slice(-6) }),
+      });
+      thinking.textContent = result.answer;
+      chatHistory.push({ role: 'user', content: question }, { role: 'assistant', content: result.answer });
+    } catch (error) {
+      thinking.classList.add('error');
+      thinking.textContent = error.status === 503
+        ? 'L’assistant IA n’est pas disponible pour le moment (clé LLM manquante).'
+        : error.message || 'L’assistant n’a pas pu répondre. Réessayez dans un instant.';
+    } finally {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      chatInput.disabled = false;
+      if (submitButton) submitButton.disabled = false;
+      chatInput.focus();
     }
-
-    if (text.includes('politique') || text.includes('constitution') || text.includes('gouvernement')) {
-      const preset = visiblePresets[0];
-      return `Le parcours “${preset.title}” explore notamment la nouvelle Constitution et les changements politiques de 2021. Il montre comment un acte constitutionnel devient une mémoire collective, avec des sources documentaires et des récits à mettre en perspective.`;
-    }
-
-    if (text.includes('migration') || text.includes('société') || text.includes('migrant')) {
-      const preset = visiblePresets[1];
-      return `Le parcours “${preset.title}” s’intéresse aux migrations et aux dynamiques sociales en Méditerranée. Il met en regard les trajectoires humaines, les décisions publiques et les effets sur les villes et les communautés.`;
-    }
-
-    if (text.includes('culture') || text.includes('cinéma') || text.includes('art')) {
-      const preset = visiblePresets[2];
-      return `Le parcours “${preset.title}” est centré sur la culture et les arts, notamment le cinéma tunisien et son influence mondiale. Il permet de suivre comment les œuvres racontent les idées et les tensions d’une époque.`;
-    }
-
-    if (text.includes('combien') || text.includes('nombre') || text.includes('parcours')) {
-      return `Le musée propose ${presets.length} parcours documentaires, consacrés à l'histoire, la société, la culture et aux transformations de la Tunisie.`;
-    }
-
-    if (text.includes('quelle') || text.includes('quoi') || text.includes('présente')) {
-      return `Le musée présente des récits documentaires et des regards d’agents spécialisés sur les grands sujets de notre époque : politique, société, culture, technologie et mémoire collective.`;
-    }
-
-    return `Le musée propose plusieurs parcours : ${visiblePresets.map(preset => `“${preset.title}”`).join(', ')}. Posez-moi une question sur l’un d’eux ou sur les archives.`;
   }
 
   function renderExhibitions() {
@@ -679,9 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     addChatMessage(question, 'user');
     chatInput.value = '';
-    setTimeout(() => {
-      addChatMessage(buildMuseumAnswer(question), 'assistant');
-    }, 180);
+    askMuseumAssistant(question);
   });
 
   addChatMessage('Bonjour ! Posez une question sur le musée, les expositions ou les thèmes abordés.');

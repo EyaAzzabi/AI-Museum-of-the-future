@@ -1124,6 +1124,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   align-self: flex-end;
   background: rgba(255,255,255,0.08);
 }
+.chat-message.error {
+  border: 1px solid rgba(225,178,145,.5);
+  color: #ffe6d8;
+}
 .chat-form {
   display: flex;
   gap: 10px;
