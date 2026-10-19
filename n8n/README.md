@@ -52,17 +52,29 @@ calls the Flask exhibition API on the same machine:
 2. Optional ingest sub-workflow (disabled by default).
 3. `POST /api/exhibition` → returns `run_id` (202).
 4. Poll `GET /api/exhibition/<run_id>` every 60 s until the exhibition is written.
-5. Summary node (title + section count) or failure branch.
+5. **Exhibition summary** builds museum halls from corpus images (no generation) and emits one item per artwork.
+6. **Only hall images** → **Download museum images** (HTTP file) so the final execution shows real **Binary image previews** in n8n.
+7. Failure branch if the run has no exhibition.
 
 Body example: `{ "country": "Tunisia", "year_from": 2020, "year_to": 2026, "review": true, "fact_check": true }`.
 Replay curator only: `{ "from_run": "20261015-113815-09c5e1" }`.
+
+**End of the workflow — see the museum (images)**
+
+In the execution of **Download museum images**, open the **Binary** tab: each artwork from the halls is a downloadable/visible image.
+
+The summary item also contains:
+
+- `museum_url` → `http://127.0.0.1:5000/virtual?run=<run_id>` (visite 3D, images sur les murs)
+- `halls_url` → `http://127.0.0.1:5000/?run=<run_id>&museum=1#exhibition` (plan des salles 2D)
+- `halls[]` → `{ hall, title, image_count, images[{ title, image_url }] }`
 
 **Run it**
 
 1. `python app.py` on port 5000 (needs LLM + Supabase keys for a full run).
 2. Import the JSON into n8n; keep one active workflow (delete duplicate imports).
 3. Use `127.0.0.1`, not `localhost` (n8n on Windows often resolves `localhost` to IPv6 `::1` while Flask listens on IPv4).
-4. Optional env: `EXHIBITION_API_URL`, `EXHIBITION_API_TOKEN`. Set `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` if `$env` is blocked.
+4. Optional env: `EXHIBITION_API_URL`, `EXHIBITION_WEB_URL`, `EXHIBITION_API_TOKEN`. Set `N8N_BLOCK_ENV_ACCESS_IN_NODE=false` if `$env` is blocked.
 
 ## Known issue: document identity differs from the Python pipeline
 

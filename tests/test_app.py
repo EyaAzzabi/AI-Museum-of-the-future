@@ -10,8 +10,19 @@ def test_museum_frontend_routes_and_assets():
     assert b'/web/pipeline-client.js' in response.data
     assert client.get('/web/visitor.css').status_code == 200
     assert client.get('/web/pipeline-client.js').status_code == 200
-    assert client.get('/visite-virtuelle').status_code == 200
-    assert b'/web/virtual.js' in client.get('/visite-virtuelle').data
+    # Protected routes redirect to login when anonymous
+    assert client.get('/visite-virtuelle').status_code == 302
+    assert client.get('/virtual').status_code == 302
+    assert client.get('/tableau-de-bord').status_code == 302
+    assert client.get('/connexion').status_code == 200
+    # Demo visitor login unlocks immersive visit + dashboard
+    logged = client.post('/connexion', data={
+        'username': 'visiteur', 'password': 'musee2126', 'next': '/visite-virtuelle',
+    }, follow_redirects=False)
+    assert logged.status_code == 302
+    virtual = client.get('/visite-virtuelle')
+    assert virtual.status_code == 200
+    assert b'/web/virtual.js' in virtual.data
     dashboard = client.get('/tableau-de-bord')
     assert dashboard.status_code == 200
     assert b'/web/styles.css' in dashboard.data
@@ -19,6 +30,7 @@ def test_museum_frontend_routes_and_assets():
     assert client.get('/web/styles.css').status_code == 200
     assert client.get('/web/app.js').status_code == 200
     assert client.get('/favicon.ico').status_code == 204
+    assert client.get('/api/me').get_json()['authenticated'] is True
 
 
 def test_validation_api_returns_steps():

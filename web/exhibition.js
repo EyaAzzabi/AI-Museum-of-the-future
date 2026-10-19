@@ -11,6 +11,7 @@ const els = {
   meta: $('exMeta'), title: $('exTitle'), concept: $('exConcept'), missing: $('exMissing'),
   sections: $('exSections'), reviewBox: $('exReviewBox'), agents: $('exAgents'),
   vision: $('exVision'), gallery: $('exGallery'),
+  museum: $('exMuseum'), museumNav: $('exMuseumNav'), museumHalls: $('exMuseumHalls'),
 };
 if (!els.run) return;
 
@@ -90,6 +91,7 @@ function follow(runId, replay = false) {
       setStatus('error', `Run <code>${esc(runId)}</code> introuvable (${status}).`);
       return;
     }
+    body.openMuseum = Boolean(body.exhibition);
     render(body);
     loadSaved(runId);
   };
@@ -132,14 +134,16 @@ els.replay.addEventListener('click', () => {
 
 els.load.addEventListener('click', async () => {
   if (!els.saved.value) return;
-  const { status, body } = await api(`/api/exhibition/${encodeURIComponent(els.saved.value)}`);
-  if (status === 200) render(body); else setStatus('error', esc(body.error || `Erreur ${status}`));
+  await loadRun(els.saved.value, { openMuseum: true });
 });
 
 els.latest.addEventListener('click', async () => {
   const { status, body } = await api('/api/exhibition/latest');
-  if (status === 200) { render(body); loadSaved(body.run_id); }
-  else setStatus('error', esc(body.error || `Erreur ${status}`));
+  if (status === 200) {
+    body.openMuseum = true;
+    render(body);
+    loadSaved(body.run_id);
+  } else setStatus('error', esc(body.error || `Erreur ${status}`));
 });
 
 function citeLinks(text, refs) {
@@ -198,6 +202,58 @@ function renderSections(sections) {
   }).join('');
 }
 
+/** One curator section → one museum hall; wall shows corpus images already on artifacts. */
+function renderMuseumHalls(sections) {
+  if (!els.museum || !els.museumHalls) return;
+  const rooms = (sections || []).map((s, i) => {
+    const withImg = [...new Map(
+      (s.artifacts || []).filter(a => safeUrl(a.image_url)).map(a => [a.id, a]),
+    ).values()];
+    return { index: i + 1, title: s.title || `Salle ${i + 1}`, narrative: s.narrative || '', items: withImg, fact: s.fact_check };
+  });
+  const withArt = rooms.filter(r => r.items.length);
+  if (!withArt.length) {
+    els.museum.classList.add('hidden');
+    els.museumHalls.innerHTML = '';
+    els.museumNav.innerHTML = '';
+    return;
+  }
+  els.museum.classList.remove('hidden');
+  els.museumNav.innerHTML = rooms.map(r =>
+    `<a class="ex-museum-nav-item${r.items.length ? '' : ' is-empty'}" href="#ex-hall-${r.index}">
+      Salle ${r.index}<span>${esc(r.title)}</span>
+      <em>${r.items.length ? `${r.items.length} œuvre(s)` : 'sans image'}</em>
+    </a>`).join('');
+  els.museumHalls.innerHTML = rooms.map(r => {
+    const wall = r.items.length
+      ? `<div class="ex-hall-wall">${r.items.map(a => `
+          <figure class="ex-hall-frame">
+            <a href="#ex-art-${esc(a.id)}">
+              <img src="${esc(safeUrl(a.image_url))}" alt="${esc(a.title || '')}" loading="lazy"
+                   onerror="this.closest('figure').remove()">
+            </a>
+            <figcaption>${esc(a.title || 'Sans titre')}${a.year != null ? ` · ${esc(a.year)}` : ''}</figcaption>
+          </figure>`).join('')}</div>`
+      : `<p class="ex-hall-empty">Aucune image dans cette salle — le récit reste dans la section ci-dessous.</p>`;
+    const plaque = (r.narrative || '').slice(0, 220);
+    return `
+      <article class="ex-hall" id="ex-hall-${r.index}">
+        <header class="ex-hall-door">
+          <span class="ex-hall-num">Salle ${r.index}</span>
+          <h4 class="ex-hall-name">${esc(r.title)}</h4>
+          ${factBadge(r.fact)}
+        </header>
+        ${wall}
+        ${plaque ? `<p class="ex-hall-plaque">${esc(plaque)}${r.narrative.length > 220 ? '…' : ''}</p>` : ''}
+      </article>`;
+  }).join('');
+}
+
+function scrollToMuseum() {
+  if (!els.museum || els.museum.classList.contains('hidden')) return;
+  requestAnimationFrame(() => els.museum.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+}
+
 function agentChips(agents) {
   return (agents || []).map(a => `<span class="ex-chip">${esc(AGENT_LABELS[a] || a)}</span>`).join('');
 }
@@ -248,7 +304,7 @@ function render(view) {
   const seen = images.filter(a => a.vision).length;
   const unique = [...new Map(images.filter(a => safeUrl(a.image_url)).map(a => [a.id, a])).values()];
   els.gallery.innerHTML = unique.length
-    ? `<div class="ex-gallery-label">🖼️ Les œuvres de l'exposition (${unique.length})</div><div class="ex-gallery-grid">` +
+    ? `<div class="ex-gallery-label">🖼️ Plan rapide · ${unique.length} œuvre(s) — voir les salles ci-dessous</div><div class="ex-gallery-grid">` +
       unique.map(a => `<a class="ex-gallery-item" href="#ex-art-${esc(a.id)}" title="${esc(a.title || '')}">
         <img src="${esc(safeUrl(a.image_url))}" alt="${esc(a.title || '')}" loading="lazy" onerror="this.parentElement.remove()">
         <span>${esc(a.title || '')}</span></a>`).join('') + '</div>'
@@ -263,16 +319,21 @@ function render(view) {
     els.concept.textContent = ex.concept;
     els.missing.innerHTML = ex.missing_perspectives.length
       ? `Perspectives absentes : ${agentChips(ex.missing_perspectives)}` : '';
+    renderMuseumHalls(ex.sections);
     renderSections(ex.sections);
     const ok = ex.sections.filter(s => s.fact_check && s.fact_check.supported === true).length;
     const checked = ex.sections.some(s => s.fact_check);
+    const halls = (ex.sections || []).filter(s => (s.artifacts || []).some(a => a.image_url)).length;
     setStatus('ok', `Exposition chargée : ${ex.sections.length} section(s)` +
+      (halls ? `, ${halls} salle(s) avec images` : '') +
       (checked ? `, ${ok}/${ex.sections.length} entièrement vérifiée(s).` : '.'));
+    if (view.openMuseum) scrollToMuseum();
   } else {
     els.title.textContent = 'Pas d\'exposition pour ce run';
     els.concept.textContent = 'Sélectionnez ce run et cliquez sur « Rejouer le curateur ».';
     els.missing.innerHTML = '';
     els.sections.innerHTML = '';
+    if (els.museum) { els.museum.classList.add('hidden'); els.museumHalls.innerHTML = ''; }
     if (view.run_id) els.saved.value = view.run_id;
     setStatus('error', view.cancelled
       ? 'Run arrêté. Les analyses déjà terminées sont sauvegardées.'
@@ -280,6 +341,17 @@ function render(view) {
   }
   renderReview(view.review || { agreements: [], tensions: [], weak_findings: [] });
   renderAgents(view.insights || {});
+}
+
+async function loadRun(runId, { openMuseum = false } = {}) {
+  const { status, body } = await api(`/api/exhibition/${encodeURIComponent(runId)}`);
+  if (status !== 200) {
+    setStatus('error', esc(body.error || `Erreur ${status}`));
+    return;
+  }
+  body.openMuseum = openMuseum;
+  render(body);
+  loadSaved(runId);
 }
 
 els.vision.addEventListener('click', async () => {
@@ -299,5 +371,19 @@ els.vision.addEventListener('click', async () => {
 document.querySelectorAll('.nav-item[data-section="exhibition"]').forEach(a =>
   a.addEventListener('click', () => loadSaved()));
 loadSaved();
+
+// Deep links from n8n:
+//   halls board: http://127.0.0.1:5000/?run=<id>&museum=1#exhibition
+//   3D visit:    http://127.0.0.1:5000/virtual?run=<id>
+(async () => {
+  const params = new URLSearchParams(location.search);
+  const runId = params.get('run');
+  const openMuseum = params.get('museum') === '1' || params.get('museum') === 'true';
+  if (!runId) return;
+  const nav = document.querySelector('.nav-item[data-section="exhibition"]');
+  if (nav) nav.click();
+  else location.hash = 'exhibition';
+  await loadRun(runId, { openMuseum });
+})();
 
 });

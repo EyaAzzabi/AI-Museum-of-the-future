@@ -115,7 +115,31 @@
     return toFrontendResult(body);
   }
 
+  async function loadRun(runId, onProgress = () => {}) {
+    if (!runId) return null;
+    const statusResponse = await fetch(`/api/exhibition/${encodeURIComponent(runId)}`);
+    const body = await readJson(statusResponse);
+    if (!statusResponse.ok) {
+      throw new Error(body.error || `Impossible de charger le run ${runId} (HTTP ${statusResponse.status}).`);
+    }
+    if (body.status === 'running') {
+      onProgress(body);
+      return followRun(runId, `/api/exhibition/${encodeURIComponent(runId)}`, onProgress);
+    }
+    if (body.status === 'failed' && hasSavedAgentEvidence(body)) return toFrontendResult(body);
+    if (body.status !== 'done' || !body.exhibition) {
+      throw new Error(body.error || 'Ce run n’a pas encore d’exposition complète.');
+    }
+    return toFrontendResult(body);
+  }
+
   async function loadExisting(onProgress = () => {}) {
+    const params = new URLSearchParams(window.location.search);
+    const requestedRun = params.get('run');
+    if (requestedRun) {
+      return loadRun(requestedRun, onProgress);
+    }
+
     const listResponse = await fetch('/api/exhibitions');
     const listing = await readJson(listResponse);
     if (!listResponse.ok) {
@@ -148,5 +172,5 @@
     return null;
   }
 
-  window.MuseumPipeline = { run, loadExisting };
+  window.MuseumPipeline = { run, loadExisting, loadRun };
 })();

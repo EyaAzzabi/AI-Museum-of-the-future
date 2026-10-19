@@ -8,7 +8,8 @@ POST /api/exhibition             start a run; 202 {"run_id", "status_url"}
 POST /api/exhibition/<run_id>/cancel   stop at the next step (finished steps stay saved)
 POST /api/exhibition/<run_id>/vision   describe the exhibition's images (vision.json)
 GET  /api/exhibition/<run_id>    status, then the exhibition
-GET  /api/exhibition/<run_id>/museum-image  reserved (404 until museum image is added)
+Museum halls live on the dashboard: /?run=<id>&museum=1#exhibition
+                                 (each section = one room; walls = corpus images)
 GET  /api/exhibition/latest      last complete exhibition
 GET  /api/exhibitions            saved runs, newest first
 

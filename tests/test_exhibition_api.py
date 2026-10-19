@@ -284,6 +284,16 @@ def test_n8n_workflow_targets_these_routes():
     assert loop == [{"node": "Wait 60 s", "type": "main", "index": 0}]
     assert all(node.get("webhookId") for node in workflow["nodes"] if node["type"] == "n8n-nodes-base.webhook")
     assert "localhost" not in urls
+    summary = next(n for n in workflow["nodes"] if n["name"] == "Exhibition summary")
+    assert summary["type"] == "n8n-nodes-base.code"
+    code = summary["parameters"]["jsCode"]
+    assert "museum_url" in code and "halls" in code and "/virtual?run=" in code
+    assert "_kind" in code and "image" in code
+    names = {node["name"] for node in workflow["nodes"]}
+    assert "Only hall images" in names and "Download museum images" in names
+    assert workflow["connections"]["Exhibition summary"]["main"][0][0]["node"] == "Only hall images"
+    download = next(n for n in workflow["nodes"] if n["name"] == "Download museum images")
+    assert download["parameters"]["options"]["response"]["response"]["responseFormat"] == "file"
 
 
 def test_dashboard_serves_the_exhibition_page():
@@ -292,8 +302,11 @@ def test_dashboard_serves_the_exhibition_page():
     client = create_app().test_client()
     html = client.get("/tableau-de-bord").get_data(as_text=True)
     assert 'id="section-exhibition"' in html and 'data-section="exhibition"' in html
+    assert 'id="exMuseum"' in html and 'id="exMuseumHalls"' in html
     assert "exhibition.js" in html
+    js = client.get("/web/exhibition.js").get_data(as_text=True)
     assert client.get("/web/exhibition.js").status_code == 200
+    assert "renderMuseumHalls" in js and "museum=1" in js
 
 
 def test_validation_lists_current_prompt_versions():

@@ -1,0 +1,327 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.4cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue!50!black,
+  citecolor=black
+}
+
+\setstretch{1.15}
+\setlist[itemize]{leftmargin=1.2em,itemsep=0.15em,topsep=0.25em}
+\setlist[enumerate]{leftmargin=1.4em,itemsep=0.15em,topsep=0.25em}
+\titleformat{\section}{\large\bfseries}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection.}{0.5em}{}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\scriptsize AI Museum of the Future}
+\fancyhead[R]{\scriptsize Technical report D1}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+
+\title{\textbf{AI Museum of the Future}\\[0.4em]
+\large Technical report (D1)\\[0.3em]
+\normalsize Multi-agent curation of a virtual exhibition for a visitor in 2126}
+\author{Team project --- ESPRIT / Deep Learning\\
+Focus period: Tunisia 2020--2026\\
+Draft based on repository measurements (October 2026)}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+\noindent
+This report describes an AI system that builds a virtual museum exhibition about our era as if curated one hundred years in the future. Public contemporary sources are collected, indexed with retrieval-augmented generation (RAG), analysed by five specialist agents (historian, sociologist, technology, culture\,\&\,art, visual), peer-reviewed, synthesised by a curator into four to six sections, and fact-checked. Image understanding supplies the mandatory multimodal component. The pipeline is exposed through a Flask API, a web Exposition page, and an n8n end-to-end workflow. Design choices for chunking and retrieval are measured; multimodal analysis exposes captions that contradict the image content.
+\end{abstract}
+
+\vspace{0.5em}
+\noindent\textbf{Keywords:} multi-agent systems, RAG, multimodal vision, n8n, museum curation, Tunisia 2020--2026.
+
+\tableofcontents
+\newpage
+
+%----------------------------------------------------------------------
+\section{Problem and concept}
+%----------------------------------------------------------------------
+
+\paragraph{Central question.}
+\textit{If a museum were created in 100 years to represent our time, what would it preserve, and how would it tell our story?}
+
+The system answers that question for a controlled period and place (default: \textbf{Tunisia, 2020--2026}). It does not predict future historians with certainty, crawl the entire Internet, train a foundation model, or build a full 3D/VR museum (out of scope for the five-week project).
+
+\paragraph{Why several agents instead of one prompt.}
+A single model asked to ``write an exhibition'' tends to invent details, blur perspectives, and hide disagreement. Specialists examine the \emph{same} evidence under distinct roles; the peer reviewer makes agreements and tensions explicit; the curator must cite chunk IDs; the fact-checker marks unsupported claims. Multi-agent design therefore improves transparency and grounding, not only style. It also matches the pedagogical goal of the course: separable, testable components (data, RAG, vision, prompts, automation) rather than one opaque generation step.
+
+\paragraph{Input / processing / output.}
+\begin{itemize}
+  \item \textbf{Input:} news and events, images, science, technology, social and cultural trends (public APIs).
+  \item \textbf{Processing:} cleaning, RAG retrieval, multimodal image analysis, specialised agents, cross-agent synthesis, curatorial selection.
+  \item \textbf{Output:} exhibition title and concept, 4--6 sections with narratives, selected artefacts with citations, visual presentation on a web page.
+\end{itemize}
+
+\paragraph{Scope (Week~1 brief).}
+In scope: controlled corpus, 4--5 specialists plus curator, RAG, image understanding, automated n8n workflow, final virtual exhibition with several sections. Out of scope: crawling the whole web, certainty about future historians, full VR museum, training a foundation model from scratch, unlimited data sources.
+
+%----------------------------------------------------------------------
+\section{Architecture}
+%----------------------------------------------------------------------
+
+\begin{enumerate}[leftmargin=1.6em]
+  \item \textbf{Public data layer} --- collectors for GDELT, Wikipedia/Wikidata, World Bank, arXiv, Wikimedia, Openverse, Met, Internet Archive, DBpedia, plus Tunisian full text.
+  \item \textbf{Knowledge layer} --- sentence chunking, local multilingual embeddings (384 dimensions), Supabase Postgres + pgvector (HNSW) and full-text search.
+  \item \textbf{Multimodal layer} --- vision LLM describes source images; descriptions are cached, logged, stored in document metadata and made searchable.
+  \item \textbf{Specialised agents} --- five perspectives in parallel, each with its own retrieval queries.
+  \item \textbf{Review, curation, fact-check} --- peer review; curator (4--6 sections, retries); fact-checker (section support + optional rewrite).
+  \item \textbf{Delivery} --- every run is saved under \texttt{runs/<run\_id>/run.json}; Flask API and Exposition UI; n8n orchestration.
+\end{enumerate}
+
+\paragraph{Models.}
+Embeddings: \texttt{paraphrase-multilingual-MiniLM-L12-v2} (local, free). Chat/vision: OpenAI-compatible provider (default Groq, e.g.\ \texttt{gpt-oss-120b} / vision-capable model). Configuration lives in \texttt{agents/llm\_config.py}.
+
+\paragraph{Run log.}
+Each execution writes \texttt{runs/<YYYYMMDD-HHMMSS-xxxxxx>/run.json} with events (\texttt{evidence}, \texttt{insight}, \texttt{abstain}, \texttt{images}, \texttt{review}, \texttt{result}, \ldots) and timings. A run can be scored offline (\texttt{evaluation.evaluate\_run}) or replayed (\texttt{from\_run}: curator + fact-check only, without re-calling the five specialists). This makes demos and debugging reproducible when the LLM quota is empty.
+
+\paragraph{Information flow (logical).}
+Collectors fill \texttt{documents}/\texttt{chunks}; each specialist retrieves with its own queries; the Visual agent adds \texttt{vision:} lines; the reviewer compares insights; the curator emits sections whose artefacts are chunk IDs; the API resolves those IDs to titles, URLs and \texttt{image\_url} for the Exposition page.
+
+%----------------------------------------------------------------------
+\section{Data and RAG (B5)}
+\label{sec:rag}
+%----------------------------------------------------------------------
+
+\subsection{Corpus}
+Sources are official public APIs only. An audit (2026-10-14) showed a knowledge base dominated by titles (median document length 68 characters) and only about 75 chunks mentioning Tunisia. Remediation included 92 Tunisian Wikipedia articles (EN/FR/AR, $\approx$1.9\,M characters) and full text for hundreds of news/archive items. After re-ingestion, chunks mentioning Tunisia rose from 75 to 3{,}747 (Latin) and from 6 to 1{,}417 (Arabic); total chunks from 7{,}296 to 16{,}994.
+
+\subsection{Chunking}
+The embedding model reads only its first \textbf{128 tokens}. With former 512-token chunks, 57\% of the text was invisible to vector search. Five strategies were compared on 23 passage-level questions (EN/FR/AR):
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lcccc}
+\toprule
+Strategy & Unseen text & hit@5 & MRR@10 \\
+\midrule
+fixed-512 (former) & 57\% & 0.52 & 0.40 \\
+recursive-600 & 6\% & 0.70 & 0.43 \\
+\textbf{sentence-128 + title (chosen)} & \textbf{0\%} & 0.65 & \textbf{0.47} \\
+\bottomrule
+\end{tabular}
+\caption{Chunking comparison (summary). Full table in \texttt{rag/README.md}.}
+\end{table}
+
+\noindent\textbf{Choice:} whole sentences packed to 128 tokens of the model's tokenizer, one-sentence overlap, document title as prefix.
+
+\subsection{Retrieval}
+Hybrid vector + Postgres full-text with reciprocal-rank fusion, year/country filters, statistics down-weighted, one chunk per document. Measured on 16 fixed queries, $k{=}5$ (2026-10-15):
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lccc}
+\toprule
+Method & precision@5 & hit@5 & MRR \\
+\midrule
+vector & 0.50 & 0.88 & 0.61 \\
+\textbf{hybrid (default)} & \textbf{0.70} & \textbf{1.00} & \textbf{0.94} \\
+hybrid + LLM rerank & 0.56 & 1.00 & 0.75 \\
+\bottomrule
+\end{tabular}
+\caption{Retrieval after new corpus and HNSW + full-text indexes.}
+\end{table}
+
+\noindent LLM reranking lowers quality and costs $\approx$24\,s per query; it is \textbf{off by default}. Indexing: HNSW (recall@10 $=$ 1.00 vs 0.67 for the former ivfflat setting on the measured sample). Full-text GIN index cut median keyword latency from hundreds of milliseconds to tens of milliseconds.
+
+\paragraph{Agent-side retrieval.}
+Beyond a shared candidate pool, each specialist searches with domain queries. The sociologist may use HyDE (Hypothetical Document Embeddings). Filters prefer in-country evidence but can relax when the country filter is too sparse, marking out-of-scope hits. Duplicate arXiv/news rows from parallel Python and n8n ingestion were removed with \texttt{rag.dedupe\_documents}.
+
+\paragraph{What to write for B5 in the oral.}
+Justify: (1) public APIs only; (2) 128-token window $\Rightarrow$ sentence packing; (3) hybrid over pure vector; (4) rerank off after a full measurement; (5) HNSW over ivfflat. Cite the numbers in the tables above.
+
+%----------------------------------------------------------------------
+\section{Multimodal image understanding (C4)}
+%----------------------------------------------------------------------
+
+Image understanding is the project's mandatory non-textual modality. The Visual agent does not invent pictures: it selects real source images and asks a vision model what they show.
+
+\paragraph{Pipeline.}
+\begin{enumerate}
+  \item Download with a descriptive User-Agent (Wikimedia returns HTTP 403 without one).
+  \item Vision LLM returns structured JSON (\texttt{objects}, \texttt{scene}, \texttt{description}, \texttt{tags}, \texttt{caption\_mismatch}).
+  \item Results are disk-cached, appended to evidence as \texttt{vision: \ldots}, recorded on the run's \texttt{images} event, written to \texttt{documents.metadata.vision\_*}, and appended as a searchable \texttt{Vision:} line on the chunk.
+  \item Hybrid retrieval surfaces \texttt{vision\_*} fields so every agent can use what the pixels show.
+\end{enumerate}
+
+\paragraph{Measured contribution.}
+Caption: ``Protest in Mexico City''. Vision: shirtless men in swim trunks on a road, cars, billboards---\textbf{no protest} (\texttt{caption\_mismatch}). Text-only RAG would trust the caption; multimodality exposes the contradiction. Similar mismatches appear when an economy article is illustrated with a banknote from another country, or when a climate label is only readable in the artwork itself. The Exposition page shows source images and ``Ce que l'IA voit''.
+
+\paragraph{Limits of the multimodal stack.}
+We embed the \emph{textual description} of the image in the same 384-d space as document chunks (not a separate CLIP image tower in pgvector). That is enough to search by visual content via keywords and vectors of the description, and stays compatible with the existing schema without a mass re-ingest. Only images actually analysed by the Visual agent (bounded by \texttt{VISUAL\_MAX\_IMAGES}) are written back to Supabase.
+
+%----------------------------------------------------------------------
+\section{Agents and prompt engineering}
+%----------------------------------------------------------------------
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+Agent & Role & Notes \\
+\midrule
+Historian & Socio-historical framing & Prompt versioned in \texttt{prompts/} \\
+Sociologist & Society / civic dynamics & HyDE on own search \\
+Technology & Tech / innovation (Tasnim) & Prompt v5, measured iterations \\
+Culture \& Art & Cultural production & Country-scoped evidence \\
+Visual & Image-led artefacts & Up to \texttt{VISUAL\_MAX\_IMAGES} visions/run \\
+Reviewer & Agreements / tensions / weak findings & Shared \\
+Curator & 4--6 sections, cited narrative & Shared \\
+Fact-checker & Section support vs evidence & Shared \\
+\bottomrule
+\end{tabular}
+\caption{Specialists and synthesis agents.}
+\end{table}
+
+\paragraph{Technology agent (Tasnim).}
+Techniques include role and scope, strict JSON, cited findings only, a finding budget (3--5 findings, at most 2 interpretations), and few-shot examples taken from live failures (e.g.\ inventing technology from a headline, guessing a place name). Iterations v3$\rightarrow$v4$\rightarrow$v5 were measured on real Supabase evidence: invented technologies and guessed names went to zero in the v4 samples; v5 hedges interpretations (``may suggest'') and forbids outcomes no source measures. A separate HTTP demo exists (\texttt{serve\_technology.py}, port 5002) and an n8n template. Details: \texttt{docs/technology/PROMPT\_LIBRARY\_TECHNOLOGY.md}.
+
+\paragraph{Shared design.}
+Every specialist searches the knowledge base with its own queries; findings without valid \texttt{[chunk\_id]} citations are dropped; with nothing left, the agent abstains and appears in \texttt{missing\_perspectives}. The curator may list missing perspectives explicitly so the exhibition does not silently invent a voice that failed.
+
+\paragraph{Prompt library.}
+Prompts are versioned under \texttt{prompts/} with change logs; the dashboard validation step lists the nine system/agent files and their current versions. Earlier iterations and before/after JSON dumps live under \texttt{evaluation/prompt\_iterations/}.
+
+%----------------------------------------------------------------------
+\section{Orchestration, web application and n8n}
+%----------------------------------------------------------------------
+
+\subsection{HTTP API (\texttt{exhibition\_api.py})}
+\begin{itemize}
+  \item \texttt{POST /api/exhibition} --- start a full run, or \texttt{from\_run} to replay curator + fact-check.
+  \item \texttt{POST /api/exhibition/<run\_id>/cancel} --- cooperative stop at the next step.
+  \item \texttt{POST /api/exhibition/<run\_id>/vision} --- describe remaining exhibition images.
+  \item \texttt{GET /api/exhibition/<run\_id>}, \texttt{/latest}, \texttt{GET /api/exhibitions}.
+\end{itemize}
+One run at a time (HTTP 409 otherwise). Optional \texttt{EXHIBITION\_API\_TOKEN}. Errors returned to clients are generic (provider details stay in the server log).
+
+\subsection{Exposition page}
+Route \texttt{http://127.0.0.1:5000/\#exhibition}: launch, follow, stop, load saved runs, replay curator, gallery of artefacts, fact-check badges, peer review and per-agent status.
+
+\subsection{n8n}
+Workflow \texttt{n8n/workflows/Exhibition\_pipeline\_end\_to\_end.json}: webhook or weekly schedule $\rightarrow$ optional ingest $\rightarrow$ start run $\rightarrow$ poll every 60\,s $\rightarrow$ summary or failure. Use \texttt{127.0.0.1} rather than \texttt{localhost} on Windows (IPv6 vs IPv4). The embedding path for the separate chunking workflow also calls \texttt{POST /api/embed} so n8n vectors stay comparable to Python ingestion. Documentation: \texttt{n8n/README.md}.
+
+\paragraph{Demo path (for D5).}
+(1) Show dashboard validation. (2) Open Exposition, load a saved Tunisia run. (3) Point to citations and images. (4) Open ``Ce que l'IA voit'' on a mismatched caption. (5) Optionally trigger n8n webhook or ``Rejouer le curateur''. Keep a precomputed run ready when the free LLM quota is exhausted.
+
+%----------------------------------------------------------------------
+\section{Evaluation}
+%----------------------------------------------------------------------
+
+\begin{itemize}
+  \item \textbf{Chunking / retrieval:} Section~\ref{sec:rag} tables (scripts under \texttt{evaluation/}).
+  \item \textbf{Saved runs:} \texttt{python -m evaluation.evaluate\_run runs/<run\_id>} (coverage, citation survival, fact-check support, timings). Optional \texttt{--judge} for faithfulness (needs LLM quota).
+  \item \textbf{Automated tests:} offline \texttt{pytest} suite (API, multimodal, RAG, agents). Live sociologist tests may be deselected when the free LLM quota is empty.
+\end{itemize}
+
+\paragraph{Reproduce.}
+\begin{verbatim}
+pip install -r requirements.txt
+cp .env.example .env          # own keys only
+python -m pytest -q --deselect \
+  tests/test_sociologist.py::TestSociologistLive
+python app.py                 # :5000/#exhibition
+\end{verbatim}
+
+%----------------------------------------------------------------------
+\section{Limits and next steps}
+%----------------------------------------------------------------------
+
+\begin{itemize}
+  \item \textbf{E1 --- Provider limits.} Free-tier tokens-per-minute can abort the curator rewrite after fact-check; the exhibition is kept without the rewrite.
+  \item \textbf{E2 --- Strict fact-check.} Often only a minority of sections are fully supported; the curator may need several attempts to reach 4--6 sections.
+  \item \textbf{E3/E4 --- Quality of specialist claims} still depends on each agent's prompt and evidence.
+  \item Tunisian precision remains below global hybrid precision; more local sources remain valuable.
+  \item \textbf{D5} --- 15-minute demo script; optional AI-generated museum-hall illustration (separate image credits).
+\end{itemize}
+
+\paragraph{Team principle.}
+Roles (data, RAG, multi-agent, multimodal, prompts/evaluation, n8n) are responsibility areas, not silos: every member should understand the full pipeline.
+
+\paragraph{Ownership of this report draft.}
+Sections~2, 4 (implementation), 5 (Technology), and~6 are primarily filled from Tasnim's branch work (exhibition API/UI, multimodal persistence, n8n end-to-end, Technology prompts). Sections~3 and~5 for other agents should be completed by the RAG owner and each specialist owner before the final submission. Section~7 should paste metrics from one agreed complete run.
+
+\vspace{1em}
+\noindent\textit{This PDF is generated from} \texttt{docs/report/REPORT\_D1.tex}.
+\textit{Source outline:} \texttt{docs/REPORT\_D1.md}.
+
+
+\section*{Appendix A --- File map}
+\begin{itemize}
+  \item \texttt{exhibition\_api.py} --- HTTP exhibition API (start, cancel, vision, list).
+  \item \texttt{web/exhibition.js}, \texttt{web/exhibition.css} --- Exposition UI.
+  \item \texttt{multimodal/analyze\_image.py}, \texttt{store\_vision.py} --- vision + C3 persistence.
+  \item \texttt{n8n/workflows/Exhibition\_pipeline\_end\_to\_end.json} --- automation.
+  \item \texttt{run\_exhibition.py} --- CLI full pipeline / \texttt{--from-run}.
+  \item \texttt{evaluation/evaluate\_retrieval.py}, \texttt{compare\_chunking.py}, \texttt{evaluate\_run.py}.
+\end{itemize}
+
+\section*{Appendix B --- Example API body}
+\begin{verbatim}
+POST /api/exhibition
+{
+  "country": "Tunisia",
+  "year_from": 2020,
+  "year_to": 2026,
+  "review": true,
+  "fact_check": true
+}
+\end{verbatim}
+Replay curator only:
+\begin{verbatim}
+{ "from_run": "20261015-113815-09c5e1", "fact_check": true }
+\end{verbatim}
+
+\section*{Appendix C --- Multimodal checklist (C1--C3)}
+\begin{enumerate}
+  \item \textbf{C1 --- Analyze:} download with a browser-like User-Agent; reject non-image MIME types; call Groq vision with a structured JSON schema (caption, objects, scene, text\_in\_image, confidence).
+  \item \textbf{C2 --- Cache:} disk cache keyed by image URL/hash so re-runs and peer review do not re-bill the vision API.
+  \item \textbf{C3 --- Persist:} write \texttt{vision\_*} fields into \texttt{documents.metadata}; prepend a searchable \texttt{Vision:} line into chunk content so hybrid retrieval can surface visual context even when the Wikimedia caption is wrong or incomplete.
+\end{enumerate}
+\paragraph{Mexico-style mismatch.}
+When the caption says one thing and the pixels show another, the Exposition UI exposes ``Ce que l'IA voit'' so the visitor (and the fact-checker) can compare caption vs.\ vision description.
+
+\section*{Appendix D --- Suggested run metrics to paste for Section~7}
+Before the final PDF submission, replace placeholders with one agreed complete Tunisia run:
+\begin{itemize}
+  \item Run id, wall-clock duration, specialist timings.
+  \item Number of sections after curator (target 4--6).
+  \item Fact-check supported / unsupported counts.
+  \item Citation survival (sections still citing retrieved chunks).
+  \item Number of images with vision metadata shown in Exposition.
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{w1} AI Museum of the Future --- Week~1 brief (use case, scope, roles, n8n, architecture).
+\bibitem{rag} Project file \texttt{rag/README.md} --- measured chunking and retrieval results.
+\bibitem{mm} Project file \texttt{multimodal/README.md} --- vision pipeline and Mexico caption case.
+\bibitem{tech} \texttt{docs/technology/PROMPT\_LIBRARY\_TECHNOLOGY.md} --- Technology prompt iterations.
+\end{thebibliography}
+
+\end{document}

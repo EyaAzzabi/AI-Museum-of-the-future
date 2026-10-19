@@ -192,17 +192,53 @@
     {
       "id": "ex-ok",
       "name": "Exhibition summary",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
       "position": [1920, 40],
       "parameters": {
-        "assignments": {
-          "assignments": [
-            { "id": "1", "name": "run_id", "value": "={{ $json.run_id }}", "type": "string" },
-            { "id": "2", "name": "title", "value": "={{ $json.exhibition.title }}", "type": "string" },
-            { "id": "3", "name": "sections", "value": "={{ $json.exhibition.sections.length }}", "type": "number" },
-            { "id": "4", "name": "status", "value": "success", "type": "string" }
-          ]
+        "jsCode": "const base = ($env.EXHIBITION_WEB_URL || $env.EXHIBITION_API_URL || 'http://127.0.0.1:5000').replace(/\\/$/, '');\nconst runId = $json.run_id;\nconst ex = $json.exhibition || {};\nconst sections = ex.sections || [];\nconst halls = sections.map((s, i) => {\n  const images = (s.artifacts || [])\n    .filter(a => a && a.image_url)\n    .map(a => ({ id: a.id, title: a.title || '', image_url: a.image_url, year: a.year ?? null }));\n  return {\n    hall: i + 1,\n    title: s.title || `Salle ${i + 1}`,\n    image_count: images.length,\n    images,\n  };\n});\nconst imageTotal = halls.reduce((n, h) => n + h.image_count, 0);\nconst museumUrl = `${base}/virtual?run=${encodeURIComponent(runId)}`;\nconst hallsUrl = `${base}/?run=${encodeURIComponent(runId)}&museum=1#exhibition`;\nconst out = [{\n  json: {\n    _kind: 'summary',\n    status: 'success',\n    run_id: runId,\n    title: ex.title || '',\n    concept: ex.concept || '',\n    sections: sections.length,\n    halls_with_images: halls.filter(h => h.image_count > 0).length,\n    image_total: imageTotal,\n    halls,\n    museum_url: museumUrl,\n    halls_url: hallsUrl,\n    note: 'museum_url opens the 3D visit with corpus images on the walls. Next nodes download those images so they appear as Binary in this execution.',\n  },\n}];\nlet n = 0;\nfor (const h of halls) {\n  for (const img of h.images) {\n    if (n >= 8) break;\n    out.push({\n      json: {\n        _kind: 'image',\n        run_id: runId,\n        hall: h.hall,\n        hall_title: h.title,\n        title: img.title || `Oeuvre ${n + 1}`,\n        image_url: img.image_url,\n        museum_url: museumUrl,\n      },\n    });\n    n += 1;\n  }\n  if (n >= 8) break;\n}\nreturn out;"
+      }
+    },
+    {
+      "id": "ex-only-images",
+      "name": "Only hall images",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2,
+      "position": [2160, 40],
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict" },
+          "conditions": [
+            {
+              "id": "is-image",
+              "leftValue": "={{ $json._kind }}",
+              "rightValue": "image",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "ex-download-img",
+      "name": "Download museum images",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2400, 40],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.image_url }}",
+        "options": {
+          "timeout": 45000,
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "file",
+              "outputPropertyName": "data",
+              "neverError": true
+            }
+          }
         }
       }
     },
@@ -265,6 +301,12 @@
         [{ "node": "Exhibition summary", "type": "main", "index": 0 }],
         [{ "node": "Run failed", "type": "main", "index": 0 }]
       ]
+    },
+    "Exhibition summary": {
+      "main": [[{ "node": "Only hall images", "type": "main", "index": 0 }]]
+    },
+    "Only hall images": {
+      "main": [[{ "node": "Download museum images", "type": "main", "index": 0 }]]
     }
   },
   "settings": { "executionOrder": "v1" },

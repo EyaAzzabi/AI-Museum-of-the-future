@@ -14,7 +14,8 @@ const sectionTitles = {
   data:     'Données',
   agents:   'Agents',
   exhibition: 'Exposition',
-  historian:'Test Historian Agent',
+  agentlab: 'Agent lab',
+  historian:'Agent lab',
   prompts:  'Prompts',
   tests:    'Tests',
 };
@@ -342,15 +343,58 @@ navItems.forEach(item => {
   });
 });
 
-// Delegate click on "Tester l'agent" from Agent cards
+const AGENT_LAB = {
+  historian:   { label: 'Historian',   file: 'agents/historian.py',   prompt: 'prompts/historian.md',   author: 'Eya Idi' },
+  sociologist: { label: 'Sociologist', file: 'agents/sociologist.py', prompt: 'prompts/sociologist.md', author: 'Eya Rachdi' },
+  technology:  { label: 'Technology',  file: 'agents/technology.py',  prompt: 'prompts/technology.md',  author: 'Tasnim' },
+  culture_art: { label: 'Culture & Art', file: 'agents/culture_art.py', prompt: 'prompts/culture_art.md', author: 'Sarah' },
+  visual:      { label: 'Visual',      file: 'agents/visual.py',      prompt: 'prompts/visual.md',      author: 'Team' },
+};
+let currentLabAgent = 'historian';
+
+// Delegate click on "Test agent" from Agent cards
 document.addEventListener('click', e => {
   const btn = e.target.closest('.btn-test-agent');
   if (btn && btn.dataset.target) {
+    if (btn.dataset.agent) selectLabAgent(btn.dataset.agent);
     activateSection(btn.dataset.target);
   }
 });
 
-// ── Historian Agent Playground Controller ──────────────────────────────────
+function selectLabAgent(name) {
+  if (!AGENT_LAB[name]) return;
+  currentLabAgent = name;
+  const meta = AGENT_LAB[name];
+  const file = document.getElementById('agentLabFile');
+  const prompt = document.getElementById('agentLabPrompt');
+  const resultName = document.getElementById('agentLabResultName');
+  const runLabel = document.getElementById('agentLabRunLabel');
+  if (file) file.textContent = meta.file;
+  if (prompt) prompt.textContent = meta.prompt;
+  if (resultName) resultName.textContent = meta.label;
+  if (runLabel) runLabel.textContent = `Run ${meta.label} analysis`;
+  document.querySelectorAll('#agentLabTabs .btn-preset').forEach(b => {
+    b.classList.toggle('active', b.dataset.agent === name);
+  });
+}
+
+function renderAgentLabTabs() {
+  const tabs = document.getElementById('agentLabTabs');
+  if (!tabs) return;
+  tabs.innerHTML = '';
+  Object.entries(AGENT_LAB).forEach(([key, meta]) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-preset' + (key === currentLabAgent ? ' active' : '');
+    btn.dataset.agent = key;
+    btn.textContent = meta.label;
+    btn.addEventListener('click', () => selectLabAgent(key));
+    tabs.appendChild(btn);
+  });
+  selectLabAgent(currentLabAgent);
+}
+
+// ── Agent Lab Playground Controller (all specialists) ──────────────────────
 let historianPresets = [];
 let currentChunks = [];
 
@@ -396,7 +440,7 @@ function renderPresetsList() {
       <span class="preset-badge">${escHtml(p.category)}</span>
     `;
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
+      historianPresetsContainer.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       selectPreset(idx);
     });
@@ -473,7 +517,10 @@ if (btnRunHistorian) {
     historianLoadingStatus.classList.remove('hidden');
 
     try {
-      const res = await fetch('/api/historian/analyze', {
+      const endpoint = currentLabAgent === 'historian'
+        ? '/api/historian/analyze'
+        : `/api/agents/${encodeURIComponent(currentLabAgent)}/analyze`;
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chunks: currentChunks }),
@@ -551,6 +598,7 @@ if (btnToggleJson) {
 }
 
 // Charger les presets Historian
+renderAgentLabTabs();
 loadHistorianPresets();
 
 // Auto-run on load

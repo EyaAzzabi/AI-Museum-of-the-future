@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Connexion — Musée du futur</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='visitor.css') }}?v=5" />
+    <style>
+      .auth-page {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 2rem 1rem;
+        background:
+          radial-gradient(ellipse at 20% 10%, rgba(180,140,90,.18), transparent 45%),
+          linear-gradient(160deg, #f5f2eb 0%, #e8e2d6 55%, #ddd4c4 100%);
+      }
+      .auth-card {
+        width: min(420px, 100%);
+        background: #fffdf8;
+        border: 1px solid rgba(40, 32, 20, .12);
+        border-radius: 18px;
+        padding: 2rem 1.6rem 1.6rem;
+        box-shadow: 0 24px 60px rgba(40, 30, 15, .12);
+      }
+      .auth-card h1 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 1.7rem;
+        margin: 0 0 .4rem;
+        color: #1d1812;
+      }
+      .auth-card .lede {
+        margin: 0 0 1.4rem;
+        color: #6a5e4e;
+        line-height: 1.5;
+        font-size: .95rem;
+      }
+      .auth-card label {
+        display: block;
+        font-size: .78rem;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        color: #7a6d5c;
+        margin: .9rem 0 .35rem;
+      }
+      .auth-card input {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid rgba(40,32,20,.18);
+        border-radius: 10px;
+        padding: .75rem .9rem;
+        font-size: 1rem;
+        background: #fff;
+        color: #1d1812;
+      }
+      .auth-card button {
+        margin-top: 1.3rem;
+        width: 100%;
+        border: 0;
+        border-radius: 999px;
+        padding: .85rem 1rem;
+        background: #1d1812;
+        color: #f7f1e6;
+        font-size: .95rem;
+        cursor: pointer;
+      }
+      .auth-error {
+        margin: 0 0 1rem;
+        padding: .7rem .8rem;
+        border-radius: 10px;
+        background: #f8e6e2;
+        color: #8a2f22;
+        font-size: .9rem;
+      }
+      .auth-hint {
+        margin: 1.1rem 0 0;
+        padding: .8rem .9rem;
+        border-radius: 10px;
+        background: #f0ebe1;
+        color: #5c5144;
+        font-size: .82rem;
+        line-height: 1.45;
+      }
+      .auth-hint code {
+        font-family: ui-monospace, Consolas, monospace;
+        background: rgba(0,0,0,.06);
+        padding: .1rem .35rem;
+        border-radius: 4px;
+      }
+      .auth-back {
+        display: inline-block;
+        margin-top: 1rem;
+        color: #6a5e4e;
+        font-size: .88rem;
+      }
+    </style>
+  </head>
+  <body class="auth-page">
+    <form class="auth-card" method="post" action="{{ url_for('login') }}">
+      <h1>Connexion visiteur</h1>
+      <p class="lede">Accédez à la visite immersive et au tableau de bord du musée.</p>
+      {% if error %}
+      <p class="auth-error">{{ error }}</p>
+      {% endif %}
+      <input type="hidden" name="next" value="{{ next }}" />
+      <label for="username">Identifiant</label>
+      <input id="username" name="username" autocomplete="username" required autofocus />
+      <label for="password">Mot de passe</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+      <button type="submit">Entrer dans le musée</button>
+      <p class="auth-hint">
+        Compte démo (soutenance)&nbsp;:<br />
+        identifiant <code>visiteur</code> · mot de passe <code>musee2126</code>
+      </p>
+      <a class="auth-back" href="/">← Retour à l’accueil public</a>
+    </form>
+  </body>
+</html>

@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="{{ url_for('static', filename='virtual.css') }}?v=6" />
-    <script src="{{ url_for('static', filename='pipeline-client.js') }}?v=3" defer></script>
+    <script src="{{ url_for('static', filename='pipeline-client.js') }}?v=4" defer></script>
     <script type="importmap">
       {
         "imports": {
@@ -27,7 +27,11 @@
         <span>AI MUSEUM <small>OF THE FUTURE</small></span>
       </a>
       <div class="virtual-header-label"><span></span> VISITE IMMERSIVE · TUNISIE, 2126</div>
-      <a class="virtual-back-link" href="/">← Retour au musée</a>
+      <div style="display:flex;gap:12px;align-items:center">
+        {% if user %}<span style="font-size:.78rem;opacity:.75">{{ user }}</span>
+        <a class="virtual-back-link" href="/deconnexion">Déconnexion</a>{% endif %}
+        <a class="virtual-back-link" href="/">← Retour au musée</a>
+      </div>
     </header>
 
     <main id="virtualMuseum" class="virtual-layout">

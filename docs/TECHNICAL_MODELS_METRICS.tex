@@ -1,0 +1,419 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue!50!black}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small AI Museum of the Future}
+\fancyhead[R]{\small Technical reference --- models, metrics, hyperparameters}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\title{\textbf{AI Museum of the Future}\\[0.4em]
+\large Technical reference: models, hyperparameters, metrics\\
+and end-to-end path to the museum exhibition}
+\author{Team project --- ESPRIT / Deep Learning\\
+\textit{Document for oral defence (professor)}}
+\date{October 2026}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+\noindent
+This note lists every major model used (or planned) in the project, the
+hyperparameters that control retrieval and agents, the measured metrics, and
+the full pipeline from archival documents to a curated museum exhibition.
+\textbf{Deployed today:} text LLM (Groq), local embeddings (MiniLM), vision
+understanding (Qwen). \textbf{Image generation} is not in production; we
+document \textbf{Flux.1} as the technical candidate for optional hall
+illustrations.
+\end{abstract}
+
+\tableofcontents
+\vspace{1em}
+
+%% =====================================================================
+\section{End-to-end path: from request to museum}
+%% =====================================================================
+
+The system turns a visitor (or curator) request into a multi-section exhibition
+grounded in documentary evidence.
+
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+  \item \textbf{Input.} Country / year range / topic (default Tunisia, 2020--2026),
+        via Flask dashboard, visitor UI, or n8n webhook.
+  \item \textbf{Knowledge base.} Documents collected, chunked, embedded, stored in
+        Supabase (Postgres + pgvector + full-text search).
+  \item \textbf{Hybrid RAG.} For each specialist: vector search + keyword search,
+        fused, filtered, diversified; optional LLM rerank (off by default).
+  \item \textbf{Five specialists (parallel).} Historian, Sociologist, Technology,
+        Culture~\&~Art, Visual --- each with its own search queries and prompt.
+  \item \textbf{Multimodal (Visual).} Up to $N$ images are described by a vision
+        model; descriptions become evidence lines \texttt{vision:\ldots}.
+  \item \textbf{Governance.} Peer reviewer $\rightarrow$ Curator (4--6 sections)
+        $\rightarrow$ Fact-checker (unsupported claims trigger one curator rewrite).
+  \item \textbf{Persistence.} Run saved as \texttt{runs/<run\_id>/run.json}
+        (prompts, evidence, insights, timings).
+  \item \textbf{Experience layer.} Exposition page, visitor 3D halls (corpus
+        \texttt{image\_url} on walls), optional n8n delivery / Binary image nodes.
+\end{enumerate}
+
+\begin{center}
+\small
+\texttt{collectors $\rightarrow$ chunking $\rightarrow$ MiniLM embeddings $\rightarrow$ Supabase}\\[2pt]
+\texttt{$\downarrow$ hybrid retrieval}\\[2pt]
+\texttt{5 specialists (+ vision for Visual) $\rightarrow$ review $\rightarrow$ curator $\rightarrow$ fact-check}\\[2pt]
+\texttt{$\downarrow$}\\[2pt]
+\texttt{Flask / visitor UI / n8n $\rightarrow$ museum exhibition}
+\end{center}
+
+%% =====================================================================
+\section{Models catalogue}
+%% =====================================================================
+
+\subsection{Models deployed in the running system}
+
+\begin{longtable}{@{}p{3.2cm}p{4.2cm}p{2.2cm}p{5.2cm}@{}}
+\toprule
+\textbf{Role} & \textbf{Model / component} & \textbf{Provider} & \textbf{Env / notes} \\
+\midrule
+\endhead
+Text generation \& reasoning (all specialists + reviewer + curator + fact-checker by default) &
+\texttt{openai/gpt-oss-120b} &
+Groq (OpenAI-compatible API) &
+\texttt{LLM\_MODEL}; \texttt{LLM\_BASE\_URL=https://api.groq.com/openai/v1} \\
+\addlinespace
+Optional stronger curator &
+same or override &
+Groq / other &
+\texttt{CURATOR\_MODEL} \\
+\addlinespace
+Vision / multimodal \textbf{understanding} &
+\texttt{qwen/qwen3.8-27b} &
+Groq (vision-capable) &
+\texttt{VISION\_MODEL}; describes real corpus images \\
+\addlinespace
+Optional retrieval rerank &
+defaults to \texttt{LLM\_MODEL} &
+same &
+\texttt{RERANK\_MODEL}; off by default in agent searches \\
+\addlinespace
+Embeddings (local) &
+\texttt{paraphrase-multilingual-MiniLM-L12-v2} &
+FastEmbed (on-device) &
+384 dimensions; $\sim$120\,MB download once; no API key \\
+\addlinespace
+Vector DB &
+pgvector in Supabase &
+Supabase &
+\texttt{vector(384)}; RPC \texttt{match\_chunks} + FTS \\
+\addlinespace
+Orchestration &
+n8n workflow &
+self-hosted / cloud &
+start $\rightarrow$ poll $\rightarrow$ summary / museum URLs \\
+\addlinespace
+Application &
+Flask + static frontends &
+Python &
+visitor, dashboard, Agent lab, exposition API \\
+\bottomrule
+\end{longtable}
+
+\subsection{Image generation candidate (not deployed): Flux.1}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Name:} Flux.1 (Black Forest Labs) --- modern text-to-image model.
+  \item \textbf{Role in our architecture (planned / oral answer):} optional
+        \emph{illustration} of museum halls or atmospheric panels when no corpus
+        photo exists --- always labelled as generated, never mixed silently with
+        documentary evidence.
+  \item \textbf{Why Flux.1 is a good technical answer:} strong prompt adherence
+        and image quality vs older Stable Diffusion baselines; available via API
+        or GPU inference; industry-standard choice in 2025--2026 demos.
+  \item \textbf{How Flux.1 works (high level):}
+        \begin{enumerate}[nosep]
+          \item Encode the text prompt (and optional style constraints).
+          \item Sample from noise in a latent space.
+          \item Iteratively transform / denoise (flow-matching / diffusion-family
+                dynamics) toward an image matching the prompt.
+          \item Decode the latent to a pixel image.
+        \end{enumerate}
+  \item \textbf{Why we do not use it in production today:} free-tier credits,
+        documentary integrity (museum of memory prefers real \texttt{image\_url}),
+        and multimodal priority = \emph{understanding} captions vs pixels.
+\end{itemize}
+
+\noindent\textit{One-line oral answer:}
+``For generation we would use Flux.1; for understanding we already use Qwen vision;
+today the walls show real archive images.''
+
+%% =====================================================================
+\section{What each agent does (same LLM, different prompts)}
+%% =====================================================================
+
+All specialists share \texttt{agents/base\_agent.py}: gather evidence $\rightarrow$
+LLM call (JSON) $\rightarrow$ citation filter $\rightarrow$ insight or abstain.
+
+\begin{longtable}{@{}p{2.6cm}p{3.4cm}p{8.5cm}@{}}
+\toprule
+\textbf{Agent} & \textbf{Model} & \textbf{Focus / special knobs} \\
+\midrule
+\endhead
+Historian & \texttt{LLM\_MODEL} & Timelines, events, long memory; may write in French. \\
+Sociologist & \texttt{LLM\_MODEL} & Society, lifestyles; own search + \textbf{HyDE} (hypothetical document expansion, cached under \texttt{HYDE\_CACHE\_DIR}). \\
+Technology & \texttt{LLM\_MODEL} & Innovations, tools, implications; dedicated search queries \& prompt v5. \\
+Culture \& Art & \texttt{LLM\_MODEL} & Arts, media, symbols; category-aware search. \\
+Visual & \texttt{LLM\_MODEL} + \texttt{VISION\_MODEL} & Images first: describe up to \texttt{VISUAL\_MAX\_IMAGES} (default 3), then interpret. Search category \texttt{image}. \\
+Peer reviewer & \texttt{LLM\_MODEL} & Agreements, tensions, weak findings across insights. \\
+Curator & \texttt{LLM\_MODEL} or \texttt{CURATOR\_MODEL} & Title, concept, 4--6 sections, artifacts from specialists only; one retry with feedback on validation failure. \\
+Fact-checker & \texttt{LLM\_MODEL} & Narrative vs cited evidence; unsupported $\rightarrow$ one curator rewrite. \\
+\bottomrule
+\end{longtable}
+
+\noindent\textbf{Hard citation rule:} every finding must contain at least one
+\texttt{[chunk\_id]} present in that agent's evidence; uncited findings are
+dropped; if none remain, the agent abstains and appears in
+\texttt{missing\_perspectives}.
+
+%% =====================================================================
+\section{Hyperparameters and configuration knobs}
+%% =====================================================================
+
+\subsection{LLM / runtime}
+
+\begin{tabular}{@{}llp{7.5cm}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Default} & \textbf{Effect} \\
+\midrule
+\texttt{LLM\_MODEL} & \texttt{openai/gpt-oss-120b} & Text reasoning / generation \\
+\texttt{VISION\_MODEL} & \texttt{qwen/qwen3.8-27b} & Image understanding \\
+\texttt{CURATOR\_MODEL} & (unset $=$ LLM) & Optional stronger curator \\
+\texttt{LLM\_MAX\_CONCURRENCY} & 3 & Parallel LLM calls (TPM-friendly) \\
+\texttt{LLM\_ATTEMPTS} & 4 & Retries with provider-aware wait \\
+Response format & JSON object & Structured agent outputs \\
+Specialist timeout & 120\,s (often 400\,s free tier) & Pipeline \texttt{--timeout} \\
+Full run LLM calls & $\sim$15--20 & Quota planning on Groq free tier \\
+\bottomrule
+\end{tabular}
+
+\subsection{Embeddings \& chunking}
+
+\begin{tabular}{@{}llp{7.5cm}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Default / choice} & \textbf{Rationale} \\
+\midrule
+Embedding model & MiniLM multilingual L12 & Multilingual FR/EN/AR corpus \\
+Dimension & 384 & Matches \texttt{vector(384)} schema \\
+Effective window & 128 tokens & Model ignores tokens beyond 128 \\
+Chunking strategy & Sentence packing to 128 + title prefix & Chosen over fixed-512 (57\% text unseen) \\
+Chunking MRR@10 (selection) & 0.47 & Passage-level offline comparison \\
+\bottomrule
+\end{tabular}
+
+\subsection{Hybrid retrieval (\texttt{SearchConfig})}
+
+\begin{tabular}{@{}llp{7.2cm}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Default} & \textbf{Meaning} \\
+\midrule
+\texttt{candidate\_pool} & 40 & Candidates per channel before fuse/filter \\
+\texttt{statistics\_weight} & 0.35 & Down-weight World Bank-style stats rows \\
+\texttt{max\_statistics} & 1 & At most one stats row in a result set \\
+\texttt{duplicate\_threshold} & 0.6 & Token Jaccard near-duplicate cut \\
+\texttt{rerank\_pool} & 20 & Candidates sent to LLM reranker \\
+\texttt{relax\_country} & true & Top-up outside country if too few hits \\
+\texttt{rerank\_agent\_searches} & false & LLM rerank off for agent own-search \\
+Default year filter & 2020--2026 & Exhibition default window \\
+\texttt{keep\_undated} & true & Many docs lack \texttt{published\_at} \\
+Result diversity & 1 chunk / document & Avoid same-doc flooding \\
+\bottomrule
+\end{tabular}
+
+\subsection{Multimodal}
+
+\begin{tabular}{@{}llp{7.5cm}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Default} & \textbf{Meaning} \\
+\midrule
+\texttt{VISUAL\_MAX\_IMAGES} & 3 & Vision LLM calls per Visual run \\
+Download User-Agent & required & Wikimedia returns 403 without it \\
+Cache & \texttt{multimodal/cache/} & Avoid re-describing same URL \\
+Output & structured JSON + text line & Fed as \texttt{vision:} evidence; optional DB \texttt{vision\_*} \\
+\bottomrule
+\end{tabular}
+
+\subsection{Curator validation}
+
+\begin{itemize}[nosep]
+  \item Section count must be in $[4,6]$.
+  \item Non-empty title / concept / narratives.
+  \item Artifacts must come from specialists (no invented items).
+  \item One retry with explicit feedback; then \texttt{CuratorValidationError}.
+\end{itemize}
+
+\subsection{Flux.1 (if enabled later) --- typical generation knobs}
+
+\begin{tabular}{@{}llp{7.2cm}@{}}
+\toprule
+\textbf{Knob} & \textbf{Typical range} & \textbf{Role} \\
+\midrule
+Prompt (+ negative) & free text & Subject, style, documentary vs illustrative \\
+Steps / guidance & model-dependent & Quality vs latency / cost \\
+Resolution & e.g.\ 1024$\times$1024 & Hall panel size \\
+Seed & fixed for demos & Reproducibility \\
+\label & ``AI illustration'' & Ethics / museum honesty \\
+\bottomrule
+\end{tabular}
+
+%% =====================================================================
+\section{Metrics and evaluation results}
+%% =====================================================================
+
+\subsection{Retrieval (documented in \texttt{evaluation/})}
+
+Test set: \textbf{16 queries}, $k=5$, term-rule relevance proxy
+(\texttt{retrieval\_cases.json}).
+
+\paragraph{Run 2026-10-14 (README table --- often cited in pitch).}
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Method & Precision@5 & Hit@5 & MRR & Stats share \\
+\midrule
+Vector only & 0.41 & 0.75 & 0.52 & 0.11 \\
+Hybrid & 0.68 & 0.94 & 0.83 & 0.00 \\
+Hybrid + LLM rerank & \textbf{0.72} & \textbf{1.00} & \textbf{0.92} & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Update 2026-10-15 (full reranks completed).}
+Vector $0.50 / 0.88 / 0.61$; hybrid $0.70 / 1.00 / 0.94$; hybrid+rerank
+$0.56 / 1.00 / 0.75$. With every rerank executed, reranking \textbf{hurt}
+precision --- hence \textbf{rerank off by default}.
+
+\paragraph{Metric definitions.}
+\begin{itemize}[nosep]
+  \item \textbf{Precision@$k$:} fraction of top-$k$ results that match relevance rules.
+  \item \textbf{Hit@$k$:} fraction of queries with $\ge 1$ relevant result in top-$k$.
+  \item \textbf{MRR:} mean of $1/\text{rank}$ of the first relevant result.
+\end{itemize}
+
+\noindent\textit{Caveat:} Tunisia-specific precision stays low ($\sim$0.2--0.4): few
+Tunisia chunks ($\sim$75, many statistics). Better retrieval cannot invent missing archives.
+
+\subsection{Chunking selection}
+
+Offline comparison on long documents / passage questions (EN/FR/AR): sentence packing
+to the embedder's 128-token window + title prefix selected (MRR@10 $\approx 0.47$
+in D1 draft notes).
+
+\subsection{Exhibition run metrics (\texttt{evaluate\_run})}
+
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+\textbf{Metric} & \textbf{Meaning} \\
+\midrule
+coverage & Specialists with cited findings / 5 \\
+abstained / errors & No valid citations / provider timeout \\
+findings\_dropped\_uncited & Guardrail: uncited claims removed \\
+citation\_survival & kept / (kept + dropped) \\
+own\_search\_results\_per\_agent & Evidence each agent retrieved itself \\
+review\_* & Peer-review agreements, tensions, weak findings \\
+fact\_check\_supported & Sections fully supported by cited text \\
+faithfulness (\texttt{--judge}) & LLM judge: finding supported by its citations \\
+llm\_calls / timings\_s & Cost and latency of the run \\
+\bottomrule
+\end{tabular}
+
+\subsection{Multimodal qualitative metric}
+
+Caption ``Protest in Mexico City'' vs vision: beach/road scene, no protest
+$\rightarrow$ \texttt{caption\_mismatch}. Demonstrates why vision understanding
+matters beyond text RAG.
+
+%% =====================================================================
+\section{Multimodal module --- image understanding (not generation)}
+%% =====================================================================
+
+\begin{enumerate}[leftmargin=*]
+  \item Read \texttt{image\_url} from document metadata.
+  \item Download image (browser User-Agent).
+  \item Call \texttt{VISION\_MODEL} $\rightarrow$ structured JSON description.
+  \item Disk-cache; attach \texttt{vision:} line to Visual evidence.
+  \item Optionally write \texttt{vision\_*} into Supabase so hybrid search can
+        match visual content, not only captions.
+\end{enumerate}
+
+\noindent Exposition UI can show ``what the AI sees'' via
+\texttt{POST /api/exhibition/<run\_id>/vision}.
+
+%% =====================================================================
+\section{Orchestration and museum delivery}
+%% =====================================================================
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Flask API:} start / cancel / poll / list runs; vision describe;
+        Agent lab \texttt{POST /api/agents/<name>/analyze}.
+  \item \textbf{n8n:} \texttt{Exhibition\_pipeline\_end\_to\_end.json} ---
+        webhook/schedule $\rightarrow$ start pipeline $\rightarrow$ poll
+        ($\sim$60\,s) $\rightarrow$ summary + museum / halls URLs; Binary
+        download of corpus images for walls.
+  \item \textbf{Visitor UX:} warm public frontend + 3D rooms (specialist
+        galleries) + immersive visit; login for protected routes
+        (demo \texttt{visiteur} / \texttt{musee2126}).
+  \item \textbf{Dashboard:} Agent lab (test each specialist), exhibition board,
+        data browser.
+\end{itemize}
+
+%% =====================================================================
+\section{Trust, security, and limits}
+%% =====================================================================
+
+\begin{itemize}[leftmargin=*]
+  \item Traceability via mandatory \texttt{[chunk\_id]} citations.
+  \item Structured JSON + curator / fact-check validators.
+  \item Secrets in \texttt{.env} (never committed); optional Bearer tokens for APIs.
+  \item Free-tier TPM can block curator rewrite after fact-check.
+  \item Citation $\neq$ proof: relevance and fact-check remain necessary.
+  \item Image generation (Flux.1) kept optional to protect documentary honesty.
+\end{itemize}
+
+%% =====================================================================
+\section{Quick oral cheat-sheet}
+%% =====================================================================
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Text brain:} Groq \texttt{gpt-oss-120b}.
+  \item \textbf{Memory:} MiniLM 384-d + Supabase hybrid RAG.
+  \item \textbf{Eyes:} Qwen vision --- understand photos.
+  \item \textbf{Paintbrush (future):} Flux.1 --- generate illustrations only.
+  \item \textbf{Best retrieval numbers to quote carefully:} hybrid+rerank
+        0.72 / 1.00 / 0.92 (14 Oct) \emph{or} hybrid 0.70 / 1.00 / 0.94 with
+        rerank off (15 Oct finding).
+  \item \textbf{Museum result:} 4--6 curated sections + corpus images on walls,
+        not AI-invented history.
+\end{enumerate}
+
+\vspace{1.5em}
+\noindent\rule{\textwidth}{0.4pt}\\
+{\small\textit{Sources in repository:} \texttt{README.md}, \texttt{agents/llm\_config.py},
+\texttt{rag/vector\_store/hybrid\_retriever.py}, \texttt{multimodal/README.md},
+\texttt{evaluation/README.md}, \texttt{docs/REPORT\_D1.md}. Confirm live
+\texttt{.env} model names before the defence if the team changed providers.}
+
+\end{document}

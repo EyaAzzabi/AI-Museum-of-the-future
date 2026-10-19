@@ -7,7 +7,8 @@ from typing import Any
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
+from functools import wraps
 
 from agents.base_agent import InsightObject
 from agents.historian import HistorianAgent
@@ -196,7 +197,20 @@ def _historian_presets() -> list[dict[str, Any]]:
 
 def create_app() -> Flask:
     app = Flask(__name__, static_folder="web", template_folder="web")
+    app.secret_key = os.getenv("FLASK_SECRET_KEY", "ai-museum-demo-secret-change-me")
+    # Demo visitor account for the public UI (soutenance). Override via env if needed.
+    demo_user = os.getenv("DEMO_USERNAME", "visiteur")
+    demo_password = os.getenv("DEMO_PASSWORD", "musee2126")
     app.register_blueprint(create_exhibition_blueprint())
+
+    def _login_required(view):
+        @wraps(view)
+        def wrapped(*args: Any, **kwargs: Any):
+            if session.get("user"):
+                return view(*args, **kwargs)
+            nxt = request.full_path if request.query_string else request.path
+            return redirect(url_for("login", next=nxt.rstrip("?")))
+        return wrapped
 
     def _result(name: str, ok: bool, detail: str) -> dict[str, Any]:
         return {"name": name, "ok": ok, "detail": detail}
@@ -251,19 +265,64 @@ def create_app() -> Flask:
 
     @app.get("/")
     def index() -> str:
-        return render_template("visitor.html")
+        return render_template("visitor.html", user=session.get("user"))
+
+    @app.get("/connexion")
+    @app.get("/login")
+    def login() -> Any:
+        if session.get("user"):
+            return redirect(request.args.get("next") or url_for("virtual_museum"))
+        return render_template(
+            "login.html",
+            error=None,
+            next=request.args.get("next") or "/visite-virtuelle",
+        )
+
+    @app.post("/connexion")
+    @app.post("/login")
+    def login_post() -> Any:
+        username = (request.form.get("username") or "").strip()
+        password = request.form.get("password") or ""
+        nxt = request.form.get("next") or "/visite-virtuelle"
+        if username == demo_user and password == demo_password:
+            session["user"] = username
+            if not nxt.startswith("/"):
+                nxt = "/visite-virtuelle"
+            return redirect(nxt)
+        return render_template(
+            "login.html",
+            error="Identifiant ou mot de passe incorrect.",
+            next=nxt,
+        ), 401
+
+    @app.get("/deconnexion")
+    @app.get("/logout")
+    def logout() -> Any:
+        session.clear()
+        return redirect(url_for("index"))
 
     @app.get("/visite-virtuelle")
+    @app.get("/virtual")
+    @_login_required
     def virtual_museum() -> str:
-        return render_template("virtual.html")
+        return render_template("virtual.html", user=session.get("user"))
 
     @app.get("/tableau-de-bord")
+    @app.get("/dashboard")
+    @_login_required
     def dashboard() -> str:
-        return render_template("index.html")
+        return render_template("index.html", user=session.get("user"))
 
     @app.get("/favicon.ico")
     def favicon() -> tuple[str, int]:
         return "", 204
+
+    @app.get("/api/me")
+    def whoami() -> Any:
+        user = session.get("user")
+        if not user:
+            return jsonify({"authenticated": False}), 401
+        return jsonify({"authenticated": True, "user": user})
 
     @app.get("/api/historian/presets")
     def get_historian_presets() -> Any:
@@ -322,12 +381,10 @@ def create_app() -> Flask:
 
         return jsonify({"ok": True, "answer": answer, "model": get_model()})
 
-    @app.post("/api/historian/analyze")
-    def analyze_historian() -> Any:
-        data = request.get_json(silent=True) or {}
-        raw_chunks = data.get("chunks", [])
-
+    def _chunks_from_payload(raw_chunks: Any) -> list[RetrievalResult]:
         chunks: list[RetrievalResult] = []
+        if not isinstance(raw_chunks, list):
+            return chunks
         for i, c in enumerate(raw_chunks):
             if isinstance(c, dict):
                 cid = str(c.get("chunk_id") or f"c_{i+1}")
@@ -338,6 +395,66 @@ def create_app() -> Flask:
                 chunks.append(RetrievalResult(chunk_id=cid, document_id=did, content=cnt, metadata=meta, similarity=sim))
             elif isinstance(c, str):
                 chunks.append(RetrievalResult(chunk_id=f"c_{i+1}", document_id=f"doc_{i+1}", content=c, metadata={}, similarity=0.9))
+        return chunks
+
+    def _build_specialist(name: str):
+        from agents.culture_art import CultureArtAgent
+        from agents.sociologist import SociologistAgent
+        from agents.technology import TechnologyAgent
+        from agents.visual import VisualAgent
+        client = build_llm_client()
+        agents = {
+            "historian": HistorianAgent,
+            "sociologist": SociologistAgent,
+            "technology": TechnologyAgent,
+            "culture_art": CultureArtAgent,
+            "visual": VisualAgent,
+        }
+        cls = agents.get(name)
+        if cls is None:
+            return None
+        return cls(openai_client=client)
+
+    @app.post("/api/agents/<agent_name>/analyze")
+    def analyze_specialist(agent_name: str) -> Any:
+        """Run one specialist on provided chunks (dashboard agent lab)."""
+        if agent_name not in {"historian", "sociologist", "technology", "culture_art", "visual"}:
+            return jsonify({"ok": False, "error": f"Unknown agent '{agent_name}'."}), 404
+        data = request.get_json(silent=True) or {}
+        chunks = _chunks_from_payload(data.get("chunks", []))
+        if not chunks:
+            return jsonify({"ok": False, "error": "No documents/chunks provided for analysis."}), 400
+        if not (os.getenv("LLM_API_KEY") or os.getenv("GROQ_API_KEY")):
+            return jsonify({
+                "ok": False,
+                "error": "LLM_API_KEY is missing in .env — required to run specialist agents.",
+            }), 503
+        agent = _build_specialist(agent_name)
+        try:
+            insight = agent.run(chunks)
+        except Exception as exc:  # noqa: BLE001
+            return jsonify({"ok": False, "error": f"LLM provider rejected the request: {exc}"}), 502
+        return jsonify({
+            "ok": True,
+            "mode": "live",
+            "model": get_model(),
+            "agent": agent_name,
+            "insight": {
+                "agent": insight.agent,
+                "perspective": insight.perspective,
+                "key_findings": insight.key_findings,
+                "selected_artifacts": insight.selected_artifacts,
+            },
+            "grounded_artifacts": insight.selected_artifacts,
+            "input_chunk_ids": [c.chunk_id for c in chunks],
+        })
+
+    @app.post("/api/historian/analyze")
+    def analyze_historian() -> Any:
+        data = request.get_json(silent=True) or {}
+        raw_chunks = data.get("chunks", [])
+
+        chunks = _chunks_from_payload(raw_chunks)
 
         if not chunks:
             return jsonify({"ok": False, "error": "Aucun document ou chunk fourni pour l'analyse historique."}), 400

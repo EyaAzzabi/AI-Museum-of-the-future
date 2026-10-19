@@ -36,15 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatInput = document.getElementById('chatInput');
 
   const pageSize = 9;
+  // Visitor gallery: the five specialists only (pipeline roles are not visitor rooms).
+  // Visual room removed from this front carousel (cool/blue gallery tile) — still available in /visite-virtuelle + pipeline.
   const museumRooms = [
     { agent: 'historian', icon: '◷', label: 'Historien', title: 'Le temps long', description: 'Relie les événements d’aujourd’hui aux transformations qui façonneront la mémoire de demain.', focus: 'Événements, mémoire collective et perspectives à cent ans.' },
     { agent: 'sociologist', icon: '◎', label: 'Sociologue', title: 'Vies en mouvement', description: 'Observe comment les sociétés changent, s’organisent et répondent aux défis de leur temps.', focus: 'Identités, modes de vie et transformations sociales.' },
     { agent: 'technology', icon: '⌘', label: 'Technologies', title: 'Le monde de demain', description: 'Explore les innovations qui transforment déjà notre façon de vivre et d’imaginer le futur.', focus: 'Sciences, inventions et effets des technologies.' },
     { agent: 'culture_art', icon: '✳', label: 'Culture & arts', title: 'L’esprit d’une époque', description: 'Met en lumière les œuvres, les symboles et les récits qui donnent forme à notre culture.', focus: 'Arts, médias, expressions et héritages culturels.' },
-    { agent: 'visual', icon: '◉', label: 'Agent visuel', title: 'Voir notre monde', description: 'Étudie les images et les objets visuels qui rendent notre époque tangible aux visiteurs.', focus: 'Images, esthétique et culture visuelle.' },
-    { agent: 'reviewer', icon: '⇄', label: 'Relecture croisée', title: 'Les idées en dialogue', description: 'Compare les interprétations des spécialistes, leurs accords et leurs désaccords.', focus: 'Points communs, tensions et qualité des preuves.' },
-    { agent: 'curator', icon: '⌂', label: 'Conservateur', title: 'Composer le parcours', description: 'Relie les cinq regards en un récit cohérent et transforme les archives en exposition.', focus: 'Curation de récits accessibles et reliés aux sources.' },
-    { agent: 'fact_checker', icon: '✓', label: 'Vérificateur', title: 'Vérifier les traces', description: 'Contrôle que les récits du musée restent fidèles aux documents qui les étayent.', focus: 'Vérification des faits et des citations des archives.' },
   ];
   let records = [];
   let filteredRecords = [];
@@ -140,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!Number.isInteger(index)) return;
     currentRoom = (index + museumRooms.length) % museumRooms.length;
     const room = museumRooms[currentRoom];
-    museumWorld.style.setProperty('--world-rotation', `${-currentRoom * 45}deg`);
+    museumWorld.style.setProperty('--world-rotation', `${-currentRoom * 90}deg`);
     museumWorld.querySelectorAll('[data-room]').forEach(button => {
       const isCurrent = Number(button.dataset.room) === currentRoom;
       button.classList.toggle('is-current', isCurrent);

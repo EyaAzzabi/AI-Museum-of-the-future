@@ -27,8 +27,14 @@
         <a href="#collection">La collection</a>
         <a href="#historien">Le regard de 2126</a>
         <a href="#apropos">Le musée</a>
+        {% if user %}
+        <a href="/tableau-de-bord">Tableau de bord</a>
+        <a href="/deconnexion">Déconnexion ({{ user }})</a>
+        {% else %}
+        <a href="/connexion">Connexion</a>
+        {% endif %}
       </nav>
-      <a class="header-visit" href="/visite-virtuelle">Entrer dans le musée <span aria-hidden="true">↗</span></a>
+      <a class="header-visit" href="{% if user %}/visite-virtuelle{% else %}/connexion?next=/visite-virtuelle{% endif %}">Entrer dans le musée <span aria-hidden="true">↗</span></a>
     </header>
 
     <main>

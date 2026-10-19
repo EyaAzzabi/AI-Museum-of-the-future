@@ -545,7 +545,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   box-shadow: 0 16px 35px rgba(7,14,9,.42), inset 0 0 30px rgba(226,209,169,.05);
   cursor: pointer;
   text-align: left;
-  transform: translate(-50%, -50%) rotateY(calc(var(--room-index) * 45deg)) translateZ(350px);
+  transform: translate(-50%, -50%) rotateY(calc(var(--room-index) * 90deg)) translateZ(280px);
   transform-style: preserve-3d;
   backface-visibility: hidden;
   transition: filter .35s, border-color .35s, box-shadow .35s;
@@ -1222,7 +1222,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .about-section { grid-template-columns: 55px 1.1fr .8fr; gap: 35px; }
   .virtual-museum { padding-right: 40px; padding-left: 40px; }
   .museum-visit { grid-template-columns: minmax(0, 1.45fr) minmax(240px, .8fr); }
-  .room-card { width: 215px; height: 276px; transform: translate(-50%, -50%) rotateY(calc(var(--room-index) * 45deg)) translateZ(305px); }
+  .room-card { width: 215px; height: 276px; transform: translate(-50%, -50%) rotateY(calc(var(--room-index) * 90deg)) translateZ(305px); }
 }
 @media (max-width: 760px) {
   html { scroll-padding-top: 68px; }
@@ -1301,7 +1301,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
   .museum-scene { height: clamp(350px, 100vw, 435px); }
   .museum-guide { min-height: 410px; padding: 25px 22px 22px; border-top: 1px solid rgba(225,215,188,.18); border-left: 0; }
   .guide-icon { margin-top: 22px; }
-  .room-card { width: 220px; height: 273px; transform: translate(-50%, -50%) rotateY(calc(var(--room-index) * 45deg)) translateZ(285px); }
+  .room-card { width: 220px; height: 273px; transform: translate(-50%, -50%) rotateY(calc(var(--room-index) * 90deg)) translateZ(285px); }
   .museum-scene-caption { font-size: .43rem; }
   .team-grid { grid-template-columns: 1fr; }
   .about-section { grid-template-columns: 40px 1fr; gap: 26px; padding: 72px 25px; }
